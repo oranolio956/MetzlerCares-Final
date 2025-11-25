@@ -61,23 +61,30 @@ const WorldMap: React.FC<{ activeTx: string | null }> = ({ activeTx }) => {
        // Draw Pulse if active
        if (activeTx && !isCalmMode) {
           const time = Date.now() / 1000;
-          const px = (dots[Math.floor(time * 10) % dots.length].x / 100) * w;
-          const py = (dots[Math.floor(time * 10) % dots.length].y / 100) * h;
-          
-          // Rings
-          for(let i=0; i<3; i++) {
-             ctx.beginPath();
-             ctx.arc(px, py, (i * 10) + (Math.sin(time * 5) * 5), 0, Math.PI * 2);
-             ctx.strokeStyle = `rgba(45, 156, 142, ${1 - (i * 0.3)})`;
-             ctx.lineWidth = 1;
-             ctx.stroke();
+          const targetDot = dots[Math.floor(time * 10) % dots.length];
+          if (targetDot) {
+            const px = (targetDot.x / 100) * w;
+            const py = (targetDot.y / 100) * h;
+            
+            // Rings
+            for(let i=0; i<3; i++) {
+               ctx.beginPath();
+               // Ensure radius is positive to avoid IndexSizeError
+               // Shift base size up and reduce amplitude of sine wave relative to base
+               const radius = Math.max(0.1, (i * 10) + 6 + (Math.sin(time * 5) * 4));
+               
+               ctx.arc(px, py, radius, 0, Math.PI * 2);
+               ctx.strokeStyle = `rgba(45, 156, 142, ${1 - (i * 0.3)})`;
+               ctx.lineWidth = 1;
+               ctx.stroke();
+            }
+            
+            // Center
+            ctx.beginPath();
+            ctx.arc(px, py, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#2D9C8E';
+            ctx.fill();
           }
-          
-          // Center
-          ctx.beginPath();
-          ctx.arc(px, py, 4, 0, Math.PI * 2);
-          ctx.fillStyle = '#2D9C8E';
-          ctx.fill();
        }
     };
 
