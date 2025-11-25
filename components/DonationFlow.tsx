@@ -1,41 +1,10 @@
+
 import React, { useState, useEffect, useMemo, memo } from 'react';
 import { ArrowRight, ShieldCheck, TrendingUp, Lock, Printer, CreditCard, Bus, Laptop, Home, Target, Activity, Zap, Apple, Pill, FileBadge, Smartphone, Shirt, Briefcase, Smile, Package, Building, Utensils, Sparkles, FileText, HardHat } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { PaymentModal } from './PaymentModal';
 import { useStore } from '../context/StoreContext';
 import { useSound } from '../hooks/useSound';
-
-// --- SUB-COMPONENT: SCRAMBLE TEXT EFFECT ---
-const ScrambleText: React.FC<{ text: string; className?: string; active: boolean }> = memo(({ text = "", className, active }) => {
-  const [display, setDisplay] = useState(text || "");
-  const chars = "1234567890"; 
-
-  useEffect(() => {
-    const safeText = text || "";
-    if (!active || !safeText) {
-      setDisplay(safeText);
-      return;
-    }
-
-    let iteration = 0;
-    const interval = setInterval(() => {
-      setDisplay(prev => 
-        safeText.split("").map((char, index) => {
-          if (index < iteration) return safeText[index];
-          if (char === '.' || char === ',' || char === '$') return char;
-          return chars[Math.floor(Math.random() * chars.length)];
-        }).join("")
-      );
-
-      if (iteration >= safeText.length) clearInterval(interval);
-      iteration += 1 / 2;
-    }, 30);
-
-    return () => clearInterval(interval);
-  }, [text, active]);
-
-  return <span className={`${className} font-mono tracking-wider`}>{display}</span>;
-});
 
 // --- SUB-COMPONENT: MARKET SPARKLINE ---
 const MarketSparkline: React.FC<{ color: string; seed: number }> = memo(({ color, seed }) => {
@@ -283,7 +252,6 @@ export const DonationFlow: React.FC = () => {
   const [selectedImpact, setSelectedImpact] = useState(IMPACT_LEVELS[0]);
   const [multiplier, setMultiplier] = useState(1);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [scrambleTrigger, setScrambleTrigger] = useState(false);
   const [txId, setTxId] = useState("#TX-9921");
   const [idleMascot, setIdleMascot] = useState(false);
 
@@ -345,14 +313,9 @@ export const DonationFlow: React.FC = () => {
   }, [selectedImpact, multiplier]);
 
   useEffect(() => {
-    if (!isCalmMode) {
-      setScrambleTrigger(true);
-      const t = setTimeout(() => setScrambleTrigger(false), 500);
-      const id = Math.floor(Math.random() * 90000) + 10000;
-      setTxId(`#TX-${id}`);
-      return () => clearTimeout(t);
-    }
-  }, [selectedImpact, multiplier, isCalmMode]);
+    const id = Math.floor(Math.random() * 90000) + 10000;
+    setTxId(`#TX-${id}`);
+  }, [selectedImpact, multiplier]);
 
   const handleSliderChange = (val: number) => {
     setMultiplier(val);
@@ -462,7 +425,7 @@ export const DonationFlow: React.FC = () => {
         <div className="lg:col-span-8 flex flex-col gap-6">
             
             {/* SECTOR SELECTOR */}
-            <div className="flex flex-wrap gap-2 md:gap-4 p-2 bg-brand-navy/5 rounded-2xl overflow-x-auto">
+            <div className="flex flex-wrap gap-2 md:gap-4 p-2 bg-brand-navy/5 rounded-2xl overflow-x-auto no-scrollbar">
                {SECTORS.map((sector) => {
                   const Icon = sector.icon;
                   const isActive = activeSector === sector.id;
@@ -485,7 +448,7 @@ export const DonationFlow: React.FC = () => {
 
             {/* ASSET GRID */}
             <div 
-              className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[200px]" 
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[200px]" 
               role="radiogroup" 
               aria-label="Investment Asset Class"
             >
@@ -543,7 +506,7 @@ export const DonationFlow: React.FC = () => {
               })}
             </div>
 
-            <div className="bg-white border-2 border-brand-navy/5 rounded-[3rem] p-8 md:p-12 shadow-xl relative overflow-hidden flex-grow flex flex-col justify-center">
+            <div className="bg-white border-2 border-brand-navy/5 rounded-[3rem] p-6 md:p-12 shadow-xl relative overflow-hidden flex-grow flex flex-col justify-center">
                <div className={`absolute -right-20 -bottom-20 opacity-[0.03] pointer-events-none transition-all duration-1000 ${idleMascot ? 'translate-y-[-20px] rotate-6 opacity-10' : 'rotate-12'}`}>
                   <Mascot 
                     variant={selectedImpact.variant} 
@@ -553,7 +516,7 @@ export const DonationFlow: React.FC = () => {
                </div>
 
                <div className="relative z-10">
-                  <div className="flex flex-col md:flex-row gap-12 items-center">
+                  <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
                      <div className="flex-1 w-full">
                         <div className="flex justify-between items-end mb-8">
                            <div>
@@ -624,7 +587,7 @@ export const DonationFlow: React.FC = () => {
                               </p>
                            </div>
                            <div className="sm:ml-auto md:hidden pt-2 sm:pt-0 border-t sm:border-t-0 border-brand-navy/10 w-full sm:w-auto">
-                              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40">Total</span>
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy">Total</span>
                               <div className="text-xl font-display font-bold text-brand-teal tabular-nums">
                                  ${totalAmount}
                               </div>
@@ -660,7 +623,7 @@ export const DonationFlow: React.FC = () => {
                               <span className="block text-[10px] text-brand-navy/40 font-normal">{selectedImpact.sub}</span>
                            </span>
                            <span className="text-brand-navy font-bold">
-                             $<ScrambleText text={totalAmount.toFixed(2)} active={scrambleTrigger} />
+                             ${totalAmount.toFixed(2)}
                            </span>
                         </div>
                         <div className="flex justify-between items-center text-brand-navy/40">
@@ -676,7 +639,7 @@ export const DonationFlow: React.FC = () => {
                         <div className="flex justify-between items-end">
                            <span className="font-bold text-xl text-brand-navy">TOTAL</span>
                            <span className="font-display font-bold text-4xl text-brand-navy">
-                              $<ScrambleText text={totalAmount.toFixed(2)} active={scrambleTrigger} />
+                              ${totalAmount.toFixed(2)}
                            </span>
                         </div>
                      </div>

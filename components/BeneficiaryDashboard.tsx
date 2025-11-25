@@ -30,22 +30,22 @@ export const BeneficiaryDashboard: React.FC = () => {
     <div className="w-full max-w-6xl mx-auto animate-float" style={{ animationDuration: '0.8s', animationIterationCount: 1 }}>
       
       {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row items-end gap-6 mb-12">
-        <div className="bg-brand-navy text-white p-8 rounded-[2.5rem] rounded-bl-none shadow-xl flex-1 relative overflow-hidden">
+      <div className="flex flex-col lg:flex-row items-end gap-6 mb-12">
+        <div className="bg-brand-navy text-white p-6 md:p-8 rounded-[2.5rem] rounded-bl-none shadow-xl flex-1 relative overflow-hidden w-full">
            {/* Decorative circles */}
            <div className="absolute top-[-50px] right-[-50px] w-40 h-40 bg-brand-teal opacity-20 rounded-full blur-2xl"></div>
            
            <div className="relative z-10">
              <div className="flex items-center gap-4 mb-2">
-               <h2 className="font-display font-bold text-4xl">Welcome home, {beneficiaryProfile.name}.</h2>
-               <Mascot expression="happy" className="w-12 h-12" />
+               <h2 className="font-display font-bold text-3xl md:text-4xl">Welcome home, {beneficiaryProfile.name}.</h2>
+               <Mascot expression="happy" className="w-10 h-10 md:w-12 md:h-12 shrink-0" />
              </div>
-             <p className="text-brand-lavender text-lg">Your recovery is the priority. We handle the logistics.</p>
+             <p className="text-brand-lavender text-base md:text-lg">Your recovery is the priority. We handle the logistics.</p>
            </div>
         </div>
 
         {/* Milestone Tracker */}
-        <div className="bg-white border-4 border-brand-teal p-6 rounded-[2.5rem] rounded-br-none shadow-xl min-w-[280px]">
+        <div className="bg-white border-4 border-brand-teal p-6 rounded-[2.5rem] rounded-br-none shadow-xl w-full lg:w-auto lg:min-w-[280px]">
            <div className="flex items-center justify-between mb-2">
              <span className="text-xs font-bold uppercase tracking-widest text-brand-navy/60">Sober Streak</span>
              <Star className="text-brand-yellow fill-brand-yellow" size={20} />
@@ -70,9 +70,9 @@ export const BeneficiaryDashboard: React.FC = () => {
            </h3>
            
            {beneficiaryProfile.requests.map((req) => (
-             <div key={req.id} className="group bg-white p-6 rounded-3xl border-2 border-brand-navy/5 hover:border-brand-navy transition-all hover:shadow-[4px_4px_0px_0px_rgba(26,42,58,1)] flex items-center justify-between">
+             <div key={req.id} className="group bg-white p-6 rounded-3xl border-2 border-brand-navy/5 hover:border-brand-navy transition-all hover:shadow-[4px_4px_0px_0px_rgba(26,42,58,1)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getStatusColor(req.status)}`}>
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${getStatusColor(req.status)}`}>
                     {getStatusIcon(req.status)}
                   </div>
                   <div>
@@ -82,9 +82,9 @@ export const BeneficiaryDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
                   {req.status === 'action_needed' && (
-                    <button className="bg-brand-coral text-brand-navy px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-brand-coral/80 transition-colors">
+                    <button className="bg-brand-coral text-brand-navy px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-brand-coral/80 transition-colors w-full sm:w-auto justify-center">
                       <UploadCloud size={16} />
                       {req.note}
                     </button>
@@ -116,7 +116,7 @@ export const BeneficiaryDashboard: React.FC = () => {
            
            <div className="bg-brand-cream p-6 rounded-3xl border border-brand-navy/10">
               <div className="flex items-start gap-4 mb-6">
-                 <Calendar className="text-brand-navy" />
+                 <Calendar className="text-brand-navy shrink-0" />
                  <div>
                    <h4 className="font-bold text-brand-navy">Upcoming Meeting</h4>
                    <p className="text-sm text-brand-navy/60">Tuesday, 7:00 PM</p>
@@ -128,11 +128,11 @@ export const BeneficiaryDashboard: React.FC = () => {
               <h5 className="font-bold text-sm text-brand-navy mb-3">Community Updates</h5>
               <ul className="space-y-3">
                 <li className="text-sm text-brand-navy/70 flex items-start gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-coral mt-1.5"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-coral mt-1.5 shrink-0"></span>
                   New job workshop this Saturday
                 </li>
                 <li className="text-sm text-brand-navy/70 flex items-start gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-teal mt-1.5"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-teal mt-1.5 shrink-0"></span>
                   Grocery pantry restocked
                 </li>
               </ul>

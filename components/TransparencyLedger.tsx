@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { ShieldCheck, Lock, ArrowDownLeft, FileText, ExternalLink, Filter, MapPin, Globe, Check } from 'lucide-react';
 import { LedgerItem } from '../types';
@@ -218,7 +219,7 @@ export const TransparencyLedger: React.FC = () => {
                     
                     {/* Time */}
                     <div className="col-span-2 flex flex-row md:flex-col justify-between md:justify-start">
-                        <span className="md:hidden text-xs font-bold text-brand-navy/30">Time</span>
+                        <span className="md:hidden text-xs font-bold text-brand-navy/30 uppercase tracking-widest">Time</span>
                         <div>
                            <span className="font-mono font-bold text-brand-navy text-sm">{item.timestamp.split(',')[1]}</span>
                            <span className="text-xs text-brand-navy/40 ml-2 md:ml-0">{item.timestamp.split(',')[0]}</span>
@@ -226,21 +227,24 @@ export const TransparencyLedger: React.FC = () => {
                     </div>
 
                     {/* Vendor */}
-                    <div className="col-span-3 flex flex-row md:flex-col justify-between md:justify-start gap-3">
-                         <div className="flex items-center gap-3">
-                            <div className="hidden md:flex w-8 h-8 rounded-full bg-brand-navy/5 items-center justify-center text-brand-navy group-hover:bg-brand-navy group-hover:text-white transition-colors shrink-0">
-                                <ArrowDownLeft size={14} />
-                            </div>
-                            <div>
-                                <span className="block font-bold text-brand-navy text-sm text-right md:text-left">{item.vendor}</span>
-                                <span className="font-mono text-[10px] text-brand-navy/30 hidden md:block">{item.id}</span>
+                    <div className="col-span-3 flex flex-row md:flex-col justify-between md:justify-start gap-3 mt-2 md:mt-0">
+                         <div className="flex items-center gap-3 w-full justify-between md:justify-start">
+                            <span className="md:hidden text-xs font-bold text-brand-navy/30 uppercase tracking-widest">Vendor</span>
+                            <div className="flex items-center gap-2 md:gap-3">
+                                <div className="hidden md:flex w-8 h-8 rounded-full bg-brand-navy/5 items-center justify-center text-brand-navy group-hover:bg-brand-navy group-hover:text-white transition-colors shrink-0">
+                                    <ArrowDownLeft size={14} />
+                                </div>
+                                <div className="text-right md:text-left">
+                                    <span className="block font-bold text-brand-navy text-sm">{item.vendor}</span>
+                                    <span className="font-mono text-[10px] text-brand-navy/30 hidden md:block">{item.id}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Category Badge */}
-                    <div className="col-span-3 flex justify-between md:justify-start items-center">
-                        <span className="md:hidden text-xs font-bold text-brand-navy/30">Category</span>
+                    <div className="col-span-3 flex justify-between md:justify-start items-center mt-2 md:mt-0">
+                        <span className="md:hidden text-xs font-bold text-brand-navy/30 uppercase tracking-widest">Category</span>
                         <span className={`
                             inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
                             ${item.category === 'RENT' ? 'bg-brand-coral/10 text-brand-coral' : 
@@ -252,16 +256,16 @@ export const TransparencyLedger: React.FC = () => {
                     </div>
 
                     {/* Amount */}
-                    <div className="col-span-2 text-left md:text-right flex justify-between md:block">
-                        <span className="md:hidden text-xs font-bold text-brand-navy/30">Value</span>
+                    <div className="col-span-2 text-left md:text-right flex justify-between md:block mt-2 md:mt-0 border-t border-brand-navy/5 pt-2 md:border-0 md:pt-0">
+                        <span className="md:hidden text-xs font-bold text-brand-navy/30 uppercase tracking-widest">Value</span>
                         <span className="font-mono font-bold text-brand-navy text-lg tracking-tight">
                             ${item.amount.toFixed(2)}
                         </span>
                     </div>
 
                     {/* Status */}
-                    <div className="col-span-2 text-right flex justify-between md:justify-end items-center">
-                        <span className="md:hidden text-xs font-bold text-brand-navy/30">Status</span>
+                    <div className="col-span-2 text-right flex justify-between md:justify-end items-center mt-2 md:mt-0">
+                        <span className="md:hidden text-xs font-bold text-brand-navy/30 uppercase tracking-widest">Status</span>
                         {item.status === 'CLEARED' ? (
                             <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-brand-teal bg-brand-teal/5 px-2 py-1 rounded-md">
                             <Check className="w-3 h-3" />

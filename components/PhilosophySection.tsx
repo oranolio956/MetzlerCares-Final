@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { SectionWrapper } from './SectionWrapper';
 import { Mascot } from './Mascot';
@@ -83,7 +84,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
 
   // Premium Feature: Mouse tracking for subtle 3D tilt effect on the main container
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (isCalmMode || !containerRef.current) return;
+    if (isCalmMode || !containerRef.current || window.innerWidth < 768) return;
     const { left, top, width, height } = containerRef.current.getBoundingClientRect();
     const x = (e.clientX - left) / width - 0.5;
     const y = (e.clientY - top) / height - 0.5;
@@ -193,7 +194,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
 
           {/* 3. The 3D Container - Adaptive Height */}
           <div 
-            className="w-full max-w-5xl min-h-[600px] h-auto md:h-[600px] relative [perspective:2000px] group"
+            className="w-full max-w-5xl min-h-[650px] md:min-h-[600px] h-auto md:h-[600px] relative [perspective:2000px] group"
             onMouseEnter={() => setIsHovering(true)}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}

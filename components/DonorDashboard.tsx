@@ -49,17 +49,17 @@ export const DonorDashboard: React.FC = () => {
            {isLoading ? (
              <Skeleton className="h-16 w-64 rounded-2xl mb-2" />
            ) : (
-             <h2 className="font-display font-bold text-5xl text-brand-navy">Your Returns.</h2>
+             <h2 className="font-display font-bold text-4xl md:text-5xl text-brand-navy">Your Returns.</h2>
            )}
            <p className="text-brand-navy/60 mt-2 text-lg">Tracking the real-world dividends of your investment.</p>
         </div>
         
-        <div className="flex gap-2">
-           <button className="bg-white border-2 border-brand-navy/10 px-6 py-3 rounded-xl font-bold text-brand-navy hover:bg-brand-cream transition-colors flex items-center gap-2">
+        <div className="flex gap-2 w-full md:w-auto">
+           <button className="flex-1 md:flex-none bg-white border-2 border-brand-navy/10 px-6 py-3 rounded-xl font-bold text-brand-navy hover:bg-brand-cream transition-colors flex items-center justify-center gap-2">
              <Bell size={18} />
-             Alerts On
+             <span className="md:inline">Alerts On</span>
            </button>
-           <button className="bg-brand-navy text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-teal transition-colors flex items-center gap-2 shadow-lg">
+           <button className="flex-1 md:flex-none bg-brand-navy text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-teal transition-colors flex items-center justify-center gap-2 shadow-lg">
              <ArrowUpRight size={18} />
              Re-Invest
            </button>
@@ -67,7 +67,7 @@ export const DonorDashboard: React.FC = () => {
       </div>
 
       {/* Financial Style Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
          {/* Total Invested */}
          <div className="bg-white p-6 rounded-3xl border border-brand-navy/10 shadow-sm relative overflow-hidden group">
             <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -141,7 +141,7 @@ export const DonorDashboard: React.FC = () => {
                  <>
                   {/* Real Session Donations */}
                   {donations.map((d) => (
-                      <div key={d.id} className="bg-brand-cream p-6 rounded-3xl border-l-4 border-brand-coral shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center animate-slide-up">
+                      <div key={d.id} className="bg-brand-cream p-6 rounded-3xl border-l-4 border-brand-coral shadow-sm flex flex-col sm:flex-row gap-4 items-start sm:items-center animate-slide-up">
                          <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-brand-navy text-white`}>
                             <Mascot variant={d.impactType === 'commute' ? 'commute' : d.impactType === 'tech' ? 'tech' : 'home'} expression="celebration" className="w-8 h-8" />
                          </div>
@@ -156,7 +156,7 @@ export const DonorDashboard: React.FC = () => {
 
                   {/* Mock Historical Stories */}
                   {MOCK_STORIES.map((story) => (
-                      <div key={story.id} className="bg-white p-6 rounded-3xl border-l-4 border-brand-teal shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center hover:shadow-md transition-shadow">
+                      <div key={story.id} className="bg-white p-6 rounded-3xl border-l-4 border-brand-teal shadow-sm flex flex-col sm:flex-row gap-4 items-start sm:items-center hover:shadow-md transition-shadow">
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${story.type === 'commute' ? 'bg-brand-lavender' : story.type === 'home' ? 'bg-brand-coral' : 'bg-brand-teal'}`}>
                             <Mascot variant={story.type} expression="excited" className="w-8 h-8" />
                         </div>
@@ -166,7 +166,7 @@ export const DonorDashboard: React.FC = () => {
                             </p>
                             <p className="text-xs text-brand-navy/40 font-bold uppercase tracking-wider mt-1">{story.date}</p>
                         </div>
-                        <button className="text-brand-navy/20 hover:text-brand-coral transition-colors">
+                        <button className="text-brand-navy/20 hover:text-brand-coral transition-colors hidden sm:block">
                             <Heart size={20} />
                         </button>
                       </div>

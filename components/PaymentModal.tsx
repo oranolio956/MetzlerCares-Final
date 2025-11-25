@@ -131,10 +131,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
 
       <div className="absolute inset-0 bg-brand-navy/80 backdrop-blur-sm" onClick={onClose}></div>
       
-      <div className={`w-full max-w-2xl bg-white rounded-3xl shadow-2xl relative overflow-hidden flex flex-col transition-all duration-500 ${step === 'success' ? 'scale-105' : 'scale-100'}`}>
+      <div className={`w-full max-w-2xl bg-white rounded-3xl shadow-2xl relative overflow-hidden flex flex-col transition-all duration-500 max-h-[90vh] ${step === 'success' ? 'scale-105' : 'scale-100'}`}>
         
         {/* Header */}
-        <div className="flex items-center justify-between px-8 py-6 border-b border-brand-navy/5 bg-brand-cream">
+        <div className="flex items-center justify-between px-6 py-4 md:px-8 md:py-6 border-b border-brand-navy/5 bg-brand-cream shrink-0">
           <div className="flex items-center gap-3">
              <div className="bg-brand-navy p-2 rounded-lg text-white">
                <ShieldCheck size={20} />
@@ -147,17 +147,17 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
         </div>
 
         {/* CONTENT */}
-        <div className="p-8 md:p-12 relative min-h-[400px] flex flex-col">
+        <div className="p-6 md:p-12 relative flex-1 overflow-y-auto flex flex-col">
           
           {step === 'details' && (
             <div className="flex-1 flex flex-col animate-slide-up">
-              <h3 className="font-display font-bold text-3xl text-brand-navy mb-2">Confirm Investment</h3>
+              <h3 className="font-display font-bold text-2xl md:text-3xl text-brand-navy mb-2">Confirm Investment</h3>
               <p className="text-brand-navy/60 mb-8">You are funding <strong className="text-brand-navy">{quantity} units</strong> of <strong className="text-brand-teal">{item.label}</strong>.</p>
               
-              <div className="bg-brand-cream border border-brand-navy/5 rounded-2xl p-6 mb-8 flex items-center justify-between">
+              <div className="bg-brand-cream border border-brand-navy/5 rounded-2xl p-4 md:p-6 mb-8 flex items-center justify-between">
                 <div>
                    <span className="text-xs font-bold uppercase tracking-widest text-brand-navy/40">Total Amount</span>
-                   <div className="text-4xl font-display font-bold text-brand-navy">${totalAmount.toFixed(2)}</div>
+                   <div className="text-3xl md:text-4xl font-display font-bold text-brand-navy">${totalAmount.toFixed(2)}</div>
                 </div>
                 <div className="text-right">
                    <span className="text-xs font-bold uppercase tracking-widest text-brand-navy/40">Tax Deductible</span>
@@ -168,7 +168,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
               </div>
 
               {/* Payment Method Tabs (Mock) */}
-              <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                  <button className="flex items-center justify-center gap-2 py-4 border-2 border-brand-navy rounded-xl bg-brand-navy text-white font-bold shadow-md">
                     <CreditCard size={20} />
                     Card / Apple Pay
@@ -196,12 +196,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
 
               <button 
                 onClick={() => { playClick(); handleExecute(); }}
-                className="mt-auto w-full bg-brand-teal text-white font-bold py-4 rounded-xl shadow-[0_10px_20px_-5px_rgba(45,156,142,0.4)] hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                className="mt-auto w-full bg-brand-teal text-white font-bold py-4 rounded-xl shadow-[0_10px_20px_-5px_rgba(45,156,142,0.4)] hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shrink-0"
               >
                 Complete Transaction <ChevronRight />
               </button>
               
-              <div className="mt-4 text-center">
+              <div className="mt-4 text-center shrink-0">
                 <span className="text-xs text-brand-navy/40 flex items-center justify-center gap-1">
                    <Lock size={10} />
                    Processed securely via Stripe. Funds go directly to vendor.
@@ -211,8 +211,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
           )}
 
           {step === 'processing' && (
-            <div className="flex-1 flex flex-col items-center justify-center text-center animate-slide-up">
-               <div className="w-48 h-48 mb-6 relative">
+            <div className="flex-1 flex flex-col items-center justify-center text-center animate-slide-up min-h-[300px]">
+               <div className="w-32 h-32 md:w-48 md:h-48 mb-6 relative">
                   <div className="absolute inset-0 bg-brand-teal/20 rounded-full animate-ping"></div>
                   <Mascot expression="thinking" className="relative z-10" />
                </div>
@@ -226,11 +226,11 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
 
           {step === 'success' && (
             <div className="flex-1 flex flex-col items-center animate-slide-up">
-               <div className="w-24 h-24 mb-4 relative">
+               <div className="w-20 h-20 md:w-24 md:h-24 mb-4 relative">
                   <div className="absolute inset-0 bg-brand-yellow/20 rounded-full animate-pulse"></div>
                   <Mascot expression="celebration" className="relative z-10" />
                </div>
-               <h3 className="font-display font-bold text-3xl text-brand-navy mb-2 text-center">Investment Deployed!</h3>
+               <h3 className="font-display font-bold text-2xl md:text-3xl text-brand-navy mb-2 text-center">Investment Deployed!</h3>
                
                {/* PREVIEW CARD */}
                {downloadUrl ? (
@@ -244,7 +244,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
                    <div className="w-full max-w-sm h-32 bg-brand-navy/10 rounded-xl animate-pulse mb-6"></div>
                )}
 
-               <div className="flex gap-3 w-full">
+               <div className="flex flex-col sm:flex-row gap-3 w-full shrink-0">
                   <button 
                     onClick={handleDownload}
                     className="flex-1 bg-brand-navy text-white font-bold py-3 rounded-xl shadow-lg hover:bg-brand-teal transition-colors flex items-center justify-center gap-2"
@@ -259,7 +259,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
                   </button>
                </div>
                
-               <p className="text-xs text-brand-navy/40 mt-4 text-center">
+               <p className="text-xs text-brand-navy/40 mt-4 text-center shrink-0">
                  A digital copy has been sent to your dashboard.
                </p>
             </div>
