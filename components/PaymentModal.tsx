@@ -162,7 +162,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
                 <div className="text-right">
                    <span className="text-xs font-bold uppercase tracking-widest text-brand-navy/40">Tax Deductible</span>
                    <div className="text-brand-teal font-bold flex items-center justify-end gap-1">
-                      <CheckIcon /> Yes
+                      <Check size={16} strokeWidth={4} /> Yes
                    </div>
                 </div>
               </div>
@@ -270,7 +270,3 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
     </div>
   );
 };
-
-const CheckIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-brand-teal"><polyline points="20 6 9 17 4 12"></polyline></svg>
-);

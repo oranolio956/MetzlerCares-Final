@@ -1,6 +1,5 @@
-
-import React, { useState, useEffect, useRef, memo } from 'react';
-import { ArrowRight, ShieldCheck, TrendingUp, Lock, Printer, CreditCard, Bus, Laptop, Home, Target, Activity, Zap } from 'lucide-react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
+import { ArrowRight, ShieldCheck, TrendingUp, Lock, Printer, CreditCard, Bus, Laptop, Home, Target, Activity, Zap, Apple, Pill, FileBadge, Smartphone, Shirt, Briefcase, Smile, Package, Building, Utensils, Sparkles, FileText, HardHat } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { PaymentModal } from './PaymentModal';
 import { useStore } from '../context/StoreContext';
@@ -97,19 +96,138 @@ const ImpactEqualizer: React.FC<{ value: number; color: string }> = memo(({ valu
   );
 });
 
+const SECTORS = [
+  { id: 'essentials', label: 'Essentials', icon: Utensils, desc: 'Survival Basics' },
+  { id: 'stability', label: 'Stability', icon: Building, desc: 'Foundation' },
+  { id: 'access', label: 'Access', icon: Laptop, desc: 'Opportunity' },
+  { id: 'flex', label: 'Flex', icon: Sparkles, desc: 'Rapid Response' }
+];
+
 const IMPACT_LEVELS = [
+  // --- ESSENTIALS ---
   {
-    id: 'commute',
+    id: 'food',
+    category: 'essentials',
+    label: "Nutrition",
+    sub: "Food Security",
+    desc: "1 Week Grocery Credit",
+    story: "Recovery requires physical repair. Real food builds the resilience needed to stay sober.",
+    vendorName: "Kroger / Local Co-op",
+    baseAmount: 75,
+    roi: "Health",
+    roiLabel: "Physical Repair",
+    variant: 'home' as const,
+    color: 'bg-brand-coral',
+    textColor: 'text-brand-coral',
+    icon: Utensils,
+    accent: 'text-brand-coral',
+    sparkSeed: 14
+  },
+  {
+    id: 'meds',
+    category: 'essentials',
+    label: "Wellness",
+    sub: "Medical Access",
+    desc: "Rx Co-Pay Assistance",
+    story: "Stabilizing chronic health conditions prevents emergency room visits and relapse.",
+    vendorName: "CVS / Walgreens",
+    baseAmount: 40,
+    roi: "Preventative",
+    roiLabel: "ER Diversion",
+    variant: 'home' as const,
+    color: 'bg-brand-coral',
+    textColor: 'text-brand-coral',
+    icon: Pill,
+    accent: 'text-brand-coral',
+    sparkSeed: 19
+  },
+  {
+    id: 'clothing',
+    category: 'essentials',
+    label: "Attire",
+    sub: "Dignity Kit",
+    desc: "Work/Interview Outfit",
+    story: "Looking the part is half the battle. Basic professional clothing opens doors.",
+    vendorName: "Retail Partners",
+    baseAmount: 100,
+    roi: "Confidence",
+    roiLabel: "Interview Success",
+    variant: 'home' as const,
+    color: 'bg-brand-coral',
+    textColor: 'text-brand-coral',
+    icon: Shirt,
+    accent: 'text-brand-coral',
+    sparkSeed: 55
+  },
+
+  // --- STABILITY ---
+  {
+    id: 'housing',
+    category: 'stability',
+    label: "Emergency Bed",
+    sub: "Sober Living Entry",
+    desc: "1 Week Safe Housing",
+    story: "Recovery cannot happen on the street. A safe bed is the foundation of everything.",
+    vendorName: "Oxford House / SafeHaven",
+    baseAmount: 250,
+    roi: "∞", 
+    roiLabel: "Relapse Prevention",
+    variant: 'home' as const,
+    color: 'bg-brand-teal',
+    textColor: 'text-brand-teal',
+    icon: Home,
+    accent: 'text-brand-teal',
+    sparkSeed: 99
+  },
+  {
+    id: 'operations',
+    category: 'stability',
+    label: "Ops Fund",
+    sub: "Platform Sustainability",
+    desc: "Powering SecondWind",
+    story: "Keeps our servers running, our intake AI live, and our team coordinating care.",
+    vendorName: "SecondWind Ops",
+    baseAmount: 50,
+    roi: "Scale",
+    roiLabel: "Platform Uptime",
+    variant: 'tech' as const,
+    color: 'bg-brand-teal',
+    textColor: 'text-brand-teal',
+    icon: Briefcase,
+    accent: 'text-brand-teal',
+    sparkSeed: 88
+  },
+
+  // --- ACCESS ---
+  {
+    id: 'laptop',
+    category: 'access',
+    label: "Tech",
+    sub: "Digital Access",
+    desc: "Refurbished Laptop",
+    story: "Remote work, education, and telehealth are impossible without hardware.",
+    vendorName: "TechReuse Corp",
+    baseAmount: 300,
+    roi: "100%", 
+    roiLabel: "Career Unlock",
+    variant: 'tech' as const,
+    color: 'bg-brand-lavender',
+    textColor: 'text-brand-lavender',
+    icon: Laptop,
+    accent: 'text-brand-lavender',
+    sparkSeed: 45
+  },
+  {
+    id: 'bus',
+    category: 'access',
     label: "Mobility",
     sub: "Transit Infrastructure",
-    desc: "Unlimited Monthly Bus Pass",
+    desc: "Monthly Bus Pass",
     story: "Transit is the lifeline to employment. Without it, opportunities are out of reach.",
-    vendorName: "City Metro Authority",
-    baseAmount: 25,
-    weeklyGoal: 20,
-    currentFunded: 14,
+    vendorName: "City Metro Auth",
+    baseAmount: 60,
     roi: "10x", 
-    roiLabel: "Job Access Multiplier",
+    roiLabel: "Job Access",
     variant: 'commute' as const,
     color: 'bg-brand-lavender',
     textColor: 'text-brand-lavender',
@@ -118,54 +236,68 @@ const IMPACT_LEVELS = [
     sparkSeed: 12
   },
   {
-    id: 'tech',
-    label: "Access",
-    sub: "Digital Inclusion",
-    desc: "Refurbished Work Laptop",
-    story: "Remote work and education are impossible without hardware. Bridge the digital divide.",
-    vendorName: "TechReuse Corp (Certified)",
-    baseAmount: 75,
-    weeklyGoal: 5,
-    currentFunded: 3,
-    roi: "100%", 
-    roiLabel: "Career Unlock Probability",
-    variant: 'tech' as const,
-    color: 'bg-brand-teal',
-    textColor: 'text-brand-teal',
-    icon: Laptop,
-    accent: 'text-brand-teal',
-    sparkSeed: 45
+    id: 'docs',
+    category: 'access',
+    label: "Identity",
+    sub: "Legal Status",
+    desc: "ID Replacement Fees",
+    story: "You don't exist on paper without an ID. It's the first step to a job.",
+    vendorName: "DMV / Vital Records",
+    baseAmount: 50,
+    roi: "Binary",
+    roiLabel: "Employment Prerequisite",
+    variant: 'commute' as const,
+    color: 'bg-brand-lavender',
+    textColor: 'text-brand-lavender',
+    icon: FileText,
+    accent: 'text-brand-lavender',
+    sparkSeed: 22
   },
+
+  // --- FLEX ---
   {
-    id: 'shelter',
-    label: "Stability",
-    sub: "Housing Security",
-    desc: "1 Week Safe Sober Living",
-    story: "Recovery cannot happen on the street. A safe bed is the foundation of everything.",
-    vendorName: "Oxford House / SafeHaven",
-    baseAmount: 200,
-    weeklyGoal: 8,
-    currentFunded: 4,
-    roi: "∞", 
-    roiLabel: "Relapse Prevention Score",
-    variant: 'home' as const,
-    color: 'bg-brand-coral',
-    textColor: 'text-brand-coral',
-    icon: Home,
-    accent: 'text-brand-coral',
-    sparkSeed: 99
+    id: 'custom',
+    category: 'flex',
+    label: "Rapid Response",
+    sub: "Gap Funding",
+    desc: "Unlisted Critical Needs",
+    story: "For the specific, unique barriers that fall through the cracks of traditional aid.",
+    vendorName: "Verified Vendor (Various)",
+    baseAmount: 25,
+    roi: "Agility",
+    roiLabel: "Problem Solving",
+    variant: 'tech' as const,
+    color: 'bg-brand-yellow',
+    textColor: 'text-brand-yellow',
+    icon: Sparkles,
+    accent: 'text-brand-yellow',
+    sparkSeed: 77
   }
 ];
 
 export const DonationFlow: React.FC = () => {
   const { isCalmMode, addDonation, addNotification, triggerConfetti } = useStore();
   const { playHover, playClick, playSuccess } = useSound();
-  const [selectedImpact, setSelectedImpact] = useState(IMPACT_LEVELS[1]);
+  
+  const [activeSector, setActiveSector] = useState('essentials');
+  const [selectedImpact, setSelectedImpact] = useState(IMPACT_LEVELS[0]);
   const [multiplier, setMultiplier] = useState(1);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [scrambleTrigger, setScrambleTrigger] = useState(false);
   const [txId, setTxId] = useState("#TX-9921");
   const [idleMascot, setIdleMascot] = useState(false);
+
+  const filteredImpacts = useMemo(() => 
+    IMPACT_LEVELS.filter(i => i.category === activeSector), 
+  [activeSector]);
+
+  useEffect(() => {
+    // Auto-select first item when sector changes if current selection is not in new sector
+    if (!filteredImpacts.find(i => i.id === selectedImpact.id)) {
+        setSelectedImpact(filteredImpacts[0]);
+        setMultiplier(1);
+    }
+  }, [activeSector, filteredImpacts, selectedImpact]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>; 
@@ -191,7 +323,10 @@ export const DonationFlow: React.FC = () => {
 
     if (assetParam) {
         const found = IMPACT_LEVELS.find(i => i.id === assetParam);
-        if (found) setSelectedImpact(found);
+        if (found) {
+            setSelectedImpact(found);
+            setActiveSector(found.category);
+        }
     }
     if (unitsParam) {
         const qty = parseInt(unitsParam);
@@ -204,13 +339,9 @@ export const DonationFlow: React.FC = () => {
         const params = new URLSearchParams(window.location.search);
         params.set('asset', selectedImpact.id);
         params.set('units', multiplier.toString());
-        
-        // Preserve the hash while updating query params
         const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
         window.history.replaceState({}, '', newUrl);
-    } catch (e) {
-        // Silently fail
-    }
+    } catch (e) {}
   }, [selectedImpact, multiplier]);
 
   useEffect(() => {
@@ -225,17 +356,15 @@ export const DonationFlow: React.FC = () => {
 
   const handleSliderChange = (val: number) => {
     setMultiplier(val);
-    playClick(); // Click on slide
+    playClick();
     if (typeof navigator !== 'undefined' && navigator.vibrate && !isCalmMode) {
         navigator.vibrate(10);
     }
   };
 
   const handlePaymentComplete = () => {
-    // THE PAYOFF
     playSuccess();
     triggerConfetti();
-
     addDonation({
       id: txId,
       amount: selectedImpact.baseAmount * multiplier,
@@ -258,25 +387,25 @@ export const DonationFlow: React.FC = () => {
     
     addDonation({
         id: `#TX-${Math.floor(Math.random() * 90000) + 10000}`,
-        amount: 10,
+        amount: 25,
         itemLabel: "Rapid Response Fund",
         impactType: 'commute', // Generic fallback
         timestamp: new Date()
     });
     
-    addNotification('success', '⚡ $10 Quick Investment Deployed!');
+    addNotification('success', '⚡ $25 Rapid Response Deployed!');
   };
 
   const totalAmount = selectedImpact.baseAmount * multiplier;
 
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === 'ArrowRight') {
-      const nextIndex = (index + 1) % IMPACT_LEVELS.length;
-      setSelectedImpact(IMPACT_LEVELS[nextIndex]);
+      const nextIndex = (index + 1) % filteredImpacts.length;
+      setSelectedImpact(filteredImpacts[nextIndex]);
       playClick();
     } else if (e.key === 'ArrowLeft') {
-      const prevIndex = (index - 1 + IMPACT_LEVELS.length) % IMPACT_LEVELS.length;
-      setSelectedImpact(IMPACT_LEVELS[prevIndex]);
+      const prevIndex = (index - 1 + filteredImpacts.length) % filteredImpacts.length;
+      setSelectedImpact(filteredImpacts[prevIndex]);
       playClick();
     }
   };
@@ -299,7 +428,7 @@ export const DonationFlow: React.FC = () => {
         Selected {selectedImpact.label}. {multiplier} units. Total Investment ${totalAmount}. Impact: {multiplier}x {selectedImpact.desc}.
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6 relative z-20">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 gap-6 relative z-20">
          <div>
             <div className="flex items-center gap-2 mb-4">
                <div className="bg-brand-navy text-white p-1.5 rounded-md">
@@ -330,13 +459,37 @@ export const DonationFlow: React.FC = () => {
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
-        <div className="lg:col-span-8 flex flex-col gap-8">
+        <div className="lg:col-span-8 flex flex-col gap-6">
+            
+            {/* SECTOR SELECTOR */}
+            <div className="flex flex-wrap gap-2 md:gap-4 p-2 bg-brand-navy/5 rounded-2xl overflow-x-auto">
+               {SECTORS.map((sector) => {
+                  const Icon = sector.icon;
+                  const isActive = activeSector === sector.id;
+                  return (
+                     <button
+                        key={sector.id}
+                        onClick={() => { setActiveSector(sector.id); playClick(); }}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-bold text-sm whitespace-nowrap ${
+                           isActive 
+                           ? 'bg-brand-navy text-white shadow-lg' 
+                           : 'bg-white text-brand-navy/50 hover:text-brand-navy hover:bg-white/80'
+                        }`}
+                     >
+                        <Icon size={16} />
+                        {sector.label}
+                     </button>
+                  )
+               })}
+            </div>
+
+            {/* ASSET GRID */}
             <div 
-              className="grid grid-cols-1 md:grid-cols-3 gap-4" 
+              className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[200px]" 
               role="radiogroup" 
               aria-label="Investment Asset Class"
             >
-              {IMPACT_LEVELS.map((level, idx) => {
+              {filteredImpacts.map((level, idx) => {
                 const isSelected = selectedImpact.id === level.id;
                 const Icon = level.icon;
                 return (
@@ -354,7 +507,7 @@ export const DonationFlow: React.FC = () => {
                     onMouseEnter={playHover}
                     onKeyDown={(e) => handleKeyDown(e, idx)}
                     className={`
-                      group relative flex flex-col items-start text-left p-6 rounded-[2rem] transition-all duration-500 border-2 outline-none focus-visible:ring-4 focus-visible:ring-brand-teal overflow-hidden
+                      group relative flex flex-col items-start text-left p-6 rounded-[2rem] transition-all duration-500 border-2 outline-none focus-visible:ring-4 focus-visible:ring-brand-teal overflow-hidden animate-slide-up
                       ${isSelected 
                         ? 'bg-brand-navy border-brand-navy shadow-[0_20px_40px_-10px_rgba(26,42,58,0.3)] scale-[1.02] z-10' 
                         : 'bg-white border-brand-navy/5 hover:border-brand-navy/20 hover:shadow-lg scale-100 opacity-80 hover:opacity-100'
@@ -461,7 +614,7 @@ export const DonationFlow: React.FC = () => {
                            </div>
                         </div>
                         <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-brand-cream rounded-xl border border-brand-navy/5">
-                           <div className={`p-2 rounded-lg text-white shadow-sm shrink-0 ${selectedImpact.id === 'commute' ? 'bg-brand-lavender' : selectedImpact.id === 'tech' ? 'bg-brand-teal' : 'bg-brand-coral'}`}>
+                           <div className={`p-2 rounded-lg text-white shadow-sm shrink-0 ${selectedImpact.color}`}>
                               <Target size={20} />
                            </div>
                            <div>
@@ -534,9 +687,8 @@ export const DonationFlow: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-3">
                            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-navy shadow-sm">
-                              {selectedImpact.id === 'commute' && <Bus size={14} />}
-                              {selectedImpact.id === 'tech' && <Laptop size={14} />}
-                              {selectedImpact.id === 'shelter' && <Home size={14} />}
+                              {/* Dynamic Icon based on variant for receipt */}
+                              <selectedImpact.icon size={14} />
                            </div>
                            <div className="text-xs">
                               <span className="block font-bold text-brand-navy">Payable To:</span>
@@ -571,7 +723,7 @@ export const DonationFlow: React.FC = () => {
                       className="w-full bg-brand-yellow/10 text-brand-navy font-bold text-sm py-3 rounded-xl border border-brand-yellow/20 hover:bg-brand-yellow/20 transition-all flex items-center justify-center gap-2 group"
                    >
                       <Zap size={16} className="text-brand-yellow group-hover:fill-brand-yellow transition-colors" />
-                      Flash Fund $10 (Single Click)
+                      Flash Fund $25 (Single Click)
                    </button>
                </div>
 
