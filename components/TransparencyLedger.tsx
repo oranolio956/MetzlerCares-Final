@@ -15,6 +15,7 @@ const MOCK_LEDGER: LedgerItem[] = [
 // --- WORLD MAP COMPONENT ---
 const WorldMap: React.FC<{ activeTx: string | null }> = ({ activeTx }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const { isCalmMode } = useStore();
 
   // Simplified Dot Map Coords (Rough World Shape)
@@ -37,9 +38,18 @@ const WorldMap: React.FC<{ activeTx: string | null }> = ({ activeTx }) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Resize Observer to handle window resizing cleanly
+    const resizeObserver = new ResizeObserver(() => {
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+    });
+    resizeObserver.observe(container);
 
     const render = () => {
        ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -69,8 +79,7 @@ const WorldMap: React.FC<{ activeTx: string | null }> = ({ activeTx }) => {
             // Rings
             for(let i=0; i<3; i++) {
                ctx.beginPath();
-               // Ensure radius is positive to avoid IndexSizeError
-               // Shift base size up and reduce amplitude of sine wave relative to base
+               // Ensure positive radius
                const radius = Math.max(0.1, (i * 10) + 6 + (Math.sin(time * 5) * 4));
                
                ctx.arc(px, py, radius, 0, Math.PI * 2);
@@ -89,17 +98,20 @@ const WorldMap: React.FC<{ activeTx: string | null }> = ({ activeTx }) => {
     };
 
     const interval = setInterval(render, 50);
-    return () => clearInterval(interval);
+    return () => {
+        clearInterval(interval);
+        resizeObserver.disconnect();
+    };
 
   }, [dots, activeTx, isCalmMode]);
 
   return (
-    <canvas 
-       ref={canvasRef} 
-       width={800} 
-       height={400} 
-       className="w-full h-full object-contain opacity-60 mix-blend-multiply"
-    />
+    <div ref={containerRef} className="w-full h-full">
+        <canvas 
+        ref={canvasRef} 
+        className="w-full h-full object-contain opacity-60 mix-blend-multiply"
+        />
+    </div>
   );
 };
 
@@ -117,7 +129,7 @@ export const TransparencyLedger: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
+    <div className="w-full max-w-6xl mx-auto px-4 md:px-0">
       
       {/* 1. Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-end mb-12">
@@ -126,21 +138,21 @@ export const TransparencyLedger: React.FC = () => {
                <ShieldCheck size={24} />
                <span className="font-bold uppercase tracking-widest text-xs">Verified Ledger</span>
             </div>
-            <h2 className="font-display font-bold text-5xl text-brand-navy leading-none">
+            <h2 className="font-display font-bold text-4xl md:text-5xl text-brand-navy leading-none">
               Open Books.
             </h2>
             <p className="text-brand-navy/60 text-lg mt-4 max-w-lg">
               Radical transparency. Every cent is tracked from donation to vendor payment in real-time.
             </p>
          </div>
-         <div className="flex gap-4 mt-6 md:mt-0">
-            <button className="flex items-center gap-2 px-6 py-3 rounded-xl border-2 border-brand-navy/10 font-bold text-brand-navy hover:bg-brand-cream transition-colors">
+         <div className="flex gap-4 mt-6 md:mt-0 w-full md:w-auto">
+            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-brand-navy/10 font-bold text-brand-navy hover:bg-brand-cream transition-colors">
                <FileText size={18} />
                Download CSV
             </button>
-            <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-navy text-white font-bold hover:bg-brand-teal transition-colors shadow-lg">
+            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-brand-navy text-white font-bold hover:bg-brand-teal transition-colors shadow-lg">
                <ExternalLink size={18} />
-               View Audit
+               Audit
             </button>
          </div>
       </div>
@@ -159,7 +171,7 @@ export const TransparencyLedger: React.FC = () => {
              
              {/* Floating Recent Card */}
              {activeTx && (
-                <div className="absolute bottom-6 right-6 bg-white/90 backdrop-blur p-4 rounded-xl shadow-lg border-l-4 border-brand-teal animate-slide-up max-w-xs hidden md:block">
+                <div className="absolute bottom-6 right-6 left-6 md:left-auto bg-white/90 backdrop-blur p-4 rounded-xl shadow-lg border-l-4 border-brand-teal animate-slide-up max-w-sm">
                    <div className="flex items-center gap-2 mb-1">
                       <div className="w-2 h-2 rounded-full bg-brand-teal animate-pulse"></div>
                       <span className="text-[10px] font-bold uppercase text-brand-navy/50">Just Cleared</span>
@@ -199,7 +211,7 @@ export const TransparencyLedger: React.FC = () => {
                 {MOCK_LEDGER.map((item) => (
                 <div 
                     key={item.id} 
-                    className={`grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-8 py-6 items-center hover:bg-brand-cream/50 transition-colors group cursor-default ${activeTx === item.id ? 'bg-brand-teal/5' : ''}`}
+                    className={`grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-6 md:px-8 py-6 items-center hover:bg-brand-cream/50 transition-colors group cursor-default ${activeTx === item.id ? 'bg-brand-teal/5' : ''}`}
                     onMouseEnter={() => setActiveTx(item.id)}
                     onMouseLeave={() => setActiveTx(null)}
                 >
@@ -216,19 +228,19 @@ export const TransparencyLedger: React.FC = () => {
                     {/* Vendor */}
                     <div className="col-span-3 flex flex-row md:flex-col justify-between md:justify-start gap-3">
                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-brand-navy/5 flex items-center justify-center text-brand-navy group-hover:bg-brand-navy group-hover:text-white transition-colors shrink-0">
+                            <div className="hidden md:flex w-8 h-8 rounded-full bg-brand-navy/5 items-center justify-center text-brand-navy group-hover:bg-brand-navy group-hover:text-white transition-colors shrink-0">
                                 <ArrowDownLeft size={14} />
                             </div>
                             <div>
-                                <span className="block font-bold text-brand-navy text-sm">{item.vendor}</span>
-                                <span className="font-mono text-[10px] text-brand-navy/30">{item.id}</span>
+                                <span className="block font-bold text-brand-navy text-sm text-right md:text-left">{item.vendor}</span>
+                                <span className="font-mono text-[10px] text-brand-navy/30 hidden md:block">{item.id}</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Category Badge */}
-                    <div className="col-span-3 flex justify-between md:justify-start">
-                        <span className="md:hidden text-xs font-bold text-brand-navy/30">Type</span>
+                    <div className="col-span-3 flex justify-between md:justify-start items-center">
+                        <span className="md:hidden text-xs font-bold text-brand-navy/30">Category</span>
                         <span className={`
                             inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
                             ${item.category === 'RENT' ? 'bg-brand-coral/10 text-brand-coral' : 
@@ -248,7 +260,8 @@ export const TransparencyLedger: React.FC = () => {
                     </div>
 
                     {/* Status */}
-                    <div className="col-span-2 text-right flex justify-end">
+                    <div className="col-span-2 text-right flex justify-between md:justify-end items-center">
+                        <span className="md:hidden text-xs font-bold text-brand-navy/30">Status</span>
                         {item.status === 'CLEARED' ? (
                             <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-brand-teal bg-brand-teal/5 px-2 py-1 rounded-md">
                             <Check className="w-3 h-3" />

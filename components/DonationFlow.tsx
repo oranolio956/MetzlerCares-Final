@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, memo } from 'react';
-import { ArrowRight, ShieldCheck, TrendingUp, Lock, Printer, CreditCard, Bus, Laptop, Home, Target, Activity } from 'lucide-react';
+import { ArrowRight, ShieldCheck, TrendingUp, Lock, Printer, CreditCard, Bus, Laptop, Home, Target, Activity, Zap } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { PaymentModal } from './PaymentModal';
 import { useStore } from '../context/StoreContext';
@@ -246,6 +246,27 @@ export const DonationFlow: React.FC = () => {
     addNotification('success', 'Investment Deployed. Check your portfolio.');
   };
 
+  const handleQuickDonate = () => {
+    playClick();
+    if (typeof navigator !== 'undefined' && navigator.vibrate && !isCalmMode) {
+        navigator.vibrate([50, 50, 50]);
+    }
+    
+    // Immediate feedback
+    triggerConfetti();
+    playSuccess();
+    
+    addDonation({
+        id: `#TX-${Math.floor(Math.random() * 90000) + 10000}`,
+        amount: 10,
+        itemLabel: "Rapid Response Fund",
+        impactType: 'commute', // Generic fallback
+        timestamp: new Date()
+    });
+    
+    addNotification('success', '⚡ $10 Quick Investment Deployed!');
+  };
+
   const totalAmount = selectedImpact.baseAmount * multiplier;
 
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
@@ -278,7 +299,7 @@ export const DonationFlow: React.FC = () => {
         Selected {selectedImpact.label}. {multiplier} units. Total Investment ${totalAmount}. Impact: {multiplier}x {selectedImpact.desc}.
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 relative z-20">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6 relative z-20">
          <div>
             <div className="flex items-center gap-2 mb-4">
                <div className="bg-brand-navy text-white p-1.5 rounded-md">
@@ -297,12 +318,12 @@ export const DonationFlow: React.FC = () => {
             </h3>
          </div>
          
-         <div className="flex flex-col items-end gap-2">
-            <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-xl border border-brand-navy/10 shadow-sm transition-transform hover:scale-105">
+         <div className="flex flex-col items-start md:items-end gap-2 w-full md:w-auto">
+            <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-xl border border-brand-navy/10 shadow-sm transition-transform hover:scale-105 w-full md:w-auto">
                 <ShieldCheck size={20} className="text-brand-teal" />
                 <span className="text-sm font-bold uppercase tracking-wider text-brand-navy/60">Verified 501(c)(3)</span>
             </div>
-            <p className="text-xs font-bold text-brand-navy/30 uppercase tracking-widest text-right">
+            <p className="text-xs font-bold text-brand-navy/30 uppercase tracking-widest text-right hidden md:block">
                100% Direct-to-Vendor
             </p>
          </div>
@@ -401,7 +422,7 @@ export const DonationFlow: React.FC = () => {
                            </div>
                         </div>
 
-                        <div className="relative h-24 flex items-center group">
+                        <div className="relative h-24 flex items-center group touch-none">
                            <div className={`absolute bottom-8 left-0 right-0 h-full ${selectedImpact.accent}`}>
                               <ImpactEqualizer value={multiplier} color={selectedImpact.color} />
                            </div>
@@ -439,8 +460,8 @@ export const DonationFlow: React.FC = () => {
                               <div className="w-1 h-6 bg-brand-navy/20 rounded-full"></div>
                            </div>
                         </div>
-                        <div className="mt-8 flex items-center gap-4 p-4 bg-brand-cream rounded-xl border border-brand-navy/5">
-                           <div className={`p-2 rounded-lg text-white shadow-sm ${selectedImpact.id === 'commute' ? 'bg-brand-lavender' : selectedImpact.id === 'tech' ? 'bg-brand-teal' : 'bg-brand-coral'}`}>
+                        <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-brand-cream rounded-xl border border-brand-navy/5">
+                           <div className={`p-2 rounded-lg text-white shadow-sm shrink-0 ${selectedImpact.id === 'commute' ? 'bg-brand-lavender' : selectedImpact.id === 'tech' ? 'bg-brand-teal' : 'bg-brand-coral'}`}>
                               <Target size={20} />
                            </div>
                            <div>
@@ -448,6 +469,12 @@ export const DonationFlow: React.FC = () => {
                               <p className="text-brand-navy font-bold leading-tight">
                                  {multiplier} x {selectedImpact.desc}
                               </p>
+                           </div>
+                           <div className="sm:ml-auto md:hidden pt-2 sm:pt-0 border-t sm:border-t-0 border-brand-navy/10 w-full sm:w-auto">
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40">Total</span>
+                              <div className="text-xl font-display font-bold text-brand-teal tabular-nums">
+                                 ${totalAmount}
+                              </div>
                            </div>
                         </div>
                      </div>
@@ -527,14 +554,27 @@ export const DonationFlow: React.FC = () => {
                   </div>
                   <div className="absolute -bottom-3 left-0 w-full h-4 bg-white" style={{ clipPath: 'polygon(0% 0%, 5% 100%, 10% 0%, 15% 100%, 20% 0%, 25% 100%, 30% 0%, 35% 100%, 40% 0%, 45% 100%, 50% 0%, 55% 100%, 60% 0%, 65% 100%, 70% 0%, 75% 100%, 80% 0%, 85% 100%, 90% 0%, 95% 100%, 100% 0%)' }}></div>
                </div>
-               <button 
-                  onClick={() => { playClick(); setIsPaymentModalOpen(true); }}
-                  onMouseEnter={playHover}
-                  className="w-full mt-8 bg-brand-navy text-white font-bold text-xl py-5 rounded-2xl shadow-[8px_8px_0px_0px_rgba(45,156,142,1)] hover:shadow-[4px_4px_0px_0px_rgba(45,156,142,1)] hover:translate-x-1 hover:translate-y-1 transition-all flex items-center justify-center gap-3 active:shadow-none active:translate-x-2 active:translate-y-2 border-2 border-brand-navy"
-               >
-                  Deploy Capital
-                  <ArrowRight strokeWidth={3} size={20} />
-               </button>
+               
+               <div className="mt-8 space-y-4">
+                   <button 
+                      onClick={() => { playClick(); setIsPaymentModalOpen(true); }}
+                      onMouseEnter={playHover}
+                      className="w-full bg-brand-navy text-white font-bold text-xl py-5 rounded-2xl shadow-[8px_8px_0px_0px_rgba(45,156,142,1)] hover:shadow-[4px_4px_0px_0px_rgba(45,156,142,1)] hover:translate-x-1 hover:translate-y-1 transition-all flex items-center justify-center gap-3 active:shadow-none active:translate-x-2 active:translate-y-2 border-2 border-brand-navy"
+                   >
+                      Deploy Capital
+                      <ArrowRight strokeWidth={3} size={20} />
+                   </button>
+
+                   <button 
+                      onClick={handleQuickDonate}
+                      onMouseEnter={playHover}
+                      className="w-full bg-brand-yellow/10 text-brand-navy font-bold text-sm py-3 rounded-xl border border-brand-yellow/20 hover:bg-brand-yellow/20 transition-all flex items-center justify-center gap-2 group"
+                   >
+                      <Zap size={16} className="text-brand-yellow group-hover:fill-brand-yellow transition-colors" />
+                      Flash Fund $10 (Single Click)
+                   </button>
+               </div>
+
                <div className="mt-4 text-center">
                   <span className="text-[10px] font-bold text-brand-navy/30 uppercase tracking-wider flex items-center justify-center gap-2">
                      <CreditCard size={12} />

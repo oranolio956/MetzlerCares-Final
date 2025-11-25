@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { HeartHandshake, ArrowRight, Wind } from 'lucide-react';
 import { Mascot } from './Mascot';
@@ -15,7 +14,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
   const containerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // Disable on mobile/Calm Mode
+    // Disable on mobile/Calm Mode for performance
     if (isCalmMode || window.matchMedia("(max-width: 768px)").matches) return;
 
     let rafId: number;
@@ -41,7 +40,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-screen w-full flex flex-col justify-start md:justify-center overflow-x-hidden"
+      className="relative min-h-[90vh] md:min-h-screen w-full flex flex-col justify-center overflow-hidden"
       aria-label="Introduction"
     >
       <SEOHead 
@@ -66,25 +65,26 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
         <div className="absolute top-[30%] left-[50%] w-[200px] md:w-[300px] h-[200px] md:h-[300px] bg-brand-yellow opacity-10 rounded-full filter blur-[60px] md:blur-[80px] animate-blob mix-blend-multiply" style={{animationDelay: '4s'}}></div>
       </div>
 
-      <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center pt-36 md:pt-0 pb-24 md:pb-0 h-full">
+      <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center pt-24 pb-12 md:py-0">
          
          {/* Left Side: Typography */}
-         <div className="lg:col-span-8 relative flex flex-col items-center lg:items-start text-center lg:text-left">
+         <div className="lg:col-span-8 relative flex flex-col items-center lg:items-start text-center lg:text-left z-20">
             
             {/* Parallax Layer: Typography */}
             <div 
               className="relative z-20 transition-transform duration-300 ease-out will-change-transform"
               style={{ transform: `translate(calc(var(--mouse-x, 0) * -20px), calc(var(--mouse-y, 0) * -20px))` }}
             >
-              <h1 className="font-display font-bold leading-[0.85] md:leading-[0.9] tracking-tighter text-brand-navy select-none pointer-events-none" aria-label="Get back up.">
-                <span className="block text-[16vw] sm:text-[14vw] lg:text-[10rem] xl:text-[11rem] opacity-0 animate-slide-up min-h-[1em]" style={{ animationDelay: '0.1s' }} aria-hidden="true">
+              <h1 className="font-display font-bold leading-[0.85] md:leading-[0.85] tracking-tighter text-brand-navy select-none pointer-events-none" aria-label="Get back up.">
+                {/* Clamp font size: Min 14vw, Ideal 16vw, Max 11rem (approx 176px) */}
+                <span className="block text-[clamp(4rem,15vw,11rem)] opacity-0 animate-slide-up min-h-[1em]" style={{ animationDelay: '0.1s' }} aria-hidden="true">
                   GET
                 </span>
-                <span className="block text-[16vw] sm:text-[14vw] lg:text-[10rem] xl:text-[11rem] opacity-0 animate-slide-up text-stroke-navy relative min-h-[1em]" style={{ animationDelay: '0.2s' }} aria-hidden="true">
+                <span className="block text-[clamp(4rem,15vw,11rem)] opacity-0 animate-slide-up text-stroke-navy relative min-h-[1em]" style={{ animationDelay: '0.2s' }} aria-hidden="true">
                    BACK
                    <span className="absolute top-1 left-1 md:top-3 md:left-3 text-brand-coral opacity-20 blur-sm pointer-events-none -z-10">BACK</span>
                 </span>
-                <span className="block text-[16vw] sm:text-[14vw] lg:text-[10rem] xl:text-[11rem] opacity-0 animate-slide-up text-brand-navy min-h-[1em]" style={{ animationDelay: '0.3s' }} aria-hidden="true">
+                <span className="block text-[clamp(4rem,15vw,11rem)] opacity-0 animate-slide-up text-brand-navy min-h-[1em]" style={{ animationDelay: '0.3s' }} aria-hidden="true">
                   UP<span className="text-brand-coral inline-block animate-pulse text-[1.2em] leading-none">.</span>
                 </span>
               </h1>
@@ -95,11 +95,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                className="
                  absolute 
                  z-10
-                 top-[-20px] right-[-10px] 
-                 sm:top-[0px] sm:right-[10%]
-                 md:top-[5%] md:right-[5%] 
-                 lg:right-[0%] lg:top-[5%]
-                 w-24 h-24 sm:w-32 sm:h-32 md:w-64 md:h-64 lg:w-80 lg:h-80 
+                 top-[-30px] right-[-10px] 
+                 sm:top-[-20px] sm:right-[10%]
+                 md:top-[0px] md:right-[5%] 
+                 lg:right-[-20px] lg:top-[10px]
+                 w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 lg:w-72 lg:h-72 
                  opacity-0 animate-slide-up pointer-events-none
                " 
                style={{ 
@@ -111,19 +111,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                }}
                aria-hidden="true"
             >
-                <div className="w-full h-full aspect-square">
-                    {/* Mascot reads vars from parent */}
-                    <Mascot expression="excited" className="w-full h-full drop-shadow-2xl opacity-90" />
+                <div className="w-full h-full aspect-square filter drop-shadow-2xl">
+                    <Mascot expression="excited" className="w-full h-full opacity-90" />
                 </div>
             </div>
          </div>
 
          {/* Right Side: The "Card" */}
-         <div className="lg:col-span-4 perspective-1000 w-full max-w-md lg:max-w-none mx-auto mt-8 lg:mt-32 relative z-30">
+         <div className="lg:col-span-4 perspective-1000 w-full max-w-md lg:max-w-none mx-auto mt-0 lg:mt-32 relative z-30">
             <article 
               className={`
-                relative p-6 md:p-8 rounded-[2rem] transition-all duration-500 ease-out transform 
-                group hover:scale-105 hover:shadow-[0_25px_50px_-12px_rgba(255,255,255,0.5)] shadow-2xl
+                relative p-6 md:p-10 rounded-[2.5rem] transition-all duration-500 ease-out transform 
+                group hover:scale-[1.02] hover:shadow-[0_25px_50px_-12px_rgba(255,255,255,0.5)] shadow-2xl
                 opacity-0 animate-slide-up will-change-transform
                 bg-white/60 backdrop-blur-2xl border border-white/80
               `}
@@ -136,39 +135,39 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                 `
               }}
             >
-               <div className="absolute inset-0 bg-white/20 rounded-[2rem] pointer-events-none"></div>
+               <div className="absolute inset-0 bg-white/20 rounded-[2.5rem] pointer-events-none"></div>
 
                <div className="relative z-10">
-                 <div className="flex items-center gap-3 mb-4 md:mb-6">
-                   <div className="w-10 h-10 rounded-full bg-brand-navy text-white flex items-center justify-center shrink-0 shadow-lg">
-                      <Wind size={20} className="animate-pulse-fast" />
+                 <div className="flex items-center gap-4 mb-6">
+                   <div className="w-12 h-12 rounded-full bg-brand-navy text-white flex items-center justify-center shrink-0 shadow-lg border-2 border-brand-cream">
+                      <Wind size={24} className="animate-pulse-fast" />
                    </div>
-                   <h2 className="font-bold text-xl md:text-2xl text-brand-navy font-display leading-none">Zero Red Tape.</h2>
+                   <h2 className="font-bold text-2xl md:text-3xl text-brand-navy font-display leading-none">Zero Red Tape.</h2>
                  </div>
                  
-                 <p id="hero-description" className="text-base md:text-lg text-brand-navy/80 leading-relaxed mb-6 md:mb-8 font-medium">
+                 <p id="hero-description" className="text-lg md:text-xl text-brand-navy/80 leading-relaxed mb-8 font-medium tracking-tight">
                    We replaced the bureaucracy with a bridge. Direct funding for rent, tech, and transit. No black holes.
                  </p>
                  
-                 <div className="flex flex-col gap-3">
+                 <div className="flex flex-col gap-4">
                    <button 
                      onClick={() => onNavigate('donate')}
                      aria-label="Give Support - Navigate to donation section"
-                     className="w-full bg-brand-navy text-white px-6 py-4 rounded-xl font-bold hover:bg-brand-teal transition-all flex items-center justify-between group shadow-lg active:scale-95 relative overflow-hidden"
+                     className="w-full bg-brand-navy text-white px-8 py-5 rounded-2xl font-bold hover:bg-brand-teal transition-all flex items-center justify-between group shadow-lg active:scale-95 relative overflow-hidden"
                    >
                      <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                     <span className="relative z-10">Give Support</span>
-                     <div className="relative z-10 bg-white/20 p-1.5 rounded-full group-hover:scale-125 transition-transform">
-                        <HeartHandshake size={18} />
+                     <span className="relative z-10 text-lg">Give Support</span>
+                     <div className="relative z-10 bg-white/20 p-2 rounded-full group-hover:scale-125 transition-transform">
+                        <HeartHandshake size={20} />
                      </div>
                    </button>
                    <button 
                      onClick={() => onNavigate('apply')}
                      aria-label="Get Support - Navigate to application section"
-                     className="w-full bg-transparent border-2 border-brand-navy/10 text-brand-navy px-6 py-4 rounded-xl font-bold hover:bg-white/50 transition-colors flex items-center justify-between group active:scale-95"
+                     className="w-full bg-white/50 border-2 border-brand-navy/10 text-brand-navy px-8 py-5 rounded-2xl font-bold hover:bg-white hover:border-brand-navy/30 transition-all flex items-center justify-between group active:scale-95"
                    >
-                     <span>Get Support</span>
-                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                     <span className="text-lg">Get Support</span>
+                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                    </button>
                  </div>
                </div>
@@ -178,7 +177,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
 
       {/* Scroll Indicator */}
       <div 
-        className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 opacity-0 animate-slide-up pointer-events-none" 
+        className="hidden lg:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 opacity-0 animate-slide-up pointer-events-none mix-blend-multiply" 
         style={{ animationDelay: '1.2s' }}
         aria-hidden="true"
       >

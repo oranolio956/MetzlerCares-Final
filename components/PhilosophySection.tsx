@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { SectionWrapper } from './SectionWrapper';
 import { Mascot } from './Mascot';
@@ -121,7 +120,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
         <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4 md:px-0">
           
           {/* 1. Header with 'Red Pen' Correction Effect */}
-          <div className="text-center mb-12 relative z-10 w-full">
+          <div className="text-center mb-12 relative z-10 w-full max-w-4xl">
             <div className="inline-block relative">
               <h2 
                 ref={textRef} 
@@ -130,9 +129,9 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                 Charity is broken.
               </h2>
               {/* Animated Strikethrough - Drawn like a red pen ONLY when visible */}
-              <svg className="absolute top-1/2 left-[-5%] w-[110%] h-[40px] overflow-visible pointer-events-none" style={{ transform: 'translateY(-50%)' }} aria-hidden="true">
+              <svg className="absolute top-0 left-0 w-full h-full overflow-visible pointer-events-none" aria-hidden="true">
                   <path 
-                    d="M0,20 Q150,5 300,20 T600,10" 
+                    d="M-20,30 Q150,5 300,25 T620,15" 
                     fill="none" 
                     stroke="#FF8A75" 
                     strokeWidth="6" 
@@ -147,7 +146,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
               </svg>
             </div>
             <h2 className="font-display text-5xl md:text-8xl font-bold text-brand-navy leading-[0.9] mt-2 relative drop-shadow-sm">
-              We fixed the <span className="relative inline-block text-brand-teal">
+              We fixed the <span className="relative inline-block text-brand-teal whitespace-nowrap">
                   incentives
                   <svg className="absolute -bottom-2 md:-bottom-4 left-0 w-full h-4 text-brand-yellow" viewBox="0 0 100 10" preserveAspectRatio="none">
                     <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="4" fill="none" />
@@ -158,7 +157,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
 
           {/* 2. Interactive Segmented Toggle */}
           <div 
-            className="bg-white p-2 rounded-full mb-12 flex relative z-20 shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] border border-brand-navy/10 w-full max-w-md mx-auto"
+            className="bg-white p-2 rounded-full mb-12 flex relative z-20 shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] border border-brand-navy/10 w-full max-w-sm mx-auto select-none"
             role="radiogroup"
             aria-label="View Mode"
           >
@@ -188,13 +187,13 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
               className={`flex-1 py-3 rounded-full font-bold text-sm md:text-base transition-colors duration-300 relative z-10 flex items-center justify-center gap-2 ${viewMode === 'fixed' ? 'text-white' : 'text-brand-navy/50 hover:text-brand-navy/80'}`}
             >
               <ShieldCheck size={18} className={viewMode === 'fixed' ? "text-white" : "text-brand-teal"} />
-              SecondWind Way
+              New Way
             </button>
           </div>
 
-          {/* 3. The 3D Container - Explicit Height to prevent collapse */}
+          {/* 3. The 3D Container - Adaptive Height */}
           <div 
-            className="w-full max-w-5xl h-[700px] md:h-[600px] relative [perspective:2000px] group"
+            className="w-full max-w-5xl min-h-[600px] h-auto md:h-[600px] relative [perspective:2000px] group"
             onMouseEnter={() => setIsHovering(true)}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
@@ -209,7 +208,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
               <article 
                 aria-hidden={isBrokenHidden}
                 className={`
-                  absolute inset-0 w-full h-full rounded-[3rem] overflow-hidden border-2 border-brand-navy/5 shadow-2xl 
+                  absolute inset-0 w-full h-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border-2 border-brand-navy/5 shadow-2xl 
                   transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] [backface-visibility:hidden]
                   bg-[#EAEBED]
                   ${viewMode === 'broken' 
@@ -248,10 +247,10 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                     ))}
                 </div>
 
-                <div className="relative z-10 flex flex-col items-center justify-center h-full text-center p-6 md:p-12">
+                <div className="relative z-10 flex flex-col items-center justify-center h-full text-center p-6 md:p-12 overflow-y-auto">
                     
                     {/* The Icon */}
-                    <div className="w-24 h-24 md:w-40 md:h-40 bg-brand-navy rounded-3xl flex items-center justify-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] mb-8 relative transform -rotate-3 transition-transform hover:rotate-0 duration-500 group-hover:scale-105">
+                    <div className="w-24 h-24 md:w-40 md:h-40 bg-brand-navy rounded-3xl flex items-center justify-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] mb-8 relative transform -rotate-3 transition-transform hover:rotate-0 duration-500 group-hover:scale-105 shrink-0">
                       <HelpCircle size={64} className="text-white/20" />
                       <div className="absolute inset-0 flex items-center justify-center">
                           <span className="text-4xl md:text-6xl font-display font-bold text-white tracking-tighter animate-pulse">???</span>
@@ -265,7 +264,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                     <h3 className="text-2xl md:text-5xl font-display font-bold text-brand-navy mb-4">The Black Box</h3>
                     <p className="max-w-lg text-brand-navy/60 text-base md:text-xl font-medium leading-relaxed mb-8">
                       Traditional non-profits pool your money into a general fund. 
-                      You assume it helps. <span className="text-brand-coral font-bold bg-brand-coral/10 px-1 rounded">But you never see the receipt.</span>
+                      You assume it helps. <span className="text-brand-coral font-bold bg-brand-coral/10 px-1 rounded whitespace-nowrap">But you never see the receipt.</span>
                     </p>
 
                     <div className="flex flex-wrap justify-center gap-3 md:gap-4">
@@ -284,7 +283,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
               <article 
                 aria-hidden={isFixedHidden}
                 className={`
-                  absolute inset-0 w-full h-full rounded-[3rem] overflow-hidden bg-white border-4 border-brand-teal shadow-[0_25px_50px_-12px_rgba(45,156,142,0.25)] 
+                  absolute inset-0 w-full h-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden bg-white border-4 border-brand-teal shadow-[0_25px_50px_-12px_rgba(45,156,142,0.25)] 
                   transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] [backface-visibility:hidden]
                   ${viewMode === 'fixed' 
                     ? 'opacity-100 z-20 pointer-events-auto' 
@@ -302,7 +301,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                   <div className="absolute top-0 left-0 w-full h-[2px] bg-brand-teal shadow-[0_0_40px_rgba(45,156,142,1)] animate-scan z-0 pointer-events-none"></div>
                 )}
 
-                <div className="relative z-10 h-full flex flex-col md:flex-row p-6 md:p-12 gap-8 md:gap-12 items-center">
+                <div className="relative z-10 h-full flex flex-col md:flex-row p-6 md:p-12 gap-8 md:gap-12 items-center overflow-y-auto md:overflow-hidden">
                     
                     {/* Left: Manifesto Copy */}
                     <div className="flex-1 text-center md:text-left pt-8 md:pt-0">
@@ -338,7 +337,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                     </div>
 
                     {/* Right: The Stacked Cards (Visual Proof) */}
-                    <div className="flex-1 w-full h-[300px] md:h-full relative flex items-center justify-center perspective-500" aria-hidden="true">
+                    <div className="flex-1 w-full min-h-[300px] h-full relative flex items-center justify-center perspective-500" aria-hidden="true">
                       
                       {/* Floating Mascot Celebration */}
                       <div className="absolute -top-6 -right-6 md:-top-12 md:-right-0 z-50 animate-bounce" style={{ animationDuration: '3s' }}>
@@ -391,7 +390,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
           </div>
 
           {/* 4. Social Proof / Silent Authority */}
-          <div className="mt-16 flex flex-col md:flex-row items-center gap-6 opacity-40 hover:opacity-100 transition-opacity duration-500">
+          <div className="mt-16 flex flex-col md:flex-row items-center gap-6 opacity-40 hover:opacity-100 transition-opacity duration-500 text-center md:text-left">
             <span className="text-xs font-bold uppercase tracking-widest text-brand-navy/50">Trusted By</span>
             <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 filter grayscale mix-blend-multiply items-center">
                 <span className="font-display font-bold text-brand-navy text-lg md:text-xl flex items-center gap-2">
