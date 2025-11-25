@@ -1,17 +1,20 @@
 import { GoogleGenAI, Chat, Content, Part } from "@google/genai";
 
-// Safe access to API_KEY to prevent ReferenceError in browsers where 'process' is not global
+// Safe access to API_KEY for Vite production builds
 const getApiKey = () => {
+  // Vite replaces process.env.API_KEY with the actual string value at build time.
+  // We access it directly to allow this replacement to occur.
   try {
-    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    if (process.env.API_KEY) {
       return process.env.API_KEY;
-    }
-    // Fallback for browser polyfills attached to window
-    if (typeof window !== 'undefined' && (window as any).process && (window as any).process.env) {
-      return (window as any).process.env.API_KEY;
     }
   } catch (e) {
     // ignore
+  }
+  
+  // Fallback for any other environment injections (legacy)
+  if (typeof window !== 'undefined' && (window as any).process?.env?.API_KEY) {
+    return (window as any).process.env.API_KEY;
   }
   return '';
 };
