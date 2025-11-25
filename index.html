@@ -167,14 +167,18 @@
       }
     </script>
     <style>
+      html {
+        height: 100%;
+        overscroll-behavior: none; /* Prevents rubber-banding on mobile */
+      }
       body {
         background-color: #FDFBF7;
         color: #1A2A3A;
-        overflow-x: hidden;
         transition: background-color 0.5s ease, filter 0.5s ease;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;
+        min-height: 100dvh; /* Dynamic viewport height fix */
       }
       .skip-link {
         position: absolute;
@@ -201,19 +205,29 @@
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         background-repeat: repeat;
       }
+      /* Custom Scrollbar */
       ::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
+        height: 6px;
       }
       ::-webkit-scrollbar-track {
-        background: #FDFBF7; 
+        background: transparent; 
       }
       ::-webkit-scrollbar-thumb {
-        background: #A7ACD9; 
-        border-radius: 4px;
+        background: rgba(26, 42, 58, 0.2); 
+        border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #2D9C8E; 
+        background: rgba(45, 156, 142, 0.8); 
       }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      
       .text-stroke-navy {
         -webkit-text-stroke: 1px #1A2A3A;
         color: transparent;
