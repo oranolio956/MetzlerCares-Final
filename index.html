@@ -1,25 +1,46 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     
-    <!-- SEO Core -->
+    <!-- SEO POWERHOUSE: Advanced Directives -->
     <title>SecondWind | Invest in Human Potential</title>
     <meta name="description" content="A direct-action recovery resource platform. We treat donations like investments, paying vendors directly for rent, tech, and transit. 100% transparency." />
     <meta name="keywords" content="recovery, sober living funding, non-profit, direct aid, addiction recovery resources, donate rent assistance" />
     <meta name="theme-color" content="#FDFBF7" />
-    <meta name="robots" content="index, follow" />
+    
+    <!-- Bot Control -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <meta name="format-detection" content="telephone=no" />
     <meta name="author" content="SecondWind Non-Profit" />
     <link rel="canonical" href="https://secondwind.org" />
     
-    <!-- Dynamic Brand Favicon -->
+    <!-- Internationalization -->
+    <link rel="alternate" href="https://secondwind.org" hreflang="x-default" />
+    <link rel="alternate" href="https://secondwind.org" hreflang="en" />
+    
+    <!-- GEO TAGS for Local/National Relevance -->
+    <meta name="geo.region" content="US" />
+    <meta name="geo.placename" content="United States" />
+    
+    <!-- DYNAMIC BRAND FAVICON -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%232D9C8E'/><path d='M30 50 C30 20 70 20 70 50 C70 80 30 80 30 50' stroke='white' stroke-width='8' fill='none'/></svg>" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%232D9C8E'/><path d='M30 50 C30 20 70 20 70 50 C70 80 30 80 30 50' stroke='white' stroke-width='8' fill='none'/></svg>" />
 
-    <!-- EXPERT GAP 4: Performance Hints (Preloading Critical Assets) -->
+    <!-- PERFORMANCE HINTS: Resource Prioritization -->
+    <meta http-equiv="x-dns-prefetch-control" content="on" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    
+    <!-- Fonts -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&family=Space+Grotesk:wght@300;400;500;700&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&family=Space+Grotesk:wght@300;400;500;700&display=swap" media="print" onload="this.media='all'" />
     <noscript>
@@ -38,11 +59,17 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@secondwind" />
+    <meta name="twitter:creator" content="@secondwind" />
     <meta name="twitter:title" content="SecondWind | Help Humans Be Human" />
     <meta name="twitter:description" content="Direct funding for rent, laptops, and bus passes. No red tape. Zero fraud." />
     <meta name="twitter:image" content="https://placehold.co/1200x630/2D9C8E/FFFFFF/png?text=Direct+Action" />
 
-    <!-- Structured Data (JSON-LD) for Google Knowledge Graph -->
+    <!-- PWA MANIFEST (Inline Data URI) -->
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22SecondWind%22%2C%22short_name%22%3A%22SecondWind%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23FDFBF7%22%2C%22theme_color%22%3A%22%23FDFBF7%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%253E%253Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'50'%20fill%3D'%25232D9C8E'%2F%253E%253Cpath%20d%3D'M30%2050%20C30%2020%2070%2020%2070%2050%20C70%2080%2030%2080%2030%2050'%20stroke%3D'white'%20stroke-width%3D'8'%20fill%3D'none'%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- STRUCTURED DATA: Knowledge Graph & Actions -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -53,7 +80,10 @@
       "logo": "https://secondwind.org/logo.png",
       "description": "A direct-action recovery resource platform providing rent, technology, and transit assistance.",
       "foundingDate": "2024",
-      "areaServed": "United States",
+      "areaServed": {
+        "@type": "Country",
+        "name": "United States"
+      },
       "sameAs": [
         "https://twitter.com/secondwind",
         "https://instagram.com/secondwind",
@@ -65,11 +95,22 @@
         "contactType": "customer service",
         "areaServed": "US",
         "availableLanguage": "en"
+      },
+      "potentialAction": {
+        "@type": "DonateAction",
+        "target": "https://secondwind.org#donate",
+        "description": "Invest in recovery portfolios directly",
+        "name": "Invest in Recovery",
+        "recipient": {
+            "@type": "NGO",
+            "name": "SecondWind"
+        },
+        "priceCurrency": "USD"
       }
     }
     </script>
 
-    <!-- Process Polyfill for Browser Runtime -->
+    <!-- Process Polyfill -->
     <script>
       window.process = window.process || { env: { API_KEY: '' } };
     </script>
@@ -136,8 +177,6 @@
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;
       }
-      
-      /* EXPERT GAP 3: Skip Link for Accessibility */
       .skip-link {
         position: absolute;
         top: -40px;
@@ -151,9 +190,6 @@
       .skip-link:focus {
         top: 0;
       }
-
-      /* GLOBAL NOISE TEXTURE - Performance Optimized */
-      /* Replaced heavy SVG filter with a light opacity pattern to ensure 60FPS scroll */
       .bg-noise {
         position: fixed;
         top: 0;
@@ -166,8 +202,6 @@
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         background-repeat: repeat;
       }
-
-      /* Custom scrollbar to match aesthetic */
       ::-webkit-scrollbar {
         width: 8px;
       }
@@ -181,20 +215,6 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #2D9C8E; 
       }
-
-      /* Advanced Glassmorphism */
-      .glass-panel {
-        background: rgba(255, 255, 255, 0.65);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 
-          0 4px 6px -1px rgba(0, 0, 0, 0.05),
-          0 2px 4px -1px rgba(0, 0, 0, 0.03),
-          inset 0 0 20px rgba(255, 255, 255, 0.5);
-      }
-      
-      /* Typography Utilities */
       .text-stroke-navy {
         -webkit-text-stroke: 1px #1A2A3A;
         color: transparent;
@@ -204,29 +224,23 @@
           -webkit-text-stroke: 2px #1A2A3A;
         }
       }
-
-      /* Focus management */
       :focus-visible {
         outline: 3px solid #2D9C8E;
         outline-offset: 4px;
         border-radius: 4px;
       }
-
-      /* --- CALM MODE (Radical Empathy) --- */
       body.calm-mode {
-        background-color: #F2F2F2; /* Flatter grey/white */
-        filter: saturate(0.8); /* Reduce color intensity */
+        background-color: #F2F2F2;
+        filter: saturate(0.8);
       }
       body.calm-mode .bg-noise {
-        display: none; /* Remove noise in calm mode for cleaner visual */
+        display: none;
       }
       body.calm-mode * {
         animation: none !important;
         transition: none !important;
         scroll-behavior: auto !important;
       }
-      
-      /* Standard Brand Pre-Loader */
       #initial-loader {
         position: fixed;
         top: 0;
@@ -266,19 +280,12 @@
 </script>
 </head>
   <body>
-    <!-- Accessibility Skip Link -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
-
-    <!-- Texture Overlay for that premium feel (Optimized) -->
     <div class="bg-noise"></div>
-
-    <!-- The Pre-Loader -->
     <div id="initial-loader">
       <div class="brand-pulse"></div>
     </div>
-
     <div id="root"></div>
-
     <script>
       window.addEventListener('load', () => {
         const loader = document.getElementById('initial-loader');

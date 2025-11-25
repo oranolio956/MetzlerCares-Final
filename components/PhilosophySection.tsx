@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { SectionWrapper } from './SectionWrapper';
 import { Mascot } from './Mascot';
+import { useStore } from '../context/StoreContext';
 import { 
   ArrowRight, 
   ShieldCheck, 
@@ -20,16 +21,48 @@ import {
 
 interface PhilosophySectionProps {
   onNavigate: (section: string) => void;
-  isCalmMode: boolean;
 }
 
-export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate, isCalmMode }) => {
+export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate }) => {
+  const { isCalmMode } = useStore();
   const [viewMode, setViewMode] = useState<'broken' | 'fixed'>('broken');
   const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
+
+  // SEO: FAQ Page Schema for SERP Dominance
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Why is traditional charity broken?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Traditional non-profits pool money into general funds with high overhead, red tape, and low transparency. You assume it helps, but you never see the receipt."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does SecondWind's direct-to-vendor model work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We don't give cash. We pay specific invoices for rent, laptops, or transit directly to the vendor (e.g., Landlord, Best Buy). This ensures zero fraud and 100% impact."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is SecondWind secure and transparent?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. We use bank-grade security and publish a real-time public ledger of all transactions. You can audit every cent from donation to final payment."
+        }
+      }
+    ]
+  };
 
   // Scroll Trigger Logic for Red Pen
   useEffect(() => {
@@ -82,8 +115,8 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
         id="philosophy" 
         title="Philosophy | SecondWind" 
         description="Charity is broken. We fixed the incentives with direct-to-vendor payments and micro-impact tracking."
-        isCalmMode={isCalmMode}
         className="overflow-visible" 
+        schema={faqSchema}
       >
         <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4 md:px-0">
           

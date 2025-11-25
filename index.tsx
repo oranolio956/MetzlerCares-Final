@@ -1,37 +1,54 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { StoreProvider } from './context/StoreContext';
 
 // Helper to show error
-const showErrorOverlay = (title, message, stack) => {
-  const existingError = document.getElementById('error-overlay');
-  if (existingError) return;
+const showErrorOverlay = (title: string, message: string, stack?: string) => {
+  // Prevent stacking
+  if (document.getElementById('error-overlay')) return;
 
   const errorDisplay = document.createElement('div');
   errorDisplay.id = 'error-overlay';
-  errorDisplay.style.position = 'fixed';
-  errorDisplay.style.top = '0';
-  errorDisplay.style.left = '0';
-  errorDisplay.style.width = '100%';
-  errorDisplay.style.height = 'auto';
-  errorDisplay.style.maxHeight = '50vh';
-  errorDisplay.style.overflowY = 'auto';
-  errorDisplay.style.background = '#FF8A75';
-  errorDisplay.style.color = '#1A2A3A';
-  errorDisplay.style.zIndex = '999999';
-  errorDisplay.style.padding = '20px';
-  errorDisplay.style.fontFamily = 'monospace';
-  errorDisplay.style.fontWeight = 'bold';
-  errorDisplay.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+  Object.assign(errorDisplay.style, {
+    position: 'fixed', top: '0', left: '0', width: '100%', height: 'auto',
+    maxHeight: '50vh', overflowY: 'auto', background: '#FF8A75', color: '#1A2A3A',
+    zIndex: '999999', padding: '20px', fontFamily: 'monospace', fontWeight: 'bold',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
+  });
   
-  errorDisplay.innerHTML = `
-    <h3 style="margin:0 0 10px 0;">⚠️ ${title}</h3>
-    <div style="background: rgba(255,255,255,0.5); padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-      ${message}
-    </div>
-    ${stack ? `<pre style="font-size: 10px; opacity: 0.8; overflow-x: auto; background: rgba(0,0,0,0.1); padding: 10px; border-radius: 4px;">${stack}</pre>` : ''}
-    <button onclick="document.getElementById('error-overlay').remove()" style="margin-top: 10px; padding: 5px 10px; background: #1A2A3A; color: white; border: none; border-radius: 4px; cursor: pointer;">Dismiss</button>
-  `;
+  const h3 = document.createElement('h3');
+  h3.textContent = `⚠️ ${title}`;
+  h3.style.margin = '0 0 10px 0';
+  errorDisplay.appendChild(h3);
+
+  const msgDiv = document.createElement('div');
+  msgDiv.textContent = message;
+  Object.assign(msgDiv.style, {
+    background: 'rgba(255,255,255,0.5)', padding: '10px',
+    borderRadius: '8px', marginBottom: '10px'
+  });
+  errorDisplay.appendChild(msgDiv);
+
+  if (stack) {
+    const pre = document.createElement('pre');
+    pre.textContent = stack;
+    Object.assign(pre.style, {
+      fontSize: '10px', opacity: '0.8', overflowX: 'auto',
+      background: 'rgba(0,0,0,0.1)', padding: '10px', borderRadius: '4px'
+    });
+    errorDisplay.appendChild(pre);
+  }
+
+  const btn = document.createElement('button');
+  btn.textContent = 'Dismiss';
+  btn.onclick = () => errorDisplay.remove();
+  Object.assign(btn.style, {
+    marginTop: '10px', padding: '5px 10px', background: '#1A2A3A',
+    color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'
+  });
+  errorDisplay.appendChild(btn);
   
   document.body.appendChild(errorDisplay);
   console.error("Global Error Caught:", message, stack);
@@ -55,6 +72,8 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <StoreProvider>
+      <App />
+    </StoreProvider>
   </React.StrictMode>
 );

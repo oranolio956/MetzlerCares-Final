@@ -2,20 +2,11 @@
 import React, { useState } from 'react';
 import { CheckCircle2, Clock, AlertCircle, Calendar, UploadCloud, ChevronRight, Star } from 'lucide-react';
 import { Mascot } from './Mascot';
-import { BeneficiaryProfile, ApplicationStatus } from '../types';
-
-const MOCK_USER: BeneficiaryProfile = {
-  name: "Alex",
-  daysSober: 42,
-  nextMilestone: 60,
-  requests: [
-    { id: '1', type: 'Rent Assistance (October)', date: '2 days ago', status: 'reviewing' },
-    { id: '2', type: 'Bus Pass (Monthly)', date: 'Sep 28, 2024', status: 'funded' },
-    { id: '3', type: 'Work Laptop', date: 'Sep 15, 2024', status: 'action_needed', note: 'Upload Offer Letter' }
-  ]
-};
+import { ApplicationStatus } from '../types';
+import { useStore } from '../context/StoreContext';
 
 export const BeneficiaryDashboard: React.FC = () => {
+  const { beneficiaryProfile } = useStore();
   const [activeTab, setActiveTab] = useState<'overview' | 'requests'>('overview');
 
   const getStatusColor = (status: ApplicationStatus) => {
@@ -46,7 +37,7 @@ export const BeneficiaryDashboard: React.FC = () => {
            
            <div className="relative z-10">
              <div className="flex items-center gap-4 mb-2">
-               <h2 className="font-display font-bold text-4xl">Welcome home, {MOCK_USER.name}.</h2>
+               <h2 className="font-display font-bold text-4xl">Welcome home, {beneficiaryProfile.name}.</h2>
                <Mascot expression="happy" className="w-12 h-12" />
              </div>
              <p className="text-brand-lavender text-lg">Your recovery is the priority. We handle the logistics.</p>
@@ -60,12 +51,12 @@ export const BeneficiaryDashboard: React.FC = () => {
              <Star className="text-brand-yellow fill-brand-yellow" size={20} />
            </div>
            <div className="text-6xl font-display font-bold text-brand-navy leading-none">
-             {MOCK_USER.daysSober}<span className="text-2xl text-brand-teal">days</span>
+             {beneficiaryProfile.daysSober}<span className="text-2xl text-brand-teal">days</span>
            </div>
            <div className="mt-4 w-full bg-brand-navy/5 h-2 rounded-full overflow-hidden">
              <div className="h-full bg-brand-teal w-[70%]"></div>
            </div>
-           <p className="text-xs text-brand-navy/60 mt-2 text-right">{60 - MOCK_USER.daysSober} days to next chip</p>
+           <p className="text-xs text-brand-navy/60 mt-2 text-right">{60 - beneficiaryProfile.daysSober} days to next chip</p>
         </div>
       </div>
 
@@ -73,9 +64,12 @@ export const BeneficiaryDashboard: React.FC = () => {
         
         {/* Left Col: Action Center */}
         <div className="lg:col-span-2 space-y-6">
-           <h3 className="font-display font-bold text-2xl text-brand-navy ml-4">Active Requests</h3>
+           <h3 className="font-display font-bold text-2xl text-brand-navy ml-4 flex items-center gap-2">
+             Active Requests 
+             <span className="bg-brand-navy/5 px-2 py-1 rounded-full text-sm font-bold text-brand-navy/50">{beneficiaryProfile.requests.length}</span>
+           </h3>
            
-           {MOCK_USER.requests.map((req) => (
+           {beneficiaryProfile.requests.map((req) => (
              <div key={req.id} className="group bg-white p-6 rounded-3xl border-2 border-brand-navy/5 hover:border-brand-navy transition-all hover:shadow-[4px_4px_0px_0px_rgba(26,42,58,1)] flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center ${getStatusColor(req.status)}`}>
@@ -84,6 +78,7 @@ export const BeneficiaryDashboard: React.FC = () => {
                   <div>
                     <h4 className="font-bold text-lg text-brand-navy">{req.type}</h4>
                     <span className="text-xs font-medium text-brand-navy/50">{req.date}</span>
+                    {req.details && <p className="text-xs text-brand-navy/40 mt-1 max-w-md truncate">{req.details}</p>}
                   </div>
                 </div>
 

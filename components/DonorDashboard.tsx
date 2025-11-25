@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TrendingUp, ArrowUpRight, Heart, Users, Activity, Bell } from 'lucide-react';
 import { Mascot } from './Mascot';
-import { ImpactStory, DonorStats } from '../types';
+import { ImpactStory, DonorStats, Donation } from '../types';
+import { useStore } from '../context/StoreContext';
+import { Skeleton } from './Skeleton';
 
 const MOCK_STATS: DonorStats = {
   totalInvested: 1250,
@@ -18,6 +20,20 @@ const MOCK_STORIES: ImpactStory[] = [
 ];
 
 export const DonorDashboard: React.FC = () => {
+  const { donations } = useStore();
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Calculate real stats
+  const sessionTotal = donations.reduce((acc, curr) => acc + curr.amount, 0);
+  const totalInvested = MOCK_STATS.totalInvested + sessionTotal;
+  const livesImpacted = MOCK_STATS.livesImpacted + donations.length;
+
+  useEffect(() => {
+    // Simulate data fetching for realism
+    const timer = setTimeout(() => setIsLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="w-full max-w-6xl mx-auto animate-float" style={{ animationDuration: '0.8s', animationIterationCount: 1 }}>
       
@@ -30,7 +46,11 @@ export const DonorDashboard: React.FC = () => {
              </div>
              <span className="text-xs font-bold uppercase tracking-widest text-brand-navy/50">Impact Portfolio</span>
            </div>
-           <h2 className="font-display font-bold text-5xl text-brand-navy">Your Returns.</h2>
+           {isLoading ? (
+             <Skeleton className="h-16 w-64 rounded-2xl mb-2" />
+           ) : (
+             <h2 className="font-display font-bold text-5xl text-brand-navy">Your Returns.</h2>
+           )}
            <p className="text-brand-navy/60 mt-2 text-lg">Tracking the real-world dividends of your investment.</p>
         </div>
         
@@ -55,13 +75,13 @@ export const DonorDashboard: React.FC = () => {
             </div>
             <span className="text-xs font-bold uppercase text-brand-navy/40">Total Invested</span>
             <div className="text-4xl font-display font-bold text-brand-navy mt-1">
-              ${MOCK_STATS.totalInvested.toLocaleString()}
+              {isLoading ? <Skeleton className="w-32 h-10" /> : `$${totalInvested.toLocaleString()}`}
             </div>
             <div className="text-xs font-bold text-brand-teal mt-2 flex items-center gap-1">
                <div className="w-4 h-4 bg-brand-teal/20 rounded-full flex items-center justify-center">
                  <ArrowUpRight size={10} />
                </div>
-               +12% this month
+               +{(sessionTotal / totalInvested * 100 + 12).toFixed(1)}% this month
             </div>
          </div>
 
@@ -70,7 +90,7 @@ export const DonorDashboard: React.FC = () => {
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-brand-yellow/20 rounded-full blur-xl"></div>
             <span className="text-xs font-bold uppercase text-brand-lavender">Social ROI</span>
             <div className="text-4xl font-display font-bold text-brand-yellow mt-1">
-              {(MOCK_STATS.socialRoi / 100).toFixed(1)}x
+               {isLoading ? <Skeleton className="w-24 h-10 bg-brand-lavender/20" /> : `${(MOCK_STATS.socialRoi / 100).toFixed(1)}x`}
             </div>
             <div className="text-xs font-bold text-brand-lavender/60 mt-2">
                Community Multiplier Effect
@@ -82,7 +102,7 @@ export const DonorDashboard: React.FC = () => {
              <Mascot expression="happy" className="absolute -right-2 -bottom-2 w-24 h-24 opacity-20" />
             <span className="text-xs font-bold uppercase text-brand-navy/60">Lives Impacted</span>
             <div className="text-4xl font-display font-bold text-white mt-1">
-              {MOCK_STATS.livesImpacted}
+              {isLoading ? <Skeleton className="w-16 h-10 bg-white/30" /> : livesImpacted}
             </div>
             <div className="text-xs font-bold text-brand-navy/60 mt-2">
                Direct beneficiaries
@@ -93,7 +113,7 @@ export const DonorDashboard: React.FC = () => {
          <div className="bg-white p-6 rounded-3xl border border-brand-navy/10 shadow-sm">
             <span className="text-xs font-bold uppercase text-brand-navy/40">Active Projects</span>
             <div className="text-4xl font-display font-bold text-brand-navy mt-1">
-              {MOCK_STATS.activeProjects}
+               {isLoading ? <Skeleton className="w-16 h-10" /> : MOCK_STATS.activeProjects}
             </div>
              <div className="flex -space-x-2 mt-3">
                 <div className="w-8 h-8 rounded-full bg-brand-teal border-2 border-white flex items-center justify-center text-[10px] text-white font-bold">SM</div>
@@ -111,26 +131,48 @@ export const DonorDashboard: React.FC = () => {
             </h3>
             
             <div className="space-y-4">
-               {MOCK_STORIES.map((story) => (
-                  <div key={story.id} className="bg-white p-6 rounded-3xl border-l-4 border-brand-teal shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center hover:shadow-md transition-shadow">
-                     <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${story.type === 'commute' ? 'bg-brand-lavender' : story.type === 'home' ? 'bg-brand-coral' : 'bg-brand-teal'}`}>
-                        <Mascot variant={story.type} expression="excited" className="w-8 h-8" />
-                     </div>
-                     <div className="flex-1">
-                        <p className="text-lg text-brand-navy font-medium">
-                           <span className="font-bold">{story.beneficiary}</span> {story.action} and <span className="text-brand-teal font-bold">{story.outcome}</span>.
-                        </p>
-                        <p className="text-xs text-brand-navy/40 font-bold uppercase tracking-wider mt-1">{story.date}</p>
-                     </div>
-                     <button className="text-brand-navy/20 hover:text-brand-coral transition-colors">
-                        <Heart size={20} />
-                     </button>
-                  </div>
-               ))}
-            </div>
+               {isLoading ? (
+                 <>
+                   <Skeleton className="h-24 w-full rounded-3xl" />
+                   <Skeleton className="h-24 w-full rounded-3xl" />
+                   <Skeleton className="h-24 w-full rounded-3xl" />
+                 </>
+               ) : (
+                 <>
+                  {/* Real Session Donations */}
+                  {donations.map((d) => (
+                      <div key={d.id} className="bg-brand-cream p-6 rounded-3xl border-l-4 border-brand-coral shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center animate-slide-up">
+                         <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-brand-navy text-white`}>
+                            <Mascot variant={d.impactType === 'commute' ? 'commute' : d.impactType === 'tech' ? 'tech' : 'home'} expression="celebration" className="w-8 h-8" />
+                         </div>
+                         <div className="flex-1">
+                            <p className="text-lg text-brand-navy font-medium">
+                               <span className="font-bold">You</span> just deployed <span className="font-bold text-brand-coral">${d.amount}</span> for {d.itemLabel}.
+                            </p>
+                            <p className="text-xs text-brand-navy/40 font-bold uppercase tracking-wider mt-1">Just Now</p>
+                         </div>
+                      </div>
+                  ))}
 
-            <div className="mt-6 p-6 rounded-3xl bg-brand-navy/5 border border-dashed border-brand-navy/10 text-center">
-               <p className="text-brand-navy/60 font-medium">Viewing 3 of 42 impact events</p>
+                  {/* Mock Historical Stories */}
+                  {MOCK_STORIES.map((story) => (
+                      <div key={story.id} className="bg-white p-6 rounded-3xl border-l-4 border-brand-teal shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center hover:shadow-md transition-shadow">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${story.type === 'commute' ? 'bg-brand-lavender' : story.type === 'home' ? 'bg-brand-coral' : 'bg-brand-teal'}`}>
+                            <Mascot variant={story.type} expression="excited" className="w-8 h-8" />
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-lg text-brand-navy font-medium">
+                              <span className="font-bold">{story.beneficiary}</span> {story.action} and <span className="text-brand-teal font-bold">{story.outcome}</span>.
+                            </p>
+                            <p className="text-xs text-brand-navy/40 font-bold uppercase tracking-wider mt-1">{story.date}</p>
+                        </div>
+                        <button className="text-brand-navy/20 hover:text-brand-coral transition-colors">
+                            <Heart size={20} />
+                        </button>
+                      </div>
+                  ))}
+                 </>
+               )}
             </div>
          </div>
 

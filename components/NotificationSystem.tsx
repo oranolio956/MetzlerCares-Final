@@ -1,14 +1,11 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { CheckCircle2, Info, XCircle, X } from 'lucide-react';
-import { Notification } from '../types';
+import { useStore } from '../context/StoreContext';
 
-interface NotificationSystemProps {
-  notifications: Notification[];
-  removeNotification: (id: string) => void;
-}
+export const NotificationSystem: React.FC = () => {
+  const { notifications, removeNotification } = useStore();
 
-export const NotificationSystem: React.FC<NotificationSystemProps> = ({ notifications, removeNotification }) => {
   return (
     <div className="fixed bottom-24 md:bottom-8 left-0 right-0 z-[100] flex flex-col items-center gap-3 pointer-events-none px-4">
       {notifications.map((note) => (

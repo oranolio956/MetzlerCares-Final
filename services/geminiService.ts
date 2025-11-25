@@ -1,4 +1,4 @@
-import { GoogleGenAI, Chat } from "@google/genai";
+import { GoogleGenAI, Chat, Content, Part } from "@google/genai";
 
 // Safe access to API_KEY to prevent ReferenceError in browsers where 'process' is not global
 const getApiKey = () => {
@@ -16,13 +16,13 @@ const getApiKey = () => {
   return '';
 };
 
-// Lazy initialization to prevent top-level crashes if SDK throws on empty key immediately
+// Lazy initialization
 let ai: GoogleGenAI | null = null;
 
 const getAiClient = () => {
   if (!ai) {
     const key = getApiKey();
-    console.log("Initializing Gemini AI Client...");
+    if (!key) console.warn("Gemini API Key missing");
     ai = new GoogleGenAI({ apiKey: key });
   }
   return ai;
@@ -53,24 +53,55 @@ RULES:
 After gathering the info, thank them and say you are submitting their profile to the human team.
 `;
 
-let chatSession: Chat | null = null;
-
-export const startIntakeSession = (): Chat => {
+export const startIntakeSession = (restoredHistory?: Content[]): Chat => {
   const client = getAiClient();
-  chatSession = client.chats.create({
+  
+  // Transform simplified history if needed or pass as is
+  // The SDK expects Content[] which is { role: string, parts: Part[] }[]
+  const validHistory = restoredHistory?.map(h => ({
+    role: h.role,
+    parts: h.parts
+  })) || [];
+
+  return client.chats.create({
     model: 'gemini-2.5-flash',
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
       temperature: 0.7,
     },
+    history: validHistory
   });
-  return chatSession;
 };
 
 export const sendMessageToGemini = async (message: string, chat: Chat): Promise<string> => {
   try {
     const result = await chat.sendMessage({ message });
-    return result.text || "I'm having a little trouble connecting to the wind right now. Can you try again?";
+    
+    // Safety & Null Checks
+    if (!result || !result.candidates || result.candidates.length === 0) {
+        throw new Error("No response candidates returned");
+    }
+
+    const candidate = result.candidates[0];
+    
+    // Check for safety blocking
+    if (candidate.finishReason === 'SAFETY') {
+        return "I want to help, but I need to keep our conversation focused on your recovery needs and logistics. Could we rephrase that?";
+    }
+
+    // Access text via getter, but wrap in try/catch as getters can throw on some SDK versions if empty
+    try {
+        const text = result.text;
+        if (text) return text;
+    } catch (e) {
+        // Fallback for parsing structure manually if getter fails
+        if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+             const part = candidate.content.parts[0];
+             if ('text' in part) return part.text as string;
+        }
+    }
+
+    return "I'm having a little trouble connecting to the wind right now. Can you try again?";
   } catch (error) {
     console.error("Gemini Error:", error);
     return "Oops, a gust of wind interrupted me. Let's try that again.";

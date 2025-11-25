@@ -1,29 +1,33 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { HeartHandshake, ArrowRight, Wind } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { SEOHead } from './SEOHead';
+import { useStore } from '../context/StoreContext';
 
 interface HeroSectionProps {
   onNavigate: (section: string) => void;
-  isCalmMode: boolean;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, isCalmMode }) => {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isHoveringCard, setIsHoveringCard] = useState(false);
+export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
+  const { isCalmMode } = useStore();
+  // Use a Ref for the container to update CSS variables directly, bypassing React Render Cycle
+  const containerRef = useRef<HTMLElement>(null);
 
-  // Parallax Logic - Only active on desktop for performance
   useEffect(() => {
-    // Disable on mobile completely for battery/performance
+    // Disable on mobile/Calm Mode
     if (isCalmMode || window.matchMedia("(max-width: 768px)").matches) return;
 
     let rafId: number;
     const handleMouseMove = (e: MouseEvent) => {
       rafId = requestAnimationFrame(() => {
-        const x = (e.clientX / window.innerWidth) * 2 - 1;
-        const y = (e.clientY / window.innerHeight) * 2 - 1;
-        setMousePos({ x, y });
+        if (containerRef.current) {
+           const x = (e.clientX / window.innerWidth) * 2 - 1;
+           const y = (e.clientY / window.innerHeight) * 2 - 1;
+           // Directly update CSS Variables on the DOM node
+           containerRef.current.style.setProperty('--mouse-x', x.toString());
+           containerRef.current.style.setProperty('--mouse-y', y.toString());
+        }
       });
     };
 
@@ -36,6 +40,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, isCalmMode
 
   return (
     <section 
+      ref={containerRef}
       className="relative min-h-screen w-full flex flex-col justify-start md:justify-center overflow-x-hidden"
       aria-label="Introduction"
     >
@@ -44,15 +49,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, isCalmMode
          description="A direct-action recovery resource platform. We treat donations like investments, paying vendors directly for rent, tech, and transit. 100% transparency."
          schema={{
            "@type": "SpeakableSpecification",
-           "xpath": ["/html/body/main/section[1]/div[2]/div[1]/div[1]/h1"],
-           "name": "SecondWind Hero Statement"
+           "xpath": ["/html/body/main/section[1]/div[2]/div[2]/article/div[2]/p"],
+           "cssSelector": ["#hero-description"],
+           "name": "SecondWind Mission Statement"
          }}
       />
       
-      {/* Background Blobs - GPU Accelerated & Optimized */}
+      {/* Background Blobs - Driven by CSS Vars */}
       <div 
         className="absolute inset-0 pointer-events-none -z-10 transition-transform duration-300 ease-out will-change-transform"
-        style={{ transform: `translate(${mousePos.x * -10}px, ${mousePos.y * -10}px)` }}
+        style={{ transform: `translate(calc(var(--mouse-x, 0) * -10px), calc(var(--mouse-y, 0) * -10px))` }}
         aria-hidden="true"
       >
         <div className="absolute top-[-10%] left-[10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-brand-teal opacity-10 rounded-full filter blur-[80px] md:blur-[100px] animate-blob mix-blend-multiply"></div>
@@ -60,27 +66,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, isCalmMode
         <div className="absolute top-[30%] left-[50%] w-[200px] md:w-[300px] h-[200px] md:h-[300px] bg-brand-yellow opacity-10 rounded-full filter blur-[60px] md:blur-[80px] animate-blob mix-blend-multiply" style={{animationDelay: '4s'}}></div>
       </div>
 
-      {/* Main Content Grid 
-          - Mobile: pt-36 ensures content starts BELOW the fixed header logos. 
-          - Desktop: pt-0 because flex-col justify-center handles vertical alignment perfectly.
-      */}
       <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center pt-36 md:pt-0 pb-24 md:pb-0 h-full">
          
-         {/* Left Side: Massive Typographic Statement */}
+         {/* Left Side: Typography */}
          <div className="lg:col-span-8 relative flex flex-col items-center lg:items-start text-center lg:text-left">
             
-            {/* Parallax Layer 2: Typography (Medium Speed) */}
+            {/* Parallax Layer: Typography */}
             <div 
               className="relative z-20 transition-transform duration-300 ease-out will-change-transform"
-              style={{ transform: `translate(${mousePos.x * -20}px, ${mousePos.y * -20}px)` }}
+              style={{ transform: `translate(calc(var(--mouse-x, 0) * -20px), calc(var(--mouse-y, 0) * -20px))` }}
             >
               <h1 className="font-display font-bold leading-[0.85] md:leading-[0.9] tracking-tighter text-brand-navy select-none pointer-events-none" aria-label="Get back up.">
-                {/* 
-                   Responsive Text Sizing Logic:
-                   - Mobile: 16vw ensures it fits width but remains huge.
-                   - Tablet (sm): 14vw.
-                   - Desktop (lg): Fixed rem sizes for consistency.
-                */}
                 <span className="block text-[16vw] sm:text-[14vw] lg:text-[10rem] xl:text-[11rem] opacity-0 animate-slide-up min-h-[1em]" style={{ animationDelay: '0.1s' }} aria-hidden="true">
                   GET
                 </span>
@@ -94,7 +90,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, isCalmMode
               </h1>
             </div>
 
-            {/* Floating Mascot - Responsive Positioning */}
+            {/* Floating Mascot - Driven by CSS Vars */}
             <div 
                className="
                  absolute 
@@ -108,39 +104,37 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, isCalmMode
                " 
                style={{ 
                  animationDelay: '0.6s',
-                 transform: `translate(${mousePos.x * -40}px, ${mousePos.y * -40}px) rotate(${mousePos.x * 5}deg)`
+                 transform: `
+                    translate(calc(var(--mouse-x, 0) * -40px), calc(var(--mouse-y, 0) * -40px)) 
+                    rotate(calc(var(--mouse-x, 0) * 5deg))
+                 `
                }}
                aria-hidden="true"
             >
                 <div className="w-full h-full aspect-square">
-                    <Mascot 
-                      expression="excited" 
-                      className="w-full h-full drop-shadow-2xl opacity-90" 
-                      lookAt={mousePos} 
-                    />
+                    {/* Mascot reads vars from parent */}
+                    <Mascot expression="excited" className="w-full h-full drop-shadow-2xl opacity-90" />
                 </div>
             </div>
          </div>
 
-         {/* Right Side: The "Card" - Interactive Glass Panel */}
+         {/* Right Side: The "Card" */}
          <div className="lg:col-span-4 perspective-1000 w-full max-w-md lg:max-w-none mx-auto mt-8 lg:mt-32 relative z-30">
             <article 
               className={`
                 relative p-6 md:p-8 rounded-[2rem] transition-all duration-500 ease-out transform 
-                ${isHoveringCard ? 'scale-105 shadow-[0_25px_50px_-12px_rgba(255,255,255,0.5)]' : 'scale-100 shadow-2xl'} 
+                group hover:scale-105 hover:shadow-[0_25px_50px_-12px_rgba(255,255,255,0.5)] shadow-2xl
                 opacity-0 animate-slide-up will-change-transform
                 bg-white/60 backdrop-blur-2xl border border-white/80
               `}
               style={{ 
                 animationDelay: '0.8s',
                 transform: `
-                  translate(${mousePos.x * -15}px, ${mousePos.y * -15}px)
-                  rotateX(${mousePos.y * -2}deg)
-                  rotateY(${mousePos.x * 2}deg)
+                  translate(calc(var(--mouse-x, 0) * -15px), calc(var(--mouse-y, 0) * -15px))
+                  rotateX(calc(var(--mouse-y, 0) * -2deg))
+                  rotateY(calc(var(--mouse-x, 0) * 2deg))
                 `
               }}
-              onMouseEnter={() => setIsHoveringCard(true)}
-              onMouseLeave={() => setIsHoveringCard(false)}
             >
                <div className="absolute inset-0 bg-white/20 rounded-[2rem] pointer-events-none"></div>
 
@@ -152,7 +146,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, isCalmMode
                    <h2 className="font-bold text-xl md:text-2xl text-brand-navy font-display leading-none">Zero Red Tape.</h2>
                  </div>
                  
-                 <p className="text-base md:text-lg text-brand-navy/80 leading-relaxed mb-6 md:mb-8 font-medium">
+                 <p id="hero-description" className="text-base md:text-lg text-brand-navy/80 leading-relaxed mb-6 md:mb-8 font-medium">
                    We replaced the bureaucracy with a bridge. Direct funding for rent, tech, and transit. No black holes.
                  </p>
                  

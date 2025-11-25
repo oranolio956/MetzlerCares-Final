@@ -27,6 +27,7 @@ export interface RequestItem {
   date: string;
   status: ApplicationStatus;
   note?: string;
+  details?: string;
 }
 
 export interface BeneficiaryProfile {
@@ -82,4 +83,12 @@ export interface TransactionReceipt {
   amount: number;
   item: string;
   quantity: number;
+}
+
+export interface Donation {
+  id: string;
+  amount: number;
+  itemLabel: string;
+  impactType: 'commute' | 'home' | 'tech';
+  timestamp: Date;
 }

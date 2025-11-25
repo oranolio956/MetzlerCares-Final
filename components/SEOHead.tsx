@@ -35,26 +35,22 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     if (ogDesc) ogDesc.setAttribute('content', description);
 
     // 4. Inject JSON-LD Schema (Silent SEO Feature)
+    // Now supports multiple concurrent schemas (e.g. Breadcrumbs + Product)
     if (schema) {
       const script = document.createElement('script');
       script.type = 'application/ld+json';
       script.text = JSON.stringify(schema);
-      script.id = 'dynamic-schema';
+      const id = `schema-${Math.random().toString(36).substr(2, 9)}`;
+      script.id = id;
       
-      // Remove old dynamic schema if exists
-      const oldScript = document.getElementById('dynamic-schema');
-      if (oldScript) oldScript.remove();
-
       document.head.appendChild(script);
 
       return () => {
-        // Cleanup on unmount
-        if (document.head.contains(script)) {
-          document.head.removeChild(script);
-        }
+        const el = document.getElementById(id);
+        if (el) el.remove();
       };
     }
   }, [title, description, schema]);
 
-  return null; // This component renders nothing visually
+  return null;
 };

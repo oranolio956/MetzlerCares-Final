@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ShieldCheck, Lock, X, ChevronRight, CreditCard, Banknote, PenTool } from 'lucide-react';
+import { ShieldCheck, Lock, X, ChevronRight, CreditCard, Banknote, PenTool, Download, Copy, Check } from 'lucide-react';
 import { Mascot } from './Mascot';
+import { useSound } from '../hooks/useSound';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -13,17 +14,23 @@ interface PaymentModalProps {
   };
   quantity: number;
   totalAmount: number;
+  onSuccess: () => void;
 }
 
-export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, item, quantity, totalAmount }) => {
+export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, item, quantity, totalAmount, onSuccess }) => {
   const [step, setStep] = useState<'details' | 'processing' | 'success'>('details');
   const [note, setNote] = useState('');
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { playSuccess, playClick } = useSound();
   
   // Fake processing delay
   const handleExecute = () => {
     setStep('processing');
     setTimeout(() => {
       setStep('success');
+      generateShareCard();
+      onSuccess();
     }, 2500);
   };
 
@@ -32,10 +39,96 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
     if (isOpen) setStep('details');
   }, [isOpen]);
 
+  const generateShareCard = () => {
+     const canvas = canvasRef.current;
+     if (!canvas) return;
+     const ctx = canvas.getContext('2d');
+     if (!ctx) return;
+
+     // Set Dimensions (Social Media Aspect Ratio)
+     canvas.width = 1200;
+     canvas.height = 630;
+
+     // 1. Background
+     ctx.fillStyle = '#1A2A3A';
+     ctx.fillRect(0, 0, canvas.width, canvas.height);
+     
+     // Noise Texture Pattern (Simulated)
+     for(let i=0; i<5000; i++) {
+        ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.05})`;
+        ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 2, 2);
+     }
+
+     // 2. Decorative Blobs
+     ctx.beginPath();
+     ctx.arc(100, 100, 300, 0, Math.PI * 2);
+     ctx.fillStyle = 'rgba(45, 156, 142, 0.2)'; // Teal
+     ctx.fill();
+
+     ctx.beginPath();
+     ctx.arc(1100, 530, 250, 0, Math.PI * 2);
+     ctx.fillStyle = 'rgba(255, 138, 117, 0.1)'; // Coral
+     ctx.fill();
+
+     // 3. Borders & Frame
+     ctx.strokeStyle = '#FDFBF7';
+     ctx.lineWidth = 4;
+     ctx.strokeRect(40, 40, 1120, 550);
+
+     ctx.fillStyle = '#FDFBF7';
+     ctx.font = 'bold 30px sans-serif';
+     ctx.fillText('CERTIFIED IMPACT PORTFOLIO', 80, 90);
+
+     // 4. Main Content
+     ctx.fillStyle = '#2D9C8E';
+     ctx.font = 'bold 120px sans-serif';
+     ctx.fillText(`${quantity}x ${item.label}`, 80, 250);
+
+     ctx.fillStyle = 'rgba(253, 251, 247, 0.6)';
+     ctx.font = '40px sans-serif';
+     ctx.fillText(`Directed to: ${item.sub}`, 80, 310);
+
+     // 5. Amount Badge
+     ctx.fillStyle = '#F4D35E';
+     ctx.fillRect(80, 450, 300, 80);
+     
+     ctx.fillStyle = '#1A2A3A';
+     ctx.font = 'bold 40px sans-serif';
+     ctx.fillText(`$${totalAmount.toFixed(2)}`, 130, 505);
+
+     // 6. Watermark
+     ctx.fillStyle = 'rgba(253, 251, 247, 0.1)';
+     ctx.font = 'bold 200px sans-serif';
+     ctx.fillText('SecondWind', 600, 500);
+
+     // 7. Footer
+     ctx.fillStyle = '#FDFBF7';
+     ctx.font = '24px monospace';
+     const date = new Date().toLocaleDateString();
+     ctx.fillText(`ISSUED: ${date}  |  ID: ${Math.floor(Math.random()*1000000)}`, 80, 560);
+
+     // Convert to Blob
+     const url = canvas.toDataURL('image/png');
+     setDownloadUrl(url);
+  };
+
+  const handleDownload = () => {
+     if (downloadUrl) {
+        const link = document.createElement('a');
+        link.download = `SecondWind-Impact-${Date.now()}.png`;
+        link.href = downloadUrl;
+        link.click();
+        playSuccess();
+     }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      {/* Hidden Canvas for Generation */}
+      <canvas ref={canvasRef} className="hidden" />
+
       <div className="absolute inset-0 bg-brand-navy/80 backdrop-blur-sm" onClick={onClose}></div>
       
       <div className={`w-full max-w-2xl bg-white rounded-3xl shadow-2xl relative overflow-hidden flex flex-col transition-all duration-500 ${step === 'success' ? 'scale-105' : 'scale-100'}`}>
@@ -102,7 +195,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
               </div>
 
               <button 
-                onClick={handleExecute}
+                onClick={() => { playClick(); handleExecute(); }}
                 className="mt-auto w-full bg-brand-teal text-white font-bold py-4 rounded-xl shadow-[0_10px_20px_-5px_rgba(45,156,142,0.4)] hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
               >
                 Complete Transaction <ChevronRight />
@@ -132,27 +225,43 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
           )}
 
           {step === 'success' && (
-            <div className="flex-1 flex flex-col items-center justify-center text-center animate-slide-up">
-               <div className="w-48 h-48 mb-6 relative">
+            <div className="flex-1 flex flex-col items-center animate-slide-up">
+               <div className="w-24 h-24 mb-4 relative">
                   <div className="absolute inset-0 bg-brand-yellow/20 rounded-full animate-pulse"></div>
                   <Mascot expression="celebration" className="relative z-10" />
                </div>
-               <h3 className="font-display font-bold text-4xl text-brand-navy mb-2">You're Amazing!</h3>
-               <p className="text-brand-navy/60 max-w-sm mb-8 text-lg">
-                 The funds have been deployed. You just removed a real barrier for someone.
-               </p>
+               <h3 className="font-display font-bold text-3xl text-brand-navy mb-2 text-center">Investment Deployed!</h3>
                
-               <div className="bg-brand-cream p-4 rounded-xl border border-brand-navy/10 w-full mb-8">
-                  <p className="text-xs font-bold uppercase text-brand-navy/40 mb-1">Receipt ID</p>
-                  <p className="font-mono font-bold text-brand-navy">#SW-{Math.floor(Math.random() * 99999)}</p>
-               </div>
+               {/* PREVIEW CARD */}
+               {downloadUrl ? (
+                   <div className="w-full max-w-sm aspect-video bg-brand-navy rounded-xl shadow-lg mb-6 overflow-hidden relative group cursor-pointer border-4 border-brand-cream" onClick={handleDownload}>
+                       <img src={downloadUrl} alt="Certificate" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
+                       <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <Download className="text-white" size={32} />
+                       </div>
+                   </div>
+               ) : (
+                   <div className="w-full max-w-sm h-32 bg-brand-navy/10 rounded-xl animate-pulse mb-6"></div>
+               )}
 
-               <button 
-                 onClick={onClose}
-                 className="w-full bg-brand-navy text-white font-bold py-4 rounded-xl shadow-lg hover:bg-brand-teal transition-colors"
-               >
-                 Close & Return to Portfolio
-               </button>
+               <div className="flex gap-3 w-full">
+                  <button 
+                    onClick={handleDownload}
+                    className="flex-1 bg-brand-navy text-white font-bold py-3 rounded-xl shadow-lg hover:bg-brand-teal transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Download size={18} /> Save Certificate
+                  </button>
+                  <button 
+                    onClick={onClose}
+                    className="px-6 py-3 border-2 border-brand-navy/10 rounded-xl font-bold text-brand-navy hover:bg-brand-cream transition-colors"
+                  >
+                    Close
+                  </button>
+               </div>
+               
+               <p className="text-xs text-brand-navy/40 mt-4 text-center">
+                 A digital copy has been sent to your dashboard.
+               </p>
             </div>
           )}
 

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { SEOHead } from './SEOHead';
+import { useStore } from '../context/StoreContext';
 
 interface SectionWrapperProps {
   id: string;
@@ -8,7 +9,6 @@ interface SectionWrapperProps {
   description?: string; // Used for SEO Description
   children: React.ReactNode;
   className?: string;
-  isCalmMode?: boolean;
   schema?: Record<string, any>; // JSON-LD Schema
 }
 
@@ -18,9 +18,10 @@ export const SectionWrapper: React.FC<SectionWrapperProps> = ({
   description, 
   children, 
   className = "", 
-  isCalmMode = false,
   schema
 }) => {
+  const { isCalmMode } = useStore();
+  
   return (
     <>
       {/* 1. Silent SEO Injection */}

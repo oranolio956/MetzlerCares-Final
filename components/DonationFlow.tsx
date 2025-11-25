@@ -3,15 +3,16 @@ import React, { useState, useEffect, useRef, memo } from 'react';
 import { ArrowRight, ShieldCheck, TrendingUp, Lock, Printer, CreditCard, Bus, Laptop, Home, Target, Activity } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { PaymentModal } from './PaymentModal';
+import { useStore } from '../context/StoreContext';
+import { useSound } from '../hooks/useSound';
 
-// --- SUB-COMPONENT: SCRAMBLE TEXT EFFECT (Optimized with Memo) ---
+// --- SUB-COMPONENT: SCRAMBLE TEXT EFFECT ---
 const ScrambleText: React.FC<{ text: string; className?: string; active: boolean }> = memo(({ text = "", className, active }) => {
   const [display, setDisplay] = useState(text || "");
-  const chars = "1234567890"; // Only numbers for cleaner financial look
+  const chars = "1234567890"; 
 
   useEffect(() => {
     const safeText = text || "";
-    
     if (!active || !safeText) {
       setDisplay(safeText);
       return;
@@ -28,7 +29,7 @@ const ScrambleText: React.FC<{ text: string; className?: string; active: boolean
       );
 
       if (iteration >= safeText.length) clearInterval(interval);
-      iteration += 1 / 2; // Speed
+      iteration += 1 / 2;
     }, 30);
 
     return () => clearInterval(interval);
@@ -38,7 +39,7 @@ const ScrambleText: React.FC<{ text: string; className?: string; active: boolean
 });
 
 // --- SUB-COMPONENT: MARKET SPARKLINE ---
-const MarketSparkline: React.FC<{ color: string; seed: number }> = ({ color, seed }) => {
+const MarketSparkline: React.FC<{ color: string; seed: number }> = memo(({ color, seed }) => {
   const points = Array.from({ length: 10 }, (_, i) => {
     const x = i * 10;
     const y = 20 - (Math.sin(i + seed) * 10 + 10); 
@@ -63,27 +64,24 @@ const MarketSparkline: React.FC<{ color: string; seed: number }> = ({ color, see
        />
     </svg>
   );
-};
+});
 
-// --- SUB-COMPONENT: IMPACT EQUALIZER (Now Active/Live) ---
-const ImpactEqualizer: React.FC<{ value: number; color: string }> = ({ value, color }) => {
-  // 3. LIVE MARKET DATA (Dancing Bars)
+// --- SUB-COMPONENT: IMPACT EQUALIZER (Memoized) ---
+const ImpactEqualizer: React.FC<{ value: number; color: string }> = memo(({ value, color }) => {
   return (
     <div className="absolute bottom-full left-0 w-full h-16 flex items-end justify-between px-2 mb-2 opacity-30 pointer-events-none">
       {[...Array(20)].map((_, i) => {
-        // Only animate bars within the "active" value range (plus a little buffer)
         const isActive = i < (value * 2);
         return (
           <div 
             key={i}
             className={`w-1 rounded-t-sm transition-all duration-300 ease-out`}
             style={{ 
-               height: '40%', // Base height
+               height: '40%',
                backgroundColor: 'currentColor',
                opacity: isActive ? 1 : 0.2,
-               // Use CSS Animation for "Dancing" effect
                animation: isActive ? `equalizer 0.8s infinite alternate` : 'none',
-               animationDelay: `${Math.random() * -1}s` // Randomize start time
+               animationDelay: `${Math.random() * -1}s`
             }}
           ></div>
         );
@@ -97,7 +95,7 @@ const ImpactEqualizer: React.FC<{ value: number; color: string }> = ({ value, co
       `}</style>
     </div>
   );
-};
+});
 
 const IMPACT_LEVELS = [
   {
@@ -159,11 +157,9 @@ const IMPACT_LEVELS = [
   }
 ];
 
-interface DonationFlowProps {
-  isCalmMode?: boolean;
-}
-
-export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }) => {
+export const DonationFlow: React.FC = () => {
+  const { isCalmMode, addDonation, addNotification, triggerConfetti } = useStore();
+  const { playHover, playClick, playSuccess } = useSound();
   const [selectedImpact, setSelectedImpact] = useState(IMPACT_LEVELS[1]);
   const [multiplier, setMultiplier] = useState(1);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -171,7 +167,6 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
   const [txId, setTxId] = useState("#TX-9921");
   const [idleMascot, setIdleMascot] = useState(false);
 
-  // Idle Timer for Mascot Peek
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>; 
     const resetTimer = () => {
@@ -181,7 +176,7 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
     };
     window.addEventListener('mousemove', resetTimer);
     window.addEventListener('click', resetTimer);
-    resetTimer(); // Init
+    resetTimer(); 
     return () => {
         window.removeEventListener('mousemove', resetTimer);
         window.removeEventListener('click', resetTimer);
@@ -189,9 +184,7 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
     };
   }, []);
 
-  // --- SILENT FEATURE: DEEP LINKING & STATE RESTORATION ---
   useEffect(() => {
-    // 1. On Mount: Check URL
     const params = new URLSearchParams(window.location.search);
     const assetParam = params.get('asset');
     const unitsParam = params.get('units');
@@ -206,74 +199,85 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
     }
   }, []);
 
-  // 2. On Update: Write URL (without reloading)
   useEffect(() => {
     try {
         const params = new URLSearchParams(window.location.search);
         params.set('asset', selectedImpact.id);
         params.set('units', multiplier.toString());
         
-        const newUrl = `${window.location.pathname}?${params.toString()}`;
-        // Wrap in try-catch to prevent SecurityError in sandboxed iframe environments
+        // Preserve the hash while updating query params
+        const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
         window.history.replaceState({}, '', newUrl);
     } catch (e) {
-        // Silently fail if history API is restricted
+        // Silently fail
     }
   }, [selectedImpact, multiplier]);
 
-  // Trigger visual effects on change
   useEffect(() => {
     if (!isCalmMode) {
       setScrambleTrigger(true);
       const t = setTimeout(() => setScrambleTrigger(false), 500);
-      
-      // Randomize ID for effect
       const id = Math.floor(Math.random() * 90000) + 10000;
       setTxId(`#TX-${id}`);
-      
       return () => clearTimeout(t);
     }
   }, [selectedImpact, multiplier, isCalmMode]);
 
-  // --- HAPTIC FEEDBACK HANDLER ---
   const handleSliderChange = (val: number) => {
     setMultiplier(val);
-    // Silent Feature: Tactile feedback on mobile
+    playClick(); // Click on slide
     if (typeof navigator !== 'undefined' && navigator.vibrate && !isCalmMode) {
-        navigator.vibrate(10); // 10ms pulse (Short & crisp)
+        navigator.vibrate(10);
     }
+  };
+
+  const handlePaymentComplete = () => {
+    // THE PAYOFF
+    playSuccess();
+    triggerConfetti();
+
+    addDonation({
+      id: txId,
+      amount: selectedImpact.baseAmount * multiplier,
+      itemLabel: `${multiplier}x ${selectedImpact.label}`,
+      impactType: selectedImpact.variant,
+      timestamp: new Date()
+    });
+    addNotification('success', 'Investment Deployed. Check your portfolio.');
   };
 
   const totalAmount = selectedImpact.baseAmount * multiplier;
 
-  // Keyboard Navigation
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === 'ArrowRight') {
       const nextIndex = (index + 1) % IMPACT_LEVELS.length;
       setSelectedImpact(IMPACT_LEVELS[nextIndex]);
+      playClick();
     } else if (e.key === 'ArrowLeft') {
       const prevIndex = (index - 1 + IMPACT_LEVELS.length) % IMPACT_LEVELS.length;
       setSelectedImpact(IMPACT_LEVELS[prevIndex]);
+      playClick();
     }
   };
 
   return (
     <div className="w-full max-w-7xl mx-auto relative z-10">
       
-      <PaymentModal 
-        isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
-        item={selectedImpact}
-        quantity={multiplier}
-        totalAmount={totalAmount}
-      />
+      {isPaymentModalOpen && (
+        <PaymentModal 
+            isOpen={isPaymentModalOpen}
+            onClose={() => setIsPaymentModalOpen(false)}
+            item={selectedImpact}
+            quantity={multiplier}
+            totalAmount={totalAmount}
+            onSuccess={handlePaymentComplete}
+        />
+      )}
 
-      {/* Accessibility: Live Region */}
       <div className="sr-only" aria-live="polite">
         Selected {selectedImpact.label}. {multiplier} units. Total Investment ${totalAmount}. Impact: {multiplier}x {selectedImpact.desc}.
       </div>
 
-      {/* SECTION HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 relative z-20">
          <div>
             <div className="flex items-center gap-2 mb-4">
@@ -305,11 +309,7 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
-        
-        {/* LEFT COLUMN: ASSET SELECTION (Span 8) */}
         <div className="lg:col-span-8 flex flex-col gap-8">
-            
-            {/* 1. ASSET CARDS */}
             <div 
               className="grid grid-cols-1 md:grid-cols-3 gap-4" 
               role="radiogroup" 
@@ -327,8 +327,10 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
                     onClick={() => {
                       setSelectedImpact(level);
                       setMultiplier(1);
+                      playClick();
                       if (typeof navigator !== 'undefined' && navigator.vibrate && !isCalmMode) navigator.vibrate(5);
                     }}
+                    onMouseEnter={playHover}
                     onKeyDown={(e) => handleKeyDown(e, idx)}
                     className={`
                       group relative flex flex-col items-start text-left p-6 rounded-[2rem] transition-all duration-500 border-2 outline-none focus-visible:ring-4 focus-visible:ring-brand-teal overflow-hidden
@@ -338,25 +340,18 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
                       }
                     `}
                   >
-                    {/* Market Pulse Sparkline Background */}
                     <div className="absolute bottom-0 left-0 w-full h-12 opacity-20 pointer-events-none">
                          <MarketSparkline color={isSelected ? "text-brand-teal" : level.textColor} seed={level.sparkSeed} />
                     </div>
-
-                    {/* Glowing Backdrop for Selected */}
                     {isSelected && (
                        <div className="absolute inset-0 bg-brand-teal opacity-10 rounded-[2rem] animate-pulse"></div>
                     )}
-
-                    {/* Header */}
                     <div className="w-full flex justify-between items-start mb-6 relative z-10">
                        <div className={`p-3 rounded-2xl transition-colors duration-300 ${isSelected ? 'bg-white/10 text-white' : 'bg-brand-navy/5 text-brand-navy'}`}>
                           <Icon size={24} />
                        </div>
                        {isSelected && <div className="w-2 h-2 rounded-full bg-brand-teal animate-ping"></div>}
                     </div>
-
-                    {/* Content */}
                     <div className="mt-auto relative z-10 w-full">
                       <span className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${isSelected ? 'text-brand-lavender' : 'text-brand-navy/40'}`}>
                         {level.sub}
@@ -374,10 +369,7 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
               })}
             </div>
 
-            {/* 2. THE TRADING DESK */}
             <div className="bg-white border-2 border-brand-navy/5 rounded-[3rem] p-8 md:p-12 shadow-xl relative overflow-hidden flex-grow flex flex-col justify-center">
-               
-               {/* Background Mascot - Interactive on Idle */}
                <div className={`absolute -right-20 -bottom-20 opacity-[0.03] pointer-events-none transition-all duration-1000 ${idleMascot ? 'translate-y-[-20px] rotate-6 opacity-10' : 'rotate-12'}`}>
                   <Mascot 
                     variant={selectedImpact.variant} 
@@ -388,8 +380,6 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
 
                <div className="relative z-10">
                   <div className="flex flex-col md:flex-row gap-12 items-center">
-                     
-                     {/* Volume Control (Slider) */}
                      <div className="flex-1 w-full">
                         <div className="flex justify-between items-end mb-8">
                            <div>
@@ -411,30 +401,21 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
                            </div>
                         </div>
 
-                        {/* Custom Mechanical Slider Container */}
                         <div className="relative h-24 flex items-center group">
-                           
-                           {/* IMPACT EQUALIZER (Visual Bar Graph) */}
                            <div className={`absolute bottom-8 left-0 right-0 h-full ${selectedImpact.accent}`}>
                               <ImpactEqualizer value={multiplier} color={selectedImpact.color} />
                            </div>
-
-                           {/* Track Lines */}
                            <div className="absolute w-full flex justify-between px-2 pointer-events-none opacity-20 top-1/2 -translate-y-1/2">
                               {[...Array(10)].map((_, i) => (
                                  <div key={i} className="w-[1px] h-4 bg-brand-navy"></div>
                               ))}
                            </div>
-                           
-                           {/* The Track (Heavier Look) */}
                            <div className="w-full h-4 bg-brand-navy/10 rounded-full overflow-hidden relative z-0 border border-brand-navy/5 shadow-inner">
                               <div 
                                 className={`h-full transition-all duration-150 ease-out ${selectedImpact.color}`} 
                                 style={{ width: `${(multiplier / 10) * 100}%` }}
                               ></div>
                            </div>
-
-                           {/* The Input (Accessible & Touch Optimized) */}
                            <input 
                               id="impact-slider"
                               type="range" 
@@ -443,25 +424,21 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
                               step="1"
                               value={multiplier}
                               onChange={(e) => handleSliderChange(parseInt(e.target.value))}
-                              className="w-full absolute z-20 opacity-0 cursor-pointer h-24 top-1/2 -translate-y-1/2 touch-none"
+                              className="w-full absolute z-20 opacity-0 cursor-pointer h-24 top-1/2 -translate-y-1/2 touch-none focus:outline-none"
                               aria-valuemin={1}
                               aria-valuemax={10}
                               aria-valuenow={multiplier}
                               aria-valuetext={`${multiplier} units of ${selectedImpact.label}`}
                            />
-
-                           {/* The Thumb (Visual - Mechanical Look) */}
                            <div 
                               className="absolute h-14 w-14 top-1/2 -translate-y-1/2 bg-white border-4 border-brand-navy rounded-xl shadow-[0_8px_16px_rgba(0,0,0,0.2)] z-10 transition-all duration-150 pointer-events-none flex items-center justify-center transform group-active:scale-95 group-active:shadow-[0_2px_8px_rgba(0,0,0,0.2)]"
                               style={{ left: `calc(${((multiplier - 1) / 9) * 100}% - ${multiplier === 10 ? 56 : multiplier === 1 ? 0 : 28}px)` }}
                            >
-                              {/* Grip Lines */}
                               <div className="w-1 h-6 bg-brand-navy/20 rounded-full"></div>
                               <div className="w-1 h-6 bg-brand-navy/20 rounded-full mx-1.5"></div>
                               <div className="w-1 h-6 bg-brand-navy/20 rounded-full"></div>
                            </div>
                         </div>
-
                         <div className="mt-8 flex items-center gap-4 p-4 bg-brand-cream rounded-xl border border-brand-navy/5">
                            <div className={`p-2 rounded-lg text-white shadow-sm ${selectedImpact.id === 'commute' ? 'bg-brand-lavender' : selectedImpact.id === 'tech' ? 'bg-brand-teal' : 'bg-brand-coral'}`}>
                               <Target size={20} />
@@ -479,17 +456,11 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
             </div>
         </div>
 
-        {/* RIGHT COLUMN: THE LIVE RECEIPT (Span 4) */}
         <div className="lg:col-span-4 flex flex-col h-full">
             <div className="sticky top-24">
-               {/* Receipt Container */}
                <div className="relative bg-white shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                  
-                  {/* Jagged Top */}
                   <div className="absolute -top-3 left-0 w-full h-4 bg-white" style={{ clipPath: 'polygon(0% 100%, 5% 0%, 10% 100%, 15% 0%, 20% 100%, 25% 0%, 30% 100%, 35% 0%, 40% 100%, 45% 0%, 50% 100%, 55% 0%, 60% 100%, 65% 0%, 70% 100%, 75% 0%, 80% 100%, 85% 0%, 90% 100%, 95% 0%, 100% 100%)' }}></div>
-                  
                   <div className="p-8 pb-12">
-                     {/* Header */}
                      <div className="text-center border-b-2 border-dashed border-brand-navy/10 pb-6 mb-6">
                         <div className="flex items-center justify-center gap-2 mb-2 text-brand-navy/30">
                            <Printer size={16} />
@@ -502,8 +473,6 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
                            <span className="uppercase">{txId}</span>
                         </div>
                      </div>
-
-                     {/* Line Items */}
                      <div className="space-y-4 mb-6 font-mono text-sm">
                         <div className="flex justify-between items-start">
                            <span className="text-brand-navy font-bold">
@@ -523,8 +492,6 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
                            <span className="font-bold">$0.00</span>
                         </div>
                      </div>
-
-                     {/* Total */}
                      <div className="border-t-2 border-brand-navy border-dashed pt-4 mb-8">
                         <div className="flex justify-between items-end">
                            <span className="font-bold text-xl text-brand-navy">TOTAL</span>
@@ -533,8 +500,6 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
                            </span>
                         </div>
                      </div>
-
-                     {/* Vendor Lock */}
                      <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-navy/5 mb-6">
                         <div className="flex items-center gap-2 mb-2 text-brand-navy/60">
                            <Lock size={12} />
@@ -552,8 +517,6 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
                            </div>
                         </div>
                      </div>
-
-                     {/* Social ROI */}
                      <div className="text-center">
                         <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/30 mb-1 block">Est. Social ROI</span>
                         <div className="text-brand-teal font-bold text-lg flex items-center justify-center gap-2">
@@ -562,20 +525,16 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
                         </div>
                      </div>
                   </div>
-
-                  {/* Jagged Bottom */}
                   <div className="absolute -bottom-3 left-0 w-full h-4 bg-white" style={{ clipPath: 'polygon(0% 0%, 5% 100%, 10% 0%, 15% 100%, 20% 0%, 25% 100%, 30% 0%, 35% 100%, 40% 0%, 45% 100%, 50% 0%, 55% 100%, 60% 0%, 65% 100%, 70% 0%, 75% 100%, 80% 0%, 85% 100%, 90% 0%, 95% 100%, 100% 0%)' }}></div>
                </div>
-
-               {/* Action Button */}
                <button 
-                  onClick={() => setIsPaymentModalOpen(true)}
+                  onClick={() => { playClick(); setIsPaymentModalOpen(true); }}
+                  onMouseEnter={playHover}
                   className="w-full mt-8 bg-brand-navy text-white font-bold text-xl py-5 rounded-2xl shadow-[8px_8px_0px_0px_rgba(45,156,142,1)] hover:shadow-[4px_4px_0px_0px_rgba(45,156,142,1)] hover:translate-x-1 hover:translate-y-1 transition-all flex items-center justify-center gap-3 active:shadow-none active:translate-x-2 active:translate-y-2 border-2 border-brand-navy"
                >
                   Deploy Capital
                   <ArrowRight strokeWidth={3} size={20} />
                </button>
-               
                <div className="mt-4 text-center">
                   <span className="text-[10px] font-bold text-brand-navy/30 uppercase tracking-wider flex items-center justify-center gap-2">
                      <CreditCard size={12} />
@@ -584,7 +543,6 @@ export const DonationFlow: React.FC<DonationFlowProps> = ({ isCalmMode = false }
                </div>
             </div>
         </div>
-
       </div>
     </div>
   );
