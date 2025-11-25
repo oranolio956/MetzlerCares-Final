@@ -43,7 +43,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setIsVisible(true); },
-      { threshold: 0.5 }
+      { threshold: 0.3 }
     );
     if (textRef.current) observer.observe(textRef.current);
     return () => observer.disconnect();
@@ -84,7 +84,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                   <path d="M-20,30 Q150,5 300,25 T620,15" fill="none" stroke="#FF8A75" strokeWidth="6" strokeLinecap="round" className={(!isCalmMode && isVisible) ? "animate-draw" : "opacity-0"} style={{ strokeDasharray: 1000, strokeDashoffset: 1000, animation: (!isCalmMode && isVisible) ? 'draw 1.5s ease-out forwards 0.2s' : 'none' }} />
               </svg>
             </div>
-            <h2 className="font-display text-4xl md:text-8xl font-bold text-brand-navy leading-[0.9] mt-2 relative drop-shadow-sm">
+            <h2 className="font-display text-[clamp(2.5rem,8vw,6rem)] font-bold text-brand-navy leading-[0.9] mt-2 relative drop-shadow-sm">
               We fixed the <span className="relative inline-block text-brand-teal whitespace-nowrap">
                   incentives
                   <svg className="absolute -bottom-2 md:-bottom-4 left-0 w-full h-2 md:h-4 text-brand-yellow" viewBox="0 0 100 10" preserveAspectRatio="none">
@@ -117,24 +117,29 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
             </button>
           </div>
 
+          {/* 
+            CARD CONTAINER
+            Mobile: min-height auto to prevent clipping
+            Desktop: fixed min-height for stable 3D transform
+          */}
           <div 
-            className="w-full max-w-5xl min-h-[850px] md:min-h-[600px] relative [perspective:2000px] group mb-8"
+            className="w-full max-w-5xl min-h-auto md:min-h-[600px] relative [perspective:2000px] group mb-8"
             onMouseEnter={() => setIsHovering(true)}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
           >
             <div ref={containerRef} className="w-full h-full relative transition-transform duration-200 ease-out [transform-style:preserve-3d]">
 
-              {/* SIDE A */}
+              {/* SIDE A: BROKEN (The Old Way) */}
               <article 
                 aria-hidden={isBrokenHidden}
                 className={`
-                  absolute inset-0 w-full h-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border-2 border-brand-navy/5 shadow-2xl 
+                  relative md:absolute inset-0 w-full h-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border-2 border-brand-navy/5 shadow-2xl 
                   transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] [backface-visibility:hidden]
                   bg-[#EAEBED]
-                  ${viewMode === 'broken' ? 'opacity-100 z-20 pointer-events-auto' : 'opacity-0 z-10 pointer-events-none'}
+                  ${viewMode === 'broken' ? 'opacity-100 z-20 pointer-events-auto block' : 'opacity-0 z-10 pointer-events-none hidden md:block'}
                 `}
-                style={{ transform: isCalmMode ? 'none' : (viewMode === 'broken' ? 'rotateX(0deg)' : 'rotateX(180deg)') }}
+                style={{ transform: (typeof window !== 'undefined' && window.innerWidth >= 768 && !isCalmMode) ? (viewMode === 'broken' ? 'rotateX(0deg)' : 'rotateX(180deg)') : 'none' }}
               >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-transparent via-[#D1D5DB]/30 to-[#9CA3AF]/30"></div>
                 <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
@@ -145,7 +150,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                     ))}
                 </div>
 
-                <div className="relative z-10 flex flex-col items-center justify-center h-full text-center p-6 md:p-12 overflow-y-auto">
+                <div className="relative z-10 flex flex-col items-center justify-center h-full text-center p-8 md:p-12 overflow-y-auto min-h-[500px] md:min-h-0">
                     <div className="w-24 h-24 md:w-40 md:h-40 bg-brand-navy rounded-3xl flex items-center justify-center shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] mb-8 relative transform -rotate-3 transition-transform hover:rotate-0 duration-500 group-hover:scale-105 shrink-0">
                       <HelpCircle size={64} className="text-white/20" />
                       <div className="absolute inset-0 flex items-center justify-center"><span className="text-4xl md:text-6xl font-display font-bold text-white tracking-tighter animate-pulse">???</span></div>
@@ -161,27 +166,27 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                 </div>
               </article>
 
-              {/* SIDE B */}
+              {/* SIDE B: FIXED (New Way) */}
               <article 
                 aria-hidden={isFixedHidden}
                 className={`
-                  absolute inset-0 w-full h-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden bg-white border-4 border-brand-teal shadow-[0_25px_50px_-12px_rgba(45,156,142,0.25)] 
+                  relative md:absolute inset-0 w-full h-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden bg-white border-4 border-brand-teal shadow-[0_25px_50px_-12px_rgba(45,156,142,0.25)] 
                   transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] [backface-visibility:hidden]
-                  ${viewMode === 'fixed' ? 'opacity-100 z-20 pointer-events-auto' : 'opacity-0 z-10 pointer-events-none'}
+                  ${viewMode === 'fixed' ? 'opacity-100 z-20 pointer-events-auto block' : 'opacity-0 z-10 pointer-events-none hidden md:block'}
                 `}
-                style={{ transform: isCalmMode ? 'none' : (viewMode === 'fixed' ? 'rotateX(0deg)' : 'rotateX(-180deg)') }}
+                style={{ transform: (typeof window !== 'undefined' && window.innerWidth >= 768 && !isCalmMode) ? (viewMode === 'fixed' ? 'rotateX(0deg)' : 'rotateX(-180deg)') : 'none' }}
               >
                 <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'linear-gradient(#2D9C8E 1px, transparent 1px), linear-gradient(90deg, #2D9C8E 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
                 {viewMode === 'fixed' && !isCalmMode && (<div className="absolute top-0 left-0 w-full h-[2px] bg-brand-teal shadow-[0_0_40px_rgba(45,156,142,1)] animate-scan z-0 pointer-events-none"></div>)}
 
-                <div className="relative z-10 h-full flex flex-col md:flex-row p-6 md:p-12 gap-8 md:gap-12 items-center overflow-y-auto md:overflow-hidden">
+                <div className="relative z-10 h-full flex flex-col md:flex-row p-8 md:p-12 gap-8 md:gap-12 items-center overflow-y-auto md:overflow-hidden min-h-[500px] md:min-h-0">
                     <div className="flex-1 text-center md:text-left pt-0 md:pt-0">
                       <div className="inline-flex items-center gap-2 bg-brand-teal/10 text-brand-teal px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest mb-6 border border-brand-teal/20">
                           <div className="w-2 h-2 bg-brand-teal rounded-full animate-pulse"></div> Direct-to-Vendor Model
                       </div>
                       <h3 className="text-2xl md:text-5xl font-display font-bold text-brand-navy mb-6 leading-tight">We don't give cash. <br className="hidden md:block"/><span className="text-brand-teal bg-brand-teal/5 px-2 rounded-lg">We pay bills.</span></h3>
                       <p className="text-brand-navy/70 text-base md:text-lg mb-8 leading-relaxed max-w-md mx-auto md:mx-0">Donations fund specific invoices (Rent, Laptops, Bus Passes). Money goes directly to the Landlord or vendor.<span className="block mt-4 font-bold text-brand-navy flex items-center justify-center md:justify-start gap-2"><CheckCircle2 size={18} className="text-brand-teal" /> Zero fraud. 100% impact.</span></p>
-                      <button onClick={() => onNavigate('donate')} className="bg-brand-navy text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-teal hover:scale-105 transition-all shadow-[0_10px_20px_-5px_rgba(26,42,58,0.3)] flex items-center justify-center md:justify-start gap-3 w-full md:w-auto group relative overflow-hidden">
+                      <button onClick={() => onNavigate('donate')} className="bg-brand-navy text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-teal hover:scale-105 transition-all shadow-[0_10px_20px_-5px_rgba(26,42,58,0.3)] flex items-center justify-center md:justify-start gap-3 w-full md:w-auto group relative overflow-hidden min-h-[50px]">
                         <span className="relative z-10 flex items-center gap-2"><Target size={20} /> See The Portfolio <ArrowRight className="group-hover:translate-x-1 transition-transform" /></span>
                       </button>
                     </div>

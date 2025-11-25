@@ -113,19 +113,19 @@ export const DonationFlow: React.FC = () => {
         <PaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} item={selectedImpact} quantity={multiplier} totalAmount={totalAmount} onSuccess={handlePaymentComplete} />
       )}
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 md:gap-6 relative z-20">
-         <div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 relative z-20">
+         <div className="w-full">
             <div className="flex items-center gap-2 mb-2 md:mb-4">
                <div className="bg-brand-navy text-white p-1.5 rounded-md"><TrendingUp size={16} /></div>
                <span className="text-xs font-bold uppercase tracking-[0.2em] text-brand-navy/60">Impact Allocation</span>
             </div>
-            <h3 className="text-3xl md:text-6xl font-display font-bold text-brand-navy leading-none">
+            <h3 className="text-4xl md:text-6xl font-display font-bold text-brand-navy leading-none">
                Select Resource <br/>
                <span className="text-brand-teal opacity-100 relative inline-block">Class<svg className="absolute -bottom-2 left-0 w-full h-3 text-brand-yellow/50" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span>.
             </h3>
          </div>
-         <div className="flex flex-col items-start md:items-end gap-2 w-full md:w-auto mt-4 md:mt-0">
-            <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-xl border border-brand-navy/10 shadow-sm transition-transform hover:scale-105 w-full md:w-auto">
+         <div className="flex flex-col items-start md:items-end gap-2 w-full md:w-auto">
+            <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-xl border border-brand-navy/10 shadow-sm transition-transform hover:scale-105 w-full md:w-auto justify-center md:justify-start">
                 <ShieldCheck size={20} className="text-brand-teal" />
                 <span className="text-sm font-bold uppercase tracking-wider text-brand-navy/60">Verified 501(c)(3)</span>
             </div>
@@ -134,23 +134,23 @@ export const DonationFlow: React.FC = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 relative">
         <div className="lg:col-span-8 flex flex-col gap-6">
-            <div className="flex flex-wrap gap-2 md:gap-4 p-2 bg-brand-navy/5 rounded-2xl overflow-x-auto no-scrollbar scroll-smooth snap-x">
+            <div className="flex flex-wrap gap-2 md:gap-4 p-2 bg-brand-navy/5 rounded-2xl overflow-x-auto no-scrollbar scroll-smooth snap-x touch-pan-x">
                {SECTORS.map((sector) => {
                   const Icon = sector.icon;
                   return (
-                     <button key={sector.id} onClick={() => { setActiveSector(sector.id); playClick(); }} className={`snap-center flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-bold text-xs md:text-sm whitespace-nowrap ${activeSector === sector.id ? 'bg-brand-navy text-white shadow-lg' : 'bg-white text-brand-navy/50 hover:text-brand-navy hover:bg-white/80'}`}>
-                        <Icon size={16} /> {sector.label}
+                     <button key={sector.id} onClick={() => { setActiveSector(sector.id); playClick(); }} className={`snap-center flex items-center gap-2 px-5 py-3 rounded-xl transition-all font-bold text-sm whitespace-nowrap min-h-[44px] ${activeSector === sector.id ? 'bg-brand-navy text-white shadow-lg' : 'bg-white text-brand-navy/50 hover:text-brand-navy hover:bg-white/80'}`}>
+                        <Icon size={18} /> {sector.label}
                      </button>
                   )
                })}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[200px]" role="radiogroup">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" role="radiogroup">
               {filteredImpacts.map((level, idx) => {
                 const isSelected = selectedImpact.id === level.id;
                 const Icon = level.icon;
                 return (
-                  <button key={level.id} onClick={() => { setSelectedImpact(level); setMultiplier(1); playClick(); }} onMouseEnter={playHover} className={`group relative flex flex-col items-start text-left p-6 rounded-[2rem] transition-all duration-500 border-2 outline-none focus-visible:ring-4 focus-visible:ring-brand-teal overflow-hidden ${isSelected ? 'bg-brand-navy border-brand-navy shadow-[0_20px_40px_-10px_rgba(26,42,58,0.3)] scale-[1.02] z-10' : 'bg-white border-brand-navy/5 hover:border-brand-navy/20 hover:shadow-lg scale-100 opacity-80 hover:opacity-100'}`}>
+                  <button key={level.id} onClick={() => { setSelectedImpact(level); setMultiplier(1); playClick(); }} onMouseEnter={playHover} className={`group relative flex flex-col items-start text-left p-6 rounded-[2rem] transition-all duration-300 border-2 outline-none focus-visible:ring-4 focus-visible:ring-brand-teal overflow-hidden min-h-[160px] ${isSelected ? 'bg-brand-navy border-brand-navy shadow-[0_20px_40px_-10px_rgba(26,42,58,0.3)] scale-[1.02] z-10' : 'bg-white border-brand-navy/5 hover:border-brand-navy/20 hover:shadow-lg scale-100 opacity-80 hover:opacity-100'}`}>
                     <div className="absolute bottom-0 left-0 w-full h-12 opacity-20 pointer-events-none"><MarketSparkline color={isSelected ? "text-brand-teal" : level.textColor} seed={level.sparkSeed} /></div>
                     <div className="w-full flex justify-between items-start mb-6 relative z-10">
                        <div className={`p-3 rounded-2xl transition-colors duration-300 ${isSelected ? 'bg-white/10 text-white' : 'bg-brand-navy/5 text-brand-navy'}`}><Icon size={24} /></div>
@@ -165,7 +165,7 @@ export const DonationFlow: React.FC = () => {
               })}
             </div>
 
-            <div className="bg-white border-2 border-brand-navy/5 rounded-[2.5rem] p-6 md:p-12 shadow-xl relative overflow-hidden flex-grow flex flex-col justify-center min-h-[400px]">
+            <div className="bg-white border-2 border-brand-navy/5 rounded-[2.5rem] p-6 md:p-12 shadow-xl relative overflow-hidden flex-grow flex flex-col justify-center min-h-[350px]">
                <div className={`absolute -right-20 -bottom-20 opacity-[0.03] pointer-events-none transition-all duration-1000 hidden md:block ${idleMascot ? 'translate-y-[-20px] rotate-6 opacity-10' : 'rotate-12'}`}>
                   <Mascot variant={selectedImpact.variant} expression={idleMascot ? 'wink' : 'happy'} className="w-96 h-96" />
                </div>
@@ -173,7 +173,7 @@ export const DonationFlow: React.FC = () => {
                <div className="relative z-10">
                   <div className="flex flex-col gap-8 md:gap-12 items-center">
                      <div className="flex-1 w-full">
-                        <div className="flex justify-between items-end mb-8">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 md:gap-0">
                            <div>
                               <label className="text-xs font-bold uppercase tracking-widest text-brand-navy/40 block mb-2">Impact Volume</label>
                               <div className="flex items-baseline gap-2">
@@ -181,13 +181,14 @@ export const DonationFlow: React.FC = () => {
                                  <span className="text-xl font-medium text-brand-navy/40">{multiplier === 1 ? 'unit' : 'units'}</span>
                               </div>
                            </div>
-                           <div className="text-right">
+                           <div className="text-left md:text-right w-full md:w-auto p-4 md:p-0 bg-brand-cream md:bg-transparent rounded-xl md:rounded-none">
                               <div className="text-xs font-bold uppercase tracking-widest text-brand-navy/40 mb-1">Total Investment</div>
                               <div className="text-3xl font-display font-bold text-brand-teal tabular-nums">${totalAmount}</div>
                            </div>
                         </div>
 
-                        <div className="relative h-24 flex items-center group touch-none select-none">
+                        {/* Enhanced Touch Slider */}
+                        <div className="relative h-24 flex items-center group touch-none select-none my-4">
                            <div className={`absolute bottom-8 left-0 right-0 h-full ${selectedImpact.accent}`}><ImpactEqualizer value={multiplier} color={selectedImpact.color} /></div>
                            <div className="absolute w-full flex justify-between px-2 pointer-events-none opacity-20 top-1/2 -translate-y-1/2">
                               {[...Array(10)].map((_, i) => (<div key={i} className="w-[1px] h-4 bg-brand-navy"></div>))}
@@ -195,7 +196,16 @@ export const DonationFlow: React.FC = () => {
                            <div className="w-full h-4 bg-brand-navy/10 rounded-full overflow-hidden relative z-0 border border-brand-navy/5 shadow-inner">
                               <div className={`h-full transition-all duration-150 ease-out ${selectedImpact.color}`} style={{ width: `${(multiplier / 10) * 100}%` }}></div>
                            </div>
-                           <input type="range" min="1" max="10" step="1" value={multiplier} onChange={(e) => handleSliderChange(parseInt(e.target.value))} className="w-full absolute z-20 opacity-0 cursor-pointer h-24 top-1/2 -translate-y-1/2 touch-none focus:outline-none" />
+                           <input 
+                              type="range" 
+                              min="1" 
+                              max="10" 
+                              step="1" 
+                              value={multiplier} 
+                              onChange={(e) => handleSliderChange(parseInt(e.target.value))} 
+                              className="w-full absolute z-20 opacity-0 cursor-pointer h-24 top-1/2 -translate-y-1/2 touch-pan-y focus:outline-none" 
+                              aria-label="Adjust donation multiplier"
+                           />
                            <div className="absolute h-14 w-14 top-1/2 -translate-y-1/2 bg-white border-4 border-brand-navy rounded-xl shadow-[0_8px_16px_rgba(0,0,0,0.2)] z-10 transition-all duration-150 pointer-events-none flex items-center justify-center transform group-active:scale-95 group-active:shadow-[0_2px_8px_rgba(0,0,0,0.2)]" style={{ left: `calc(${((multiplier - 1) / 9) * 100}% - ${multiplier === 10 ? 56 : multiplier === 1 ? 0 : 28}px)` }}>
                               <div className="w-1 h-6 bg-brand-navy/20 rounded-full"></div><div className="w-1 h-6 bg-brand-navy/20 rounded-full mx-1.5"></div><div className="w-1 h-6 bg-brand-navy/20 rounded-full"></div>
                            </div>
@@ -215,7 +225,7 @@ export const DonationFlow: React.FC = () => {
         </div>
 
         <div className="lg:col-span-4 flex flex-col h-full mt-8 lg:mt-0">
-            <div className="sticky top-24">
+            <div className="lg:sticky lg:top-32">
                <div className="relative bg-white shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
                   <div className="absolute -top-3 left-0 w-full h-4 bg-white" style={{ clipPath: 'polygon(0% 100%, 5% 0%, 10% 100%, 15% 0%, 20% 100%, 25% 0%, 30% 100%, 35% 0%, 40% 100%, 45% 0%, 50% 100%, 55% 0%, 60% 100%, 65% 0%, 70% 100%, 75% 0%, 80% 100%, 85% 0%, 90% 100%, 95% 0%, 100% 100%)' }}></div>
                   <div className="p-8 pb-12">
@@ -230,8 +240,8 @@ export const DonationFlow: React.FC = () => {
                      <div className="border-t-2 border-brand-navy border-dashed pt-4 mb-8">
                         <div className="flex justify-between items-end"><span className="font-bold text-xl text-brand-navy">TOTAL</span><span className="font-display font-bold text-4xl text-brand-navy">${totalAmount.toFixed(2)}</span></div>
                      </div>
-                     <button onClick={() => { playClick(); setIsPaymentModalOpen(true); }} className="w-full bg-brand-navy text-white font-bold text-xl py-5 rounded-2xl shadow-[8px_8px_0px_0px_rgba(45,156,142,1)] hover:shadow-[4px_4px_0px_0px_rgba(45,156,142,1)] hover:translate-x-1 hover:translate-y-1 transition-all flex items-center justify-center gap-3 active:shadow-none active:translate-x-2 active:translate-y-2 border-2 border-brand-navy">Deploy Capital <ArrowRight strokeWidth={3} size={20} /></button>
-                     <button onClick={handleQuickDonate} className="w-full mt-4 bg-brand-yellow/10 text-brand-navy font-bold text-sm py-3 rounded-xl border border-brand-yellow/20 hover:bg-brand-yellow/20 transition-all flex items-center justify-center gap-2 group"><Zap size={16} className="text-brand-yellow group-hover:fill-brand-yellow transition-colors" /> Flash Fund $25</button>
+                     <button onClick={() => { playClick(); setIsPaymentModalOpen(true); }} className="w-full bg-brand-navy text-white font-bold text-xl py-5 rounded-2xl shadow-[8px_8px_0px_0px_rgba(45,156,142,1)] hover:shadow-[4px_4px_0px_0px_rgba(45,156,142,1)] hover:translate-x-1 hover:translate-y-1 transition-all flex items-center justify-center gap-3 active:shadow-none active:translate-x-2 active:translate-y-2 border-2 border-brand-navy min-h-[60px]">Deploy Capital <ArrowRight strokeWidth={3} size={20} /></button>
+                     <button onClick={handleQuickDonate} className="w-full mt-4 bg-brand-yellow/10 text-brand-navy font-bold text-sm py-4 rounded-xl border border-brand-yellow/20 hover:bg-brand-yellow/20 transition-all flex items-center justify-center gap-2 group min-h-[50px]"><Zap size={16} className="text-brand-yellow group-hover:fill-brand-yellow transition-colors" /> Flash Fund $25</button>
                   </div>
                   <div className="absolute -bottom-3 left-0 w-full h-4 bg-white" style={{ clipPath: 'polygon(0% 0%, 5% 100%, 10% 0%, 15% 100%, 20% 0%, 25% 100%, 30% 0%, 35% 100%, 40% 0%, 45% 100%, 50% 0%, 55% 100%, 60% 0%, 65% 100%, 70% 0%, 75% 100%, 80% 0%, 85% 100%, 90% 0%, 95% 100%, 100% 0%)' }}></div>
                </div>

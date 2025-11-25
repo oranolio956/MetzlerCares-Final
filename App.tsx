@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { IntakeChat } from './components/IntakeChat';
 import { DonationFlow } from './components/DonationFlow';
 import { BeneficiaryDashboard } from './components/BeneficiaryDashboard';
@@ -35,14 +35,36 @@ const App: React.FC = () => {
   const { isCalmMode, toggleCalmMode, isSoundEnabled, toggleSound } = useStore();
   const { playClick, playHover } = useSound();
   const [scrolled, setScrolled] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 10);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Global Mouse Tracking for Blobs
+  useEffect(() => {
+    if (isCalmMode || window.matchMedia("(max-width: 768px)").matches) return;
+    let rafId: number;
+    const handleMouseMove = (e: MouseEvent) => {
+      rafId = requestAnimationFrame(() => {
+        if (containerRef.current) {
+           const x = (e.clientX / window.innerWidth) * 2 - 1;
+           const y = (e.clientY / window.innerHeight) * 2 - 1;
+           containerRef.current.style.setProperty('--mouse-x', x.toString());
+           containerRef.current.style.setProperty('--mouse-y', y.toString());
+        }
+      });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(rafId);
+    };
+  }, [isCalmMode]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: isCalmMode ? 'auto' : 'smooth' });
@@ -87,24 +109,41 @@ const App: React.FC = () => {
     }
   };
 
+  const bgColor = isCalmMode ? 'bg-[#F2F2F2]' : 'bg-[#FDFBF7]';
+  const headerBg = isCalmMode ? 'bg-[#F2F2F2]' : 'bg-[#FDFBF7]'; // Match main body exactly
+
   return (
     <ErrorBoundary>
-      <div className={`min-h-[100dvh] w-full transition-colors duration-500 flex flex-col ${isCalmMode ? 'bg-[#F2F2F2]' : 'bg-[#FDFBF7]'}`}>
+      <div 
+        ref={containerRef}
+        className={`min-h-[100dvh] w-full transition-colors duration-500 flex flex-col ${bgColor} relative`}
+      >
         
+        {/* GLOBAL BACKGROUND BLOBS - Fixed position ensures they cover the top padding area */}
+        <div 
+            className="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-transform duration-300 ease-out will-change-transform"
+            style={{ transform: `translate(calc(var(--mouse-x, 0) * -10px), calc(var(--mouse-y, 0) * -10px))` }}
+            aria-hidden="true"
+        >
+            <div className="absolute top-[-10%] left-[-20%] md:left-[10%] w-[200px] md:w-[600px] h-[200px] md:h-[600px] bg-brand-teal opacity-10 rounded-full filter blur-[40px] md:blur-[100px] animate-blob mix-blend-multiply"></div>
+            <div className="absolute bottom-[-10%] right-[-20%] md:right-[10%] w-[200px] md:w-[500px] h-[200px] md:h-[500px] bg-brand-coral opacity-10 rounded-full filter blur-[40px] md:blur-[100px] animate-blob mix-blend-multiply" style={{animationDelay: '2s'}}></div>
+            <div className="absolute top-[30%] left-[50%] w-[150px] md:w-[300px] h-[150px] md:h-[300px] bg-brand-yellow opacity-10 rounded-full filter blur-[40px] md:blur-[80px] animate-blob mix-blend-multiply" style={{animationDelay: '4s'}}></div>
+        </div>
+
         <Confetti />
         <NotificationSystem />
 
         {/* --- HEADER --- */}
-        <header className={`fixed top-0 left-0 right-0 z-50 flex justify-center px-4 md:px-6 transition-all duration-500 ${scrolled ? 'py-2 md:py-3' : 'py-3 md:py-6'} pointer-events-none`}>
+        <header className={`fixed top-0 left-0 right-0 z-50 flex justify-center px-4 md:px-6 transition-all duration-300 ${scrolled ? 'py-2 md:py-3' : 'py-3 md:py-6'} pointer-events-none`}>
             <div className={`
               w-full max-w-7xl 
-              bg-white/95 md:bg-white/90 backdrop-blur-xl 
-              border border-brand-navy/5 
+              ${headerBg}
               rounded-2xl md:rounded-full 
-              shadow-[0_8px_32px_rgba(26,42,58,0.04)]
               flex items-center justify-between
               p-2 pr-3
               pointer-events-auto
+              transition-all duration-300
+              ${scrolled ? 'shadow-lg border border-brand-navy/5' : 'border border-transparent'}
             `}>
                 {/* Identity */}
                 <div 
@@ -158,12 +197,14 @@ const App: React.FC = () => {
                       <button 
                         onClick={() => { playClick(); toggleSound(); }} 
                         className="p-2.5 rounded-full text-brand-navy/40 hover:text-brand-navy hover:bg-brand-navy/5 transition-colors"
+                        aria-label="Toggle Sound"
                       >
                           {isSoundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
                       </button>
                       <button 
                         onClick={() => { playClick(); toggleCalmMode(); }} 
                         className="p-2.5 rounded-full text-brand-navy/40 hover:text-brand-navy hover:bg-brand-navy/5 transition-colors"
+                        aria-label="Toggle Calm Mode"
                       >
                           {isCalmMode ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
@@ -175,7 +216,7 @@ const App: React.FC = () => {
                         className="flex items-center gap-2 px-3 md:px-5 py-2 md:py-3 bg-white border border-brand-navy/10 rounded-full text-sm font-bold text-brand-navy hover:bg-brand-cream hover:border-brand-navy/20 transition-all"
                       >
                         <UserCircle size={18} />
-                        <span className="hidden sm:inline">Access Portal</span>
+                        <span className="hidden sm:inline">Portal</span>
                       </button>
                    ) : (
                       <button 
@@ -183,16 +224,16 @@ const App: React.FC = () => {
                         className="flex items-center gap-2 px-3 md:px-6 py-2 md:py-3 bg-brand-navy text-white rounded-full text-sm font-bold shadow-lg hover:bg-brand-teal hover:shadow-brand-teal/30 hover:-translate-y-0.5 transition-all group"
                       >
                         <TrendingUp size={16} className="text-brand-yellow group-hover:animate-bounce" />
-                        <span className="hidden sm:inline">My Portfolio</span>
-                        <span className="sm:hidden">Portfolio</span>
+                        <span className="hidden sm:inline">Portfolio</span>
+                        <span className="sm:hidden">Invest</span>
                       </button>
                    )}
                 </div>
             </div>
         </header>
         
-        {/* Mobile Menu (Bottom Bar) */}
-        <div className="md:hidden fixed bottom-6 left-4 right-4 z-[90] pointer-events-auto">
+        {/* Mobile Menu (Bottom Bar) - With Safe Area Support */}
+        <div className="md:hidden fixed bottom-4 left-4 right-4 z-[90] pointer-events-auto pb-[env(safe-area-inset-bottom)]">
            <div className="bg-brand-navy/90 backdrop-blur-xl text-white p-2 rounded-2xl shadow-2xl border border-white/10 flex justify-around items-center">
              {[
                { id: 'intro', icon: HeartHandshake, label: 'Home' },
@@ -206,7 +247,7 @@ const App: React.FC = () => {
                  <button 
                    key={item.id}
                    onClick={() => { playClick(); navigate(item.id); }}
-                   className={`p-3 rounded-xl transition-all flex flex-col items-center gap-1 w-full ${isActive ? 'bg-white/20 text-white' : 'text-white/60 hover:bg-white/10'}`}
+                   className={`p-3 rounded-xl transition-all flex flex-col items-center gap-1 w-full min-h-[44px] ${isActive ? 'bg-white/20 text-white' : 'text-white/60 hover:bg-white/10'}`}
                  >
                     <Icon size={20} />
                     <span className="text-[9px] font-bold uppercase tracking-wider">{item.label}</span>
@@ -216,23 +257,25 @@ const App: React.FC = () => {
            </div>
         </div>
 
-        {/* Main Content Area */}
-        {/* Added extra top padding to prevent content from hiding under the fixed header */}
-        <main className="relative z-0 flex-grow flex flex-col pt-32 md:pt-0 pb-32 md:pb-0">
+        {/* Main Content Area - Responsive Padding to prevent header overlap. z-10 ensures content sits above blobs */}
+        <main 
+           id="main-content"
+           className="relative z-10 flex-grow flex flex-col pt-28 md:pt-36 pb-32 md:pb-0 min-h-[100dvh]"
+        >
            {renderContent()}
         </main>
 
         {activeSection !== 'intro' && (
-           <footer className="w-full max-w-7xl mx-auto px-6 md:px-8 py-12 border-t border-brand-navy/5 mt-auto mb-24 md:mb-0">
+           <footer className="w-full max-w-7xl mx-auto px-6 md:px-8 py-12 border-t border-brand-navy/5 mt-auto mb-24 md:mb-0 relative z-10">
               <div className="flex flex-col md:flex-row justify-between items-center gap-8 opacity-60 hover:opacity-100 transition-opacity">
                  <p className="text-sm font-bold text-brand-navy text-center md:text-left">
                     © 2024 SecondWind Non-Profit. 501(c)(3) Recognized.<br/>
                     <span className="font-medium text-xs text-brand-navy/60 mt-1 block">Open Ledger Active • 100% Direct-to-Vendor</span>
                  </p>
                  <div className="flex gap-6">
-                    <button className="hover:text-brand-teal transition-colors transform hover:scale-110"><Twitter size={20} /></button>
-                    <button className="hover:text-brand-coral transition-colors transform hover:scale-110"><Instagram size={20} /></button>
-                    <button className="hover:text-brand-yellow transition-colors transform hover:scale-110"><Linkedin size={20} /></button>
+                    <button className="hover:text-brand-teal transition-colors transform hover:scale-110 p-2"><Twitter size={20} /></button>
+                    <button className="hover:text-brand-coral transition-colors transform hover:scale-110 p-2"><Instagram size={20} /></button>
+                    <button className="hover:text-brand-yellow transition-colors transform hover:scale-110 p-2"><Linkedin size={20} /></button>
                  </div>
               </div>
            </footer>

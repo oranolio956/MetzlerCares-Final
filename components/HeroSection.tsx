@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { HeartHandshake, ArrowRight, Wind, Activity, TrendingUp, Users, Zap } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { HeartHandshake, ArrowRight, Wind, TrendingUp, Users } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { SEOHead } from './SEOHead';
 import { useStore } from '../context/StoreContext';
@@ -51,7 +51,7 @@ const SystemHUD = () => {
   }, []);
 
   return (
-    <div className="absolute top-24 md:top-32 left-0 w-full px-4 md:px-6 pointer-events-none hidden lg:flex justify-between items-start max-w-[1600px] mx-auto z-40">
+    <div className="absolute top-4 md:top-32 left-0 w-full px-4 md:px-6 pointer-events-none hidden lg:flex justify-between items-start max-w-[1600px] mx-auto z-40">
        <div className="bg-white/40 backdrop-blur-xl border border-white/50 p-4 rounded-2xl shadow-lg flex items-center gap-4 animate-slide-up">
           <div className="bg-brand-teal/20 p-2 rounded-lg text-brand-teal">
             <TrendingUp size={20} />
@@ -84,33 +84,9 @@ interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
-  const { isCalmMode } = useStore();
-  const containerRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (isCalmMode || window.matchMedia("(max-width: 768px)").matches) return;
-    let rafId: number;
-    const handleMouseMove = (e: MouseEvent) => {
-      rafId = requestAnimationFrame(() => {
-        if (containerRef.current) {
-           const x = (e.clientX / window.innerWidth) * 2 - 1;
-           const y = (e.clientY / window.innerHeight) * 2 - 1;
-           containerRef.current.style.setProperty('--mouse-x', x.toString());
-           containerRef.current.style.setProperty('--mouse-y', y.toString());
-        }
-      });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(rafId);
-    };
-  }, [isCalmMode]);
-
   return (
     <section 
-      ref={containerRef}
-      className="relative min-h-[calc(100dvh-6rem)] w-full flex flex-col md:justify-center overflow-x-hidden pt-0 md:pt-24"
+      className="relative min-h-[calc(100dvh-8rem)] w-full flex flex-col md:justify-center overflow-x-hidden pt-4 md:pt-12"
       aria-label="Introduction"
     >
       <SEOHead 
@@ -121,46 +97,40 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
       <LiveTicker />
       <SystemHUD />
       
-      {/* Background Blobs - Adjusted for better mobile positioning */}
-      <div 
-        className="absolute inset-0 pointer-events-none -z-10 transition-transform duration-300 ease-out will-change-transform overflow-hidden"
-        style={{ transform: `translate(calc(var(--mouse-x, 0) * -10px), calc(var(--mouse-y, 0) * -10px))` }}
-        aria-hidden="true"
-      >
-        <div className="absolute top-[-10%] left-[-10%] md:left-[10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-brand-teal opacity-10 rounded-full filter blur-[60px] md:blur-[100px] animate-blob mix-blend-multiply"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] md:right-[10%] w-[250px] md:w-[500px] h-[250px] md:h-[500px] bg-brand-coral opacity-10 rounded-full filter blur-[60px] md:blur-[100px] animate-blob mix-blend-multiply" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-[30%] left-[50%] w-[200px] md:w-[300px] h-[200px] md:h-[300px] bg-brand-yellow opacity-10 rounded-full filter blur-[50px] md:blur-[80px] animate-blob mix-blend-multiply" style={{animationDelay: '4s'}}></div>
-      </div>
+      {/* 
+         NOTE: Background blobs have been moved to App.tsx to ensure seamless 
+         blending between the sticky header and the content area.
+      */}
 
-      <div className="relative z-10 w-full max-w-[1600px] mx-auto px-4 sm:px-8 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center h-full">
+      <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 sm:px-8 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center h-full pb-20 md:pb-0">
          
-         {/* Main Typography & Mascot - Flex Column for Mobile, Grid Col for Desktop */}
-         <div className="lg:col-span-8 flex flex-col items-center lg:items-start text-center lg:text-left z-20 mt-4 md:mt-0 order-1">
+         {/* Main Typography & Mascot */}
+         <div className="lg:col-span-8 flex flex-col items-center lg:items-start text-center lg:text-left z-20 order-1">
             <div 
-              className="relative z-20 transition-transform duration-300 ease-out will-change-transform"
+              className="relative z-20 transition-transform duration-300 ease-out will-change-transform w-full"
               style={{ transform: `translate(calc(var(--mouse-x, 0) * -20px), calc(var(--mouse-y, 0) * -20px))` }}
             >
-              <h1 className="font-display font-bold leading-[0.9] tracking-tighter text-brand-navy select-none pointer-events-none" aria-label="Get back up.">
-                {/* Responsive Font Sizing */}
-                <span className="block text-[3.5rem] sm:text-[6rem] md:text-[8rem] lg:text-[clamp(4.5rem,12vw,11rem)] opacity-0 animate-slide-up min-h-[1em]" style={{ animationDelay: '0.1s' }} aria-hidden="true">
+              <h1 className="font-display font-bold leading-[0.9] tracking-tighter text-brand-navy select-none pointer-events-none flex flex-col items-center lg:items-start w-full" aria-label="Get back up.">
+                {/* Fluid Typography using clamp() */}
+                <span className="block text-[clamp(4rem,15vw,11rem)] opacity-0 animate-slide-up min-h-[1em]" style={{ animationDelay: '0.1s' }} aria-hidden="true">
                   GET
                 </span>
-                <span className="block text-[3.5rem] sm:text-[6rem] md:text-[8rem] lg:text-[clamp(4.5rem,12vw,11rem)] opacity-0 animate-slide-up text-stroke-navy relative min-h-[1em]" style={{ animationDelay: '0.2s' }} aria-hidden="true">
+                <span className="block text-[clamp(4rem,15vw,11rem)] opacity-0 animate-slide-up text-stroke-navy relative min-h-[1em]" style={{ animationDelay: '0.2s' }} aria-hidden="true">
                    BACK
                    <span className="absolute top-1 left-1 md:top-3 md:left-3 text-brand-coral opacity-20 blur-sm pointer-events-none -z-10">BACK</span>
                 </span>
-                <span className="block text-[3.5rem] sm:text-[6rem] md:text-[8rem] lg:text-[clamp(4.5rem,12vw,11rem)] opacity-0 animate-slide-up text-brand-navy min-h-[1em]" style={{ animationDelay: '0.3s' }} aria-hidden="true">
+                <span className="block text-[clamp(4rem,15vw,11rem)] opacity-0 animate-slide-up text-brand-navy min-h-[1em]" style={{ animationDelay: '0.3s' }} aria-hidden="true">
                   UP<span className="text-brand-coral inline-block animate-pulse text-[1.2em] leading-none">.</span>
                 </span>
               </h1>
             </div>
 
-            {/* Mobile Mascot - Integrated flow */}
-            <div className="lg:hidden w-32 h-32 my-6 animate-float relative z-10">
+            {/* Mobile Mascot - Integrated neatly */}
+            <div className="lg:hidden w-40 h-40 my-4 animate-float relative z-10">
                 <Mascot expression="excited" className="w-full h-full drop-shadow-2xl" />
             </div>
 
-            {/* Desktop Mascot - Absolute Positioned */}
+            {/* Desktop Mascot */}
             <div 
                className="
                  hidden lg:block
@@ -186,20 +156,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
          </div>
 
          {/* Call to Action Card */}
-         <div className="lg:col-span-4 perspective-1000 w-full max-w-sm md:max-w-md lg:max-w-none mx-auto lg:mt-32 relative z-30 order-2 mb-8 md:mb-0">
+         <div className="lg:col-span-4 perspective-1000 w-full max-w-sm md:max-w-md lg:max-w-none mx-auto lg:mt-32 relative z-30 order-2">
             <article 
               className={`
                 relative p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] transition-all duration-500 ease-out transform 
-                group hover:scale-[1.02] hover:shadow-[0_25px_50px_-12px_rgba(255,255,255,0.5)] shadow-2xl
+                group lg:hover:scale-[1.02] hover:shadow-[0_25px_50px_-12px_rgba(255,255,255,0.5)] shadow-2xl
                 opacity-0 animate-slide-up will-change-transform
                 bg-white/60 backdrop-blur-2xl border border-white/80
               `}
               style={{ 
                 animationDelay: '0.8s',
-                // Simplified transform for mobile to prevent overflow
-                transform: `
-                  translate(calc(var(--mouse-x, 0) * -15px), calc(var(--mouse-y, 0) * -15px))
-                `
               }}
             >
                <div className="absolute inset-0 bg-white/20 rounded-[2rem] md:rounded-[2.5rem] pointer-events-none"></div>
@@ -220,7 +186,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                    <button 
                      onClick={() => onNavigate('donate')}
                      aria-label="Give Support"
-                     className="w-full bg-brand-navy text-white px-6 md:px-8 py-4 md:py-5 rounded-2xl font-bold hover:bg-brand-teal transition-all flex items-center justify-between group shadow-lg active:scale-95 relative overflow-hidden"
+                     className="w-full bg-brand-navy text-white px-6 md:px-8 py-4 md:py-5 rounded-2xl font-bold hover:bg-brand-teal transition-all flex items-center justify-between group shadow-lg active:scale-95 relative overflow-hidden min-h-[60px]"
                    >
                      <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
                      <span className="relative z-10 text-base md:text-lg">Give Support</span>
@@ -231,7 +197,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                    <button 
                      onClick={() => onNavigate('apply')}
                      aria-label="Get Support"
-                     className="w-full bg-white/50 border-2 border-brand-navy/10 text-brand-navy px-6 md:px-8 py-4 md:py-5 rounded-2xl font-bold hover:bg-white hover:border-brand-navy/30 transition-all flex items-center justify-between group active:scale-95"
+                     className="w-full bg-white/50 border-2 border-brand-navy/10 text-brand-navy px-6 md:px-8 py-4 md:py-5 rounded-2xl font-bold hover:bg-white hover:border-brand-navy/30 transition-all flex items-center justify-between group active:scale-95 min-h-[60px]"
                    >
                      <span className="text-base md:text-lg">Get Support</span>
                      <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform md:w-5 md:h-5" />

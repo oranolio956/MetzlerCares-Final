@@ -118,7 +118,7 @@ export const TransparencyLedger: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           
-          <div className="lg:col-span-3 bg-brand-cream border-2 border-brand-navy/5 rounded-[2.5rem] h-64 md:h-96 relative overflow-hidden flex items-center justify-center shadow-inner">
+          <div className="lg:col-span-3 bg-brand-cream border-2 border-brand-navy/5 rounded-[2.5rem] h-48 md:h-96 relative overflow-hidden flex items-center justify-center shadow-inner">
              <div className="absolute top-6 left-6 z-10">
                 <div className="flex items-center gap-2 bg-white/50 backdrop-blur px-3 py-1 rounded-full border border-brand-navy/5">
                    <Globe size={14} className="text-brand-navy" />
@@ -163,7 +163,10 @@ export const TransparencyLedger: React.FC = () => {
                     <div className="col-span-2 flex justify-between md:block w-full">
                         <div className="md:hidden text-[10px] font-bold text-brand-navy/30 uppercase tracking-widest mb-1">Time</div>
                         <div><span className="font-mono font-bold text-brand-navy text-sm block">{item.timestamp.split(',')[1]}</span><span className="text-xs text-brand-navy/40">{item.timestamp.split(',')[0]}</span></div>
-                        <div className="md:hidden text-right"><span className="font-mono font-bold text-brand-navy text-lg">${item.amount.toFixed(2)}</span></div>
+                        <div className="md:hidden text-right flex flex-col items-end">
+                            <span className="font-mono font-bold text-brand-navy text-lg">${item.amount.toFixed(2)}</span>
+                            {item.status === 'CLEARED' ? <span className="text-[10px] font-bold text-brand-teal flex items-center gap-1"><Check size={10} /> Cleared</span> : <span className="text-[10px] font-bold text-brand-yellow">Pending</span>}
+                        </div>
                     </div>
 
                     <div className="col-span-3 mt-2 md:mt-0 w-full">
@@ -181,7 +184,7 @@ export const TransparencyLedger: React.FC = () => {
 
                     <div className="col-span-2 text-right hidden md:block"><span className="font-mono font-bold text-brand-navy text-lg tracking-tight">${item.amount.toFixed(2)}</span></div>
 
-                    <div className="col-span-2 text-right flex justify-between md:justify-end items-center mt-2 md:mt-0 w-full border-t border-brand-navy/5 pt-3 md:border-0 md:pt-0">
+                    <div className="col-span-2 text-right hidden md:flex justify-between md:justify-end items-center mt-2 md:mt-0 w-full border-t border-brand-navy/5 pt-3 md:border-0 md:pt-0">
                         <div className="md:hidden text-[10px] font-bold text-brand-navy/30 uppercase tracking-widest">Status</div>
                         {item.status === 'CLEARED' ? <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-brand-teal bg-brand-teal/5 px-2 py-1 rounded-md"><Check className="w-3 h-3" /> Cleared</div> : <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-brand-yellow bg-brand-yellow/10 px-2 py-1 rounded-md"><div className="w-1.5 h-1.5 rounded-full bg-brand-yellow animate-ping"></div> Pending</div>}
                     </div>
