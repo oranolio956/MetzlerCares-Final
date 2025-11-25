@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    
+    <!-- SEO Core -->
+    <title>SecondWind | Invest in Human Potential</title>
+    <meta name="description" content="A direct-action recovery resource platform. We treat donations like investments, paying vendors directly for rent, tech, and transit. 100% transparency." />
+    <meta name="keywords" content="recovery, sober living funding, non-profit, direct aid, addiction recovery resources, donate rent assistance" />
+    <meta name="theme-color" content="#FDFBF7" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="SecondWind Non-Profit" />
+    <link rel="canonical" href="https://secondwind.org" />
+    
+    <!-- Dynamic Brand Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%232D9C8E'/><path d='M30 50 C30 20 70 20 70 50 C70 80 30 80 30 50' stroke='white' stroke-width='8' fill='none'/></svg>" />
+
+    <!-- EXPERT GAP 4: Performance Hints (Preloading Critical Assets) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&family=Space+Grotesk:wght@300;400;500;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&family=Space+Grotesk:wght@300;400;500;700&display=swap" media="print" onload="this.media='all'" />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;800&family=Space+Grotesk:wght@300;400;500;700&display=swap" />
+    </noscript>
+
+    <!-- Social / Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SecondWind | The Anti-Bureaucracy Non-Profit" />
+    <meta property="og:description" content="Don't just donate. Invest in a recovery portfolio. View real-time impact and direct-to-vendor payments." />
+    <meta property="og:image" content="https://placehold.co/1200x630/1A2A3A/FDFBF7/png?text=SecondWind+Impact+Portfolio" />
+    <meta property="og:url" content="https://secondwind.org" />
+    <meta property="og:site_name" content="SecondWind" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@secondwind" />
+    <meta name="twitter:title" content="SecondWind | Help Humans Be Human" />
+    <meta name="twitter:description" content="Direct funding for rent, laptops, and bus passes. No red tape. Zero fraud." />
+    <meta name="twitter:image" content="https://placehold.co/1200x630/2D9C8E/FFFFFF/png?text=Direct+Action" />
+
+    <!-- Structured Data (JSON-LD) for Google Knowledge Graph -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "NGO",
+      "name": "SecondWind",
+      "alternateName": "SecondWind Recovery",
+      "url": "https://secondwind.org",
+      "logo": "https://secondwind.org/logo.png",
+      "description": "A direct-action recovery resource platform providing rent, technology, and transit assistance.",
+      "foundingDate": "2024",
+      "areaServed": "United States",
+      "sameAs": [
+        "https://twitter.com/secondwind",
+        "https://instagram.com/secondwind",
+        "https://linkedin.com/company/secondwind"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+1-800-555-5555",
+        "contactType": "customer service",
+        "areaServed": "US",
+        "availableLanguage": "en"
+      }
+    }
+    </script>
+
+    <!-- Process Polyfill for Browser Runtime -->
+    <script>
+      window.process = window.process || { env: { API_KEY: '' } };
+    </script>
+
+    <!-- Fonts & Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Outfit', 'sans-serif'],
+              display: ['Space Grotesk', 'sans-serif'],
+            },
+            colors: {
+              brand: {
+                cream: '#FDFBF7',
+                navy: '#1A2A3A',
+                teal: '#2D9C8E',
+                coral: '#FF8A75',
+                lavender: '#A7ACD9',
+                yellow: '#F4D35E'
+              }
+            },
+            animation: {
+              'float': 'float 6s ease-in-out infinite',
+              'wiggle': 'wiggle 3s ease-in-out infinite',
+              'blob': 'blob 7s infinite',
+              'spin-slow': 'spin 12s linear infinite',
+              'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-20px)' },
+              },
+              wiggle: {
+                '0%, 100%': { transform: 'rotate(-3deg)' },
+                '50%': { transform: 'rotate(3deg)' },
+              },
+              blob: {
+                '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                '100%': { transform: 'translate(0px, 0px) scale(1)' },
+              },
+              slideUp: {
+                '0%': { transform: 'translateY(40px)', opacity: '0' },
+                '100%': { transform: 'translateY(0)', opacity: '1' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #FDFBF7;
+        color: #1A2A3A;
+        overflow-x: hidden;
+        transition: background-color 0.5s ease, filter 0.5s ease;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+      
+      /* EXPERT GAP 3: Skip Link for Accessibility */
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 0;
+        background: #2D9C8E;
+        color: white;
+        padding: 8px;
+        z-index: 1000;
+        transition: top 0.3s;
+      }
+      .skip-link:focus {
+        top: 0;
+      }
+
+      /* GLOBAL NOISE TEXTURE - Performance Optimized */
+      /* Replaced heavy SVG filter with a light opacity pattern to ensure 60FPS scroll */
+      .bg-noise {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 50;
+        opacity: 0.05;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+      }
+
+      /* Custom scrollbar to match aesthetic */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #FDFBF7; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #A7ACD9; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #2D9C8E; 
+      }
+
+      /* Advanced Glassmorphism */
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 
+          0 4px 6px -1px rgba(0, 0, 0, 0.05),
+          0 2px 4px -1px rgba(0, 0, 0, 0.03),
+          inset 0 0 20px rgba(255, 255, 255, 0.5);
+      }
+      
+      /* Typography Utilities */
+      .text-stroke-navy {
+        -webkit-text-stroke: 1px #1A2A3A;
+        color: transparent;
+      }
+      @media (min-width: 768px) {
+        .text-stroke-navy {
+          -webkit-text-stroke: 2px #1A2A3A;
+        }
+      }
+
+      /* Focus management */
+      :focus-visible {
+        outline: 3px solid #2D9C8E;
+        outline-offset: 4px;
+        border-radius: 4px;
+      }
+
+      /* --- CALM MODE (Radical Empathy) --- */
+      body.calm-mode {
+        background-color: #F2F2F2; /* Flatter grey/white */
+        filter: saturate(0.8); /* Reduce color intensity */
+      }
+      body.calm-mode .bg-noise {
+        display: none; /* Remove noise in calm mode for cleaner visual */
+      }
+      body.calm-mode * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+      
+      /* Standard Brand Pre-Loader */
+      #initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #FDFBF7; 
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.5s ease-out;
+      }
+      .loader-hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .brand-pulse {
+         width: 60px;
+         height: 60px;
+         border-radius: 50%;
+         background: #2D9C8E;
+         animation: pulse 1.5s infinite;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <!-- Accessibility Skip Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Texture Overlay for that premium feel (Optimized) -->
+    <div class="bg-noise"></div>
+
+    <!-- The Pre-Loader -->
+    <div id="initial-loader">
+      <div class="brand-pulse"></div>
+    </div>
+
+    <div id="root"></div>
+
+    <script>
+      window.addEventListener('load', () => {
+        const loader = document.getElementById('initial-loader');
+        if (loader) {
+          loader.classList.add('loader-hidden');
+          setTimeout(() => {
+            loader.style.display = 'none';
+          }, 500);
+        }
+      });
+    </script>
+  </body>
+</html>
