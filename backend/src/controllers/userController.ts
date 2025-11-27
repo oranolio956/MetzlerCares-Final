@@ -1,27 +1,19 @@
 import { Request, Response } from 'express';
 import { getUserById, updateUser } from '../services/userService.js';
 import { getDatabasePool } from '../config/database.js';
-import { logger } from '../utils/logger.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
+import { NotFoundError, AuthenticationError } from '../utils/errors.js';
 
 // Get current user
-export const getCurrentUser = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getCurrentUser = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     if (!req.user) {
-      res.status(401).json({
-        error: 'Unauthorized',
-        message: 'Authentication required',
-      });
-      return;
+      throw new AuthenticationError('Authentication required');
     }
 
     const user = await getUserById(req.user.userId);
 
     if (!user) {
-      res.status(404).json({
-        error: 'Not Found',
-        message: 'User not found',
-      });
-      return;
+      throw new NotFoundError('User');
     }
 
     // Remove sensitive fields
@@ -30,44 +22,15 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<void>
     res.json({
       user: userResponse,
     });
-  } catch (error) {
-    logger.error('Get current user failed:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Failed to fetch user',
-    });
-  }
-};
+});
 
 // Update current user
-export const updateCurrentUser = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const updateCurrentUser = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     if (!req.user) {
-      res.status(401).json({
-        error: 'Unauthorized',
-        message: 'Authentication required',
-      });
-      return;
+      throw new AuthenticationError('Authentication required');
     }
 
     const { name, email } = req.body;
-
-    // Validate input
-    if (name !== undefined && (typeof name !== 'string' || name.trim().length === 0)) {
-      res.status(400).json({
-        error: 'Bad Request',
-        message: 'Name must be a non-empty string',
-      });
-      return;
-    }
-
-    if (email !== undefined && (typeof email !== 'string' || !email.includes('@'))) {
-      res.status(400).json({
-        error: 'Bad Request',
-        message: 'Email must be a valid email address',
-      });
-      return;
-    }
 
     const updatedUser = await updateUser(req.user.userId, { name, email });
 
@@ -77,41 +40,12 @@ export const updateCurrentUser = async (req: Request, res: Response): Promise<vo
     res.json({
       user: userResponse,
     });
-  } catch (error: any) {
-    logger.error('Update current user failed:', error);
-    
-    if (error.message === 'User not found') {
-      res.status(404).json({
-        error: 'Not Found',
-        message: 'User not found',
-      });
-      return;
-    }
-
-    if (error.code === '23505') {
-      res.status(409).json({
-        error: 'Conflict',
-        message: 'Email already in use',
-      });
-      return;
-    }
-
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Failed to update user',
-    });
-  }
-};
+});
 
 // Get user sessions
-export const getUserSessions = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const getUserSessions = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     if (!req.user) {
-      res.status(401).json({
-        error: 'Unauthorized',
-        message: 'Authentication required',
-      });
-      return;
+      throw new AuthenticationError('Authentication required');
     }
 
     const pool = getDatabasePool();
@@ -126,11 +60,4 @@ export const getUserSessions = async (req: Request, res: Response): Promise<void
     res.json({
       sessions: result.rows,
     });
-  } catch (error) {
-    logger.error('Get user sessions failed:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Failed to fetch sessions',
-    });
-  }
-};
+});

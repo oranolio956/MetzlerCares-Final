@@ -77,26 +77,19 @@ app.use((req, res) => {
   });
 });
 
-// Error handling middleware
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  logger.error('Unhandled error:', {
-    error: err.message,
-    stack: err.stack,
-    path: req.path,
-    method: req.method,
-  });
-
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'An unexpected error occurred',
-  });
-});
+// Error handling middleware (must be last)
+import { errorHandler } from './middleware/errorHandler.js';
+app.use(errorHandler);
 
 // Initialize database and Redis connections
 const initializeConnections = async () => {
   try {
     getDatabasePool();
     getRedisClient();
+    
+    // Start background jobs
+    const { startSessionCleanup } = await import('./services/sessionCleanup.js');
+    startSessionCleanup();
   } catch (error) {
     logger.error('Failed to initialize connections:', error);
     process.exit(1);
@@ -108,6 +101,10 @@ const shutdown = async () => {
   logger.info('Shutting down gracefully...');
   
   try {
+    // Stop background jobs
+    const { stopSessionCleanup } = await import('./services/sessionCleanup.js');
+    stopSessionCleanup();
+    
     await closeDatabasePool();
     await closeRedisClient();
     logger.info('All connections closed');

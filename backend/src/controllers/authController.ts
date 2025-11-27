@@ -3,13 +3,18 @@ import { getUserByEmail, getUserByOAuth, createUser } from '../services/userServ
 import { createSession, invalidateSession, invalidateAllUserSessions } from '../services/sessionService.js';
 import { generateTokenPair, verifyRefreshToken, JWTPayload } from '../utils/jwt.js';
 import { logger } from '../utils/logger.js';
-import { getEnv } from '../config/env.js';
+import { ConflictError, ValidationError, AuthenticationError } from '../utils/errors.js';
+import { getRedisClient } from '../config/redis.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
+import { UserType } from '../types/index.js';
 
-const env = getEnv();
+// Helper to validate user type
+const isValidUserType = (type: string): type is UserType => {
+  return type === 'donor' || type === 'beneficiary';
+};
 
 // Google OAuth callback handler
-export const handleGoogleCallback = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const handleGoogleCallback = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     // In a real implementation, you would:
     // 1. Exchange the authorization code for tokens
     // 2. Get user info from Google
@@ -19,14 +24,17 @@ export const handleGoogleCallback = async (req: Request, res: Response): Promise
 
     // For now, this is a placeholder that expects user info in the request
     // In production, use Google OAuth library (e.g., google-auth-library)
+    // The frontend should send: { email, name, sub: googleId, userType?: 'donor' | 'beneficiary' }
     const { email, name, sub: googleId } = req.body;
 
     if (!email || !googleId) {
-      res.status(400).json({
-        error: 'Bad Request',
-        message: 'Missing required OAuth data',
-      });
-      return;
+      throw new ValidationError('Missing required OAuth data: email and sub (Google ID) are required');
+    }
+
+    // Validate user type if provided
+    const userType = req.body.userType || 'beneficiary';
+    if (!isValidUserType(userType)) {
+      throw new ValidationError('Invalid user type. Must be "donor" or "beneficiary"');
     }
 
     // Find or create user
@@ -36,15 +44,11 @@ export const handleGoogleCallback = async (req: Request, res: Response): Promise
       // Check if user exists by email
       const existingUser = await getUserByEmail(email);
       if (existingUser) {
-        res.status(409).json({
-          error: 'Conflict',
-          message: 'User with this email already exists',
-        });
-        return;
+        throw new ConflictError('User with this email already exists');
       }
 
-      // Create new user (default to beneficiary, can be changed)
-      user = await createUser(email, name, 'beneficiary', 'google', googleId);
+      // Create new user
+      user = await createUser(email, name, userType, 'google', googleId);
     }
 
     // Generate tokens
@@ -66,28 +70,23 @@ export const handleGoogleCallback = async (req: Request, res: Response): Promise
       },
       tokens: tokenPair,
     });
-  } catch (error) {
-    logger.error('Google OAuth callback failed:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Authentication failed',
-    });
-  }
-};
+});
 
 // Apple Sign-In callback handler
-export const handleAppleCallback = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const handleAppleCallback = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     // Similar to Google, but for Apple Sign-In
     // In production, use apple-signin library
+    // The frontend should send: { email, name, sub: appleId, userType?: 'donor' | 'beneficiary' }
     const { email, name, sub: appleId } = req.body;
 
     if (!email || !appleId) {
-      res.status(400).json({
-        error: 'Bad Request',
-        message: 'Missing required OAuth data',
-      });
-      return;
+      throw new ValidationError('Missing required OAuth data: email and sub (Apple ID) are required');
+    }
+
+    // Validate user type if provided
+    const userType = req.body.userType || 'beneficiary';
+    if (!isValidUserType(userType)) {
+      throw new ValidationError('Invalid user type. Must be "donor" or "beneficiary"');
     }
 
     // Find or create user
@@ -96,14 +95,10 @@ export const handleAppleCallback = async (req: Request, res: Response): Promise<
     if (!user) {
       const existingUser = await getUserByEmail(email);
       if (existingUser) {
-        res.status(409).json({
-          error: 'Conflict',
-          message: 'User with this email already exists',
-        });
-        return;
+        throw new ConflictError('User with this email already exists');
       }
 
-      user = await createUser(email, name, 'beneficiary', 'apple', appleId);
+      user = await createUser(email, name, userType, 'apple', appleId);
     }
 
     // Generate tokens
@@ -125,26 +120,14 @@ export const handleAppleCallback = async (req: Request, res: Response): Promise<
       },
       tokens: tokenPair,
     });
-  } catch (error) {
-    logger.error('Apple OAuth callback failed:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Authentication failed',
-    });
-  }
-};
+});
 
 // Refresh token endpoint
-export const refreshToken = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const refreshToken = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-      res.status(400).json({
-        error: 'Bad Request',
-        message: 'Refresh token is required',
-      });
-      return;
+      throw new ValidationError('Refresh token is required');
     }
 
     // Verify refresh token
@@ -152,14 +135,20 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
 
     // Check if refresh token exists in Redis
     const redis = getRedisClient();
-    const storedUserId = await redis.get(`refresh:${refreshToken}`);
+    let storedUserId: string | null = null;
+    try {
+      storedUserId = await redis.get(`refresh:${refreshToken}`);
+    } catch (error) {
+      logger.warn('Redis error during token refresh, continuing with database check:', error);
+    }
     
     if (!storedUserId || storedUserId !== payload.userId) {
-      res.status(401).json({
-        error: 'Unauthorized',
-        message: 'Invalid refresh token',
-      });
-      return;
+      // Fallback: check database if Redis fails
+      const sessionService = await import('../services/sessionService.js');
+      const session = await sessionService.getSessionByToken(refreshToken);
+      if (!session || session.user_id !== payload.userId) {
+        throw new AuthenticationError('Invalid refresh token');
+      }
     }
 
     // Generate new token pair
@@ -171,18 +160,10 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
     res.json({
       tokens: tokenPair,
     });
-  } catch (error) {
-    logger.error('Token refresh failed:', error);
-    res.status(401).json({
-      error: 'Unauthorized',
-      message: error instanceof Error ? error.message : 'Invalid refresh token',
-    });
-  }
-};
+});
 
 // Logout endpoint
-export const logout = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const logout = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const authHeader = req.headers.authorization;
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -193,24 +174,12 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     res.json({
       message: 'Logged out successfully',
     });
-  } catch (error) {
-    logger.error('Logout failed:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Logout failed',
-    });
-  }
-};
+});
 
 // Logout all sessions
-export const logoutAll = async (req: Request, res: Response): Promise<void> => {
-  try {
+export const logoutAll = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     if (!req.user) {
-      res.status(401).json({
-        error: 'Unauthorized',
-        message: 'Authentication required',
-      });
-      return;
+      throw new AuthenticationError('Authentication required');
     }
 
     await invalidateAllUserSessions(req.user.userId);
@@ -218,11 +187,4 @@ export const logoutAll = async (req: Request, res: Response): Promise<void> => {
     res.json({
       message: 'All sessions logged out successfully',
     });
-  } catch (error) {
-    logger.error('Logout all failed:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Logout failed',
-    });
-  }
-};
+});

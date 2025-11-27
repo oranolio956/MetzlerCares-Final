@@ -5,6 +5,7 @@ import {
   getUserSessions,
 } from '../controllers/userController.js';
 import { authenticate } from '../middleware/auth.js';
+import { validate, emailRule, nameRule } from '../middleware/validator.js';
 
 const router = Router();
 
@@ -15,7 +16,7 @@ router.use(authenticate);
 router.get('/me', getCurrentUser);
 
 // Update current user
-router.patch('/me', updateCurrentUser);
+router.patch('/me', validate([nameRule, emailRule]), updateCurrentUser);
 
 // Get user sessions
 router.get('/me/sessions', getUserSessions);

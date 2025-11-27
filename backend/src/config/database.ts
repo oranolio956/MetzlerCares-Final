@@ -21,6 +21,10 @@ export const getDatabasePool = (): pg.Pool => {
       logger.error('Unexpected database pool error:', err);
     });
 
+    pool.on('connect', () => {
+      logger.info('New database client connected');
+    });
+
     // Test connection
     pool.query('SELECT NOW()')
       .then(() => {
@@ -28,7 +32,10 @@ export const getDatabasePool = (): pg.Pool => {
       })
       .catch((err) => {
         logger.error('Database connection failed:', err);
-        process.exit(1);
+        // Don't exit in development, allow graceful degradation
+        if (process.env.NODE_ENV === 'production') {
+          process.exit(1);
+        }
       });
   }
 

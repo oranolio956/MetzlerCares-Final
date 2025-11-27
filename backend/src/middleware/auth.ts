@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken, JWTPayload } from '../utils/jwt.js';
 import { getRedisClient } from '../config/redis.js';
 import { logger } from '../utils/logger.js';
+import { AuthenticationError, AuthorizationError } from '../utils/errors.js';
 
 // Extend Express Request to include user
 declare global {
@@ -21,24 +22,21 @@ export const authenticate = async (
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({
-        error: 'Unauthorized',
-        message: 'Missing or invalid authorization header',
-      });
-      return;
+      throw new AuthenticationError('Missing or invalid authorization header');
     }
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     // Check if token is blacklisted
-    const redis = getRedisClient();
-    const isBlacklisted = await redis.get(`blacklist:${token}`);
-    if (isBlacklisted) {
-      res.status(401).json({
-        error: 'Unauthorized',
-        message: 'Token has been revoked',
-      });
-      return;
+    try {
+      const redis = getRedisClient();
+      const isBlacklisted = await redis.get(`blacklist:${token}`);
+      if (isBlacklisted) {
+        throw new AuthenticationError('Token has been revoked');
+      }
+    } catch (error) {
+      // If Redis fails, continue (graceful degradation)
+      logger.warn('Redis check failed during authentication, continuing:', error);
     }
 
     // Verify token
@@ -47,30 +45,18 @@ export const authenticate = async (
 
     next();
   } catch (error) {
-    logger.warn('Authentication failed:', error);
-    res.status(401).json({
-      error: 'Unauthorized',
-      message: error instanceof Error ? error.message : 'Invalid token',
-    });
+    next(error); // Pass to error handler
   }
 };
 
 export const requireUserType = (allowedTypes: string[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
-      res.status(401).json({
-        error: 'Unauthorized',
-        message: 'Authentication required',
-      });
-      return;
+      return next(new AuthenticationError('Authentication required'));
     }
 
     if (!allowedTypes.includes(req.user.userType)) {
-      res.status(403).json({
-        error: 'Forbidden',
-        message: 'Insufficient permissions',
-      });
-      return;
+      return next(new AuthorizationError('Insufficient permissions'));
     }
 
     next();

@@ -96,7 +96,7 @@ export const getSessionByToken = async (token: string): Promise<Session | null> 
   const pool = getDatabasePool();
   
   const result = await pool.query(
-    'SELECT * FROM sessions WHERE token = $1 AND expires_at > NOW()',
+    'SELECT * FROM sessions WHERE token = $1 OR refresh_token = $1 AND expires_at > NOW()',
     [token]
   );
 

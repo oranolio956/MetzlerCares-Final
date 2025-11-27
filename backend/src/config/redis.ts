@@ -10,6 +10,15 @@ export const getRedisClient = () => {
 
     redisClient = createClient({
       url: redisUrl,
+      socket: {
+        reconnectStrategy: (retries) => {
+          if (retries > 10) {
+            logger.error('Redis reconnection failed after 10 retries');
+            return new Error('Redis reconnection limit exceeded');
+          }
+          return Math.min(retries * 100, 3000);
+        },
+      },
     });
 
     redisClient.on('error', (err) => {
@@ -24,8 +33,16 @@ export const getRedisClient = () => {
       logger.warn('Redis client disconnected');
     });
 
+    redisClient.on('ready', () => {
+      logger.info('Redis client ready');
+    });
+
     redisClient.connect().catch((err) => {
       logger.error('Failed to connect to Redis:', err);
+      // Don't exit in development, allow graceful degradation
+      if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+      }
     });
   }
 

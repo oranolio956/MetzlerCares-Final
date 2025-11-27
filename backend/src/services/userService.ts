@@ -1,6 +1,7 @@
 import { getDatabasePool } from '../config/database.js';
 import { User, UserType } from '../types/index.js';
 import { logger } from '../utils/logger.js';
+import { ConflictError, DatabaseError } from '../utils/errors.js';
 
 export const createUser = async (
   email: string,
@@ -24,10 +25,10 @@ export const createUser = async (
   } catch (error: any) {
     if (error.code === '23505') {
       // Unique constraint violation
-      throw new Error('User with this email already exists');
+      throw new ConflictError('User with this email already exists');
     }
     logger.error('Failed to create user:', error);
-    throw error;
+    throw new DatabaseError('Failed to create user');
   }
 };
 
@@ -101,7 +102,7 @@ export const updateUser = async (
   );
 
   if (result.rows.length === 0) {
-    throw new Error('User not found');
+    throw new DatabaseError('User not found');
   }
 
   return result.rows[0];
