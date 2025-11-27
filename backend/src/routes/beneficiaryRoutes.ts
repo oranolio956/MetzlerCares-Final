@@ -41,7 +41,7 @@ router.patch(
   '/me/profile',
   validate([
     body('daysSober').optional().isInt({ min: 0 }).withMessage('daysSober must be a non-negative integer'),
-    body('nextMilestone').optional().isInt({ min: 0 }).nullable().withMessage('nextMilestone must be a non-negative integer or null'),
+    body('nextMilestone').optional({ nullable: true }).isInt({ min: 0 }).withMessage('nextMilestone must be a non-negative integer or null'),
     body('insuranceStatus').optional().isIn(['verified', 'pending', 'none']).withMessage('Invalid insurance status'),
   ]),
   updateProfile

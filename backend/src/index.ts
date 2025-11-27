@@ -97,19 +97,47 @@ app.use(errorHandler);
 // Initialize database and Redis connections
 const initializeConnections = async () => {
   try {
-    getDatabasePool();
-    getRedisClient();
+    // Try to initialize database (non-blocking in development)
+    try {
+      getDatabasePool();
+      logger.info('Database pool initialized');
+    } catch (error) {
+      logger.warn('Database initialization failed (continuing in development):', error);
+      if (env.NODE_ENV === 'production') {
+        throw error;
+      }
+    }
+
+    // Try to initialize Redis (non-blocking in development)
+    try {
+      getRedisClient();
+      logger.info('Redis client initialized');
+    } catch (error) {
+      logger.warn('Redis initialization failed (continuing in development):', error);
+      if (env.NODE_ENV === 'production') {
+        throw error;
+      }
+    }
     
-    // Start background jobs
-    const { startSessionCleanup } = await import('./services/sessionCleanup.js');
-    const { startChatCleanup } = await import('./services/chatCleanup.js');
-    const { startDataRetentionCleanup } = await import('./services/dataRetention.js');
-    startSessionCleanup();
-    startChatCleanup();
-    startDataRetentionCleanup();
+    // Start background jobs (they handle their own errors)
+    try {
+      const { startSessionCleanup } = await import('./services/sessionCleanup.js');
+      const { startChatCleanup } = await import('./services/chatCleanup.js');
+      const { startDataRetentionCleanup } = await import('./services/dataRetention.js');
+      startSessionCleanup();
+      startChatCleanup();
+      startDataRetentionCleanup();
+    } catch (error) {
+      logger.warn('Failed to start some background jobs:', error);
+      // Don't fail server startup if background jobs fail
+    }
   } catch (error) {
     logger.error('Failed to initialize connections:', error);
-    process.exit(1);
+    if (env.NODE_ENV === 'production') {
+      process.exit(1);
+    } else {
+      logger.warn('Continuing in development mode despite connection errors');
+    }
   }
 };
 
