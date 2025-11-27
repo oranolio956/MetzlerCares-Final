@@ -12,7 +12,7 @@ export const VisionBoard: React.FC = () => {
   const [image, setImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { playClick, playSuccess } = useSound();
-  const { addNotification } = useStore();
+  const { addNotification, authToken } = useStore();
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
@@ -20,11 +20,15 @@ export const VisionBoard: React.FC = () => {
     playClick();
     
     try {
-        const result = await generateVisionImage(prompt, selectedSize);
+        if (!authToken) {
+          throw new Error('Please log in before generating a vision.');
+        }
+
+        const result = await generateVisionImage(prompt, selectedSize, authToken);
         setImage(result);
         playSuccess();
     } catch (e) {
-        addNotification('error', 'Failed to generate vision. Please try again.');
+        addNotification('error', e instanceof Error ? e.message : 'Failed to generate vision. Please try again.');
     } finally {
         setIsLoading(false);
     }

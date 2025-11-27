@@ -1,8 +1,13 @@
 #!/bin/bash
+set -euo pipefail
 
 # Render API Setup Script
-API_KEY="rnd_E6GGs6PzdUy5aLU4wfWpKTyJh0uE"
+API_KEY=${RENDER_API_KEY:?"RENDER_API_KEY is required"}
 API_BASE="https://api.render.com/v1"
+
+if ! command -v jq &> /dev/null; then
+  echo "⚠️  jq not found. Install jq for formatted JSON output."
+fi
 
 echo "=== Render Backend Setup ==="
 echo ""
@@ -19,38 +24,46 @@ echo "ENCRYPTION_SALT=$ENCRYPTION_SALT"
 echo ""
 
 # Create PostgreSQL Database
-echo "Creating PostgreSQL database..."
-DB_RESPONSE=$(curl -s -X POST "$API_BASE/databases" \
-  -H "Authorization: Bearer $API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "secondwind-db",
-    "databaseName": "secondwind",
-    "user": "secondwind_user",
-    "plan": "starter",
-    "region": "oregon",
-    "postgresMajorVersion": 15
-  }')
+if [[ -z "${SKIP_POSTGRES:-}" ]]; then
+  echo "Creating PostgreSQL database..."
+  DB_RESPONSE=$(curl -s -X POST "$API_BASE/databases" \
+    -H "Authorization: Bearer $API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "secondwind-db",
+      "databaseName": "secondwind",
+      "user": "secondwind_user",
+      "plan": "starter",
+      "region": "oregon",
+      "postgresMajorVersion": 15
+    }')
 
-echo "Database creation response:"
-echo "$DB_RESPONSE" | jq '.' 2>/dev/null || echo "$DB_RESPONSE"
-echo ""
+  echo "Database creation response:"
+  echo "$DB_RESPONSE" | jq '.' 2>/dev/null || echo "$DB_RESPONSE"
+  echo ""
+else
+  echo "Skipping PostgreSQL creation (SKIP_POSTGRES set)"
+fi
 
 # Create Redis
-echo "Creating Redis instance..."
-REDIS_RESPONSE=$(curl -s -X POST "$API_BASE/redis" \
-  -H "Authorization: Bearer $API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "secondwind-redis",
-    "plan": "starter",
-    "region": "oregon",
-    "maxmemoryPolicy": "allkeys-lru"
-  }')
+if [[ -z "${SKIP_REDIS:-}" ]]; then
+  echo "Creating Redis instance..."
+  REDIS_RESPONSE=$(curl -s -X POST "$API_BASE/redis" \
+    -H "Authorization: Bearer $API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "secondwind-redis",
+      "plan": "starter",
+      "region": "oregon",
+      "maxmemoryPolicy": "allkeys-lru"
+    }')
 
-echo "Redis creation response:"
-echo "$REDIS_RESPONSE" | jq '.' 2>/dev/null || echo "$REDIS_RESPONSE"
-echo ""
+  echo "Redis creation response:"
+  echo "$REDIS_RESPONSE" | jq '.' 2>/dev/null || echo "$REDIS_RESPONSE"
+  echo ""
+else
+  echo "Skipping Redis creation (SKIP_REDIS set)"
+fi
 
 echo "=== Setup Complete ==="
 echo ""

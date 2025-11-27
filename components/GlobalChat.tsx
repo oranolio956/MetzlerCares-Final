@@ -4,6 +4,7 @@ import { Mascot } from './Mascot';
 import { startGlobalSession, sendMessageToGemini } from '../services/geminiService';
 import { useSound } from '../hooks/useSound';
 import { useTypewriter } from '../hooks/useTypewriter';
+import { useStore } from '../context/StoreContext';
 
 interface GlobalMessage {
   id: string;
@@ -89,8 +90,9 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ activeSection }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const dwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
+
   const { playClick, playSuccess, playHover } = useSound();
+  const { authToken, addNotification } = useStore();
 
   // --- BEHAVIOR TRACKING ENGINE ---
   useEffect(() => {
@@ -196,18 +198,25 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ activeSection }) => {
       
       const userText = inputText;
       setInputText('');
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: 'user', text: userText }]);
+      const userMessage = { id: Date.now().toString(), role: 'user', text: userText } as GlobalMessage;
+      const newHistory = [...messages, userMessage];
+      setMessages(newHistory);
       setIsTyping(true);
 
       try {
-          const response = await sendMessageToGemini(userText, sessionRef.current);
-          setMessages(prev => [...prev, { 
-              id: (Date.now() + 1).toString(), 
-              role: 'model', 
+          if (!authToken) {
+            throw new Error('Please log in before chatting.');
+          }
+
+          const response = await sendMessageToGemini(userText, sessionRef.current, newHistory, authToken);
+          setMessages(prev => [...prev, {
+              id: (Date.now() + 1).toString(),
+              role: 'model',
               text: response.text,
               sources: response.sources
           }]);
       } catch (e) {
+          addNotification('error', e instanceof Error ? e.message : 'Unable to reach backend.');
           setMessages(prev => [...prev, { id: 'err', role: 'model', text: "I lost my connection to the server. Try again?" }]);
       } finally {
           setIsTyping(false);

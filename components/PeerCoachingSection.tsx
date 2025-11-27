@@ -88,8 +88,8 @@ export const PeerCoachingSection: React.FC<PeerCoachingSectionProps> = ({ onNavi
     }, 1500);
   };
 
-  const handleGetStarted = () => {
-    login('beneficiary');
+  const handleGetStarted = async () => {
+    await login('beneficiary');
     onNavigate('portal');
   };
 

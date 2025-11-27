@@ -3,6 +3,8 @@ import { GoogleGenAI, LiveServerMessage, Modality, FunctionDeclaration, Type } f
 import { useStore } from '../context/StoreContext';
 import { SYSTEM_INSTRUCTION } from '../services/geminiService';
 
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
 const submitApplicationTool: FunctionDeclaration = {
   name: 'submit_application',
   description: 'Submit the user\'s application after the comprehensive screening is complete. Call this ONLY after determining qualification status.',
@@ -25,7 +27,7 @@ const submitApplicationTool: FunctionDeclaration = {
 export const useGeminiLive = () => {
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [volume, setVolume] = useState(0);
-    const { addNotification, submitIntakeRequest, authToken } = useStore();
+    const { addNotification, submitIntakeRequest } = useStore();
     const [connected, setConnected] = useState(false);
     
     // Audio Context Refs
@@ -42,11 +44,11 @@ export const useGeminiLive = () => {
     const connect = useCallback(async () => {
         try {
             // Check for API Key or Backend Token
-            if (!process.env.API_KEY && !authToken) {
-                throw new Error("Missing authentication credentials. Please log in.");
+            if (!GEMINI_API_KEY) {
+                throw new Error("Voice mode requires VITE_GEMINI_API_KEY to be set.");
             }
 
-            const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            const client = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
             
             // Setup Audio Contexts
             const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -225,7 +227,7 @@ export const useGeminiLive = () => {
             console.error(error);
             addNotification('error', error.message || 'Failed to initialize voice mode');
         }
-    }, [addNotification, submitIntakeRequest, authToken]);
+    }, [addNotification, submitIntakeRequest]);
 
     const disconnect = useCallback(() => {
         if (sessionRef.current) {
