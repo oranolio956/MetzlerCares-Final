@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
-import { HeartHandshake, ArrowRight, Wind, ChevronDown, Activity, Building2, Sparkles, ArrowUpRight } from 'lucide-react';
+import { HeartHandshake, ArrowRight, Wind, ChevronDown, Activity, Building2, Sparkles, ArrowUpRight, Crown, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { SEOHead } from './SEOHead';
 import { useStore } from '../context/StoreContext';
@@ -183,30 +183,43 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                              </p>
                           </div>
 
-                          {/* PEER COACHING CARD */}
+                          {/* PEER COACHING CARD (THE UNLOCK) */}
+                          {/* Designed to look like a Premium/Gold Credit Card or VIP Pass */}
                           <div 
                             onClick={() => onNavigate('peer-coaching')}
-                            className="relative bg-brand-navy text-white p-1 rounded-2xl shadow-xl cursor-pointer transform hover:scale-105 transition-all group animate-slide-up opacity-0"
+                            className="relative overflow-hidden p-[2px] rounded-2xl shadow-2xl cursor-pointer transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 group animate-slide-up opacity-0"
                             style={{ animationDelay: '0.7s' }}
                           >
-                             <div className="absolute inset-0 rounded-2xl border-2 border-dashed border-brand-yellow opacity-30 group-hover:opacity-100 transition-opacity"></div>
-                             <div className="bg-brand-navy rounded-xl p-4 flex items-center justify-between relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-20 h-20 bg-brand-teal/30 rounded-full blur-xl -mr-6 -mt-6 animate-pulse"></div>
-                                <div className="flex items-center gap-4 relative z-10">
-                                   <div className="bg-brand-yellow text-brand-navy p-3 rounded-xl shadow-lg font-bold transform group-hover:rotate-12 transition-transform">
-                                      <Sparkles size={20} fill="currentColor" />
+                             {/* Animated Border Gradient */}
+                             <div className="absolute inset-0 bg-gradient-to-tr from-brand-yellow via-brand-coral to-brand-teal opacity-80 group-hover:opacity-100 animate-spin-slow" style={{ animationDuration: '4s' }}></div>
+                             
+                             {/* Card Body */}
+                             <div className="relative bg-brand-navy h-full rounded-[14px] p-5 flex items-center justify-between">
+                                {/* Glass Shine */}
+                                <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
+                                
+                                <div className="flex flex-col gap-1 relative z-10">
+                                   <div className="flex items-center gap-2 mb-1">
+                                      <div className="bg-brand-yellow/20 text-brand-yellow p-1.5 rounded-lg">
+                                        <Crown size={16} fill="currentColor" />
+                                      </div>
+                                      <span className="text-[10px] font-bold uppercase tracking-widest text-brand-yellow">Benefit Unlocked</span>
                                    </div>
-                                   <div>
-                                      <span className="text-[10px] font-bold uppercase tracking-widest text-brand-yellow mb-0.5 block">New Feature</span>
-                                      <span className="font-display font-bold text-lg leading-none block">Peer Coaching</span>
-                                      <span className="text-xs text-white/60">Free with Medicaid</span>
+                                   <h4 className="font-bold text-white text-lg leading-tight">Peer Recovery Agent</h4>
+                                   <div className="flex items-center gap-2 mt-1">
+                                      <span className="text-white/40 text-xs line-through">$500/mo Value</span>
+                                      <span className="text-brand-teal font-bold text-xs bg-brand-teal/10 px-2 py-0.5 rounded flex items-center gap-1">
+                                        Free with Medicaid <CheckCircle2 size={10} />
+                                      </span>
                                    </div>
                                 </div>
-                                <div className="bg-white/10 p-2 rounded-full group-hover:bg-white group-hover:text-brand-navy transition-colors">
-                                   <ArrowRight size={16} />
+
+                                <div className="bg-white/10 p-3 rounded-full group-hover:bg-brand-yellow group-hover:text-brand-navy transition-all duration-300">
+                                   <ArrowRight size={20} />
                                 </div>
                              </div>
                           </div>
+
                       </div>
                   </div>
 
@@ -235,7 +248,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                          <AnimatedCounter end={1240402} />
                        </span>
                        <span className="text-brand-navy/20 text-xl font-light">|</span>
-                       <span className="font-mono text-sm font-bold text-brand-teal bg-brand-teal/10 px-2 py-0.5 rounded">850 Rent Payments</span>
+                       <span className="font-mono text-xs font-bold text-brand-yellow bg-brand-navy/5 px-2 py-1 rounded border border-brand-navy/5 flex items-center gap-1">
+                          <ShieldCheck size={10} /> Medicaid Coaching Available
+                       </span>
                     </div>
                  </div>
               </div>
