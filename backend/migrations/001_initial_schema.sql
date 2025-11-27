@@ -70,6 +70,7 @@ CREATE TABLE donations (
     item_label VARCHAR(255),
     stripe_payment_intent_id VARCHAR(255) UNIQUE,
     status VARCHAR(20) NOT NULL CHECK (status IN ('pending', 'succeeded', 'failed', 'refunded')),
+    metadata JSONB,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -209,6 +210,19 @@ CREATE TABLE vendors (
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Vision Images table
+CREATE TABLE vision_images (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    prompt TEXT NOT NULL,
+    size VARCHAR(10) NOT NULL CHECK (size IN ('1K', '2K', '4K')),
+    image_url TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_vision_images_user_id ON vision_images(user_id);
+CREATE INDEX idx_vision_images_created_at ON vision_images(created_at);
 
 CREATE INDEX idx_vendors_name ON vendors(name);
 CREATE INDEX idx_vendors_category ON vendors(category);

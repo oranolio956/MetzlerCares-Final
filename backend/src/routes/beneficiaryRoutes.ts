@@ -1,0 +1,42 @@
+import { Router } from 'express';
+import {
+  getDashboard,
+  verifyInsuranceStatus,
+  updateProfile,
+} from '../controllers/beneficiaryController.js';
+import { authenticate, requireUserType } from '../middleware/auth.js';
+import { body } from 'express-validator';
+import { validate } from '../middleware/validator.js';
+
+const router = Router();
+
+// All beneficiary routes require authentication and beneficiary user type
+router.use(authenticate);
+router.use(requireUserType(['beneficiary']));
+
+// Get dashboard
+router.get('/me/dashboard', getDashboard);
+
+// Verify insurance
+router.post(
+  '/me/insurance/verify',
+  validate([
+    body('status')
+      .isIn(['verified', 'pending'])
+      .withMessage('status must be "verified" or "pending"'),
+  ]),
+  verifyInsuranceStatus
+);
+
+// Update profile
+router.patch(
+  '/me/profile',
+  validate([
+    body('daysSober').optional().isInt({ min: 0 }).withMessage('daysSober must be a non-negative integer'),
+    body('nextMilestone').optional().isInt({ min: 0 }).nullable().withMessage('nextMilestone must be a non-negative integer or null'),
+    body('insuranceStatus').optional().isIn(['verified', 'pending', 'none']).withMessage('Invalid insurance status'),
+  ]),
+  updateProfile
+);
+
+export default router;
