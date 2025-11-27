@@ -1,6 +1,5 @@
-import { getDatabasePool } from '../config/database.js';
-import { getRedisClient } from '../config/redis.js';
-import { checkDatabaseHealth, checkRedisHealth } from '../config/database.js';
+import { getDatabasePool, checkDatabaseHealth } from '../config/database.js';
+import { getRedisClient, checkRedisHealth } from '../config/redis.js';
 import { logger } from './logger.js';
 import { getEnv } from '../config/env.js';
 
