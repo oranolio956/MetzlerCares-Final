@@ -16,10 +16,12 @@ import { LoginExperience } from './components/LoginExperience';
 import { useRouter } from './hooks/useRouter';
 import { useStore } from './context/StoreContext';
 import { useSound } from './hooks/useSound';
-import { Confetti } from './components/Confetti';
 import { Footer } from './components/Footer';
 import { RecoveryDirectory } from './components/RecoveryDirectory';
-import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, Activity, Globe, LogIn, LogOut, Menu, X, Phone, MessageSquare, LifeBuoy } from 'lucide-react';
+import { PartnerDirectory } from './components/PartnerDirectory';
+import { ImpactTicker } from './components/ImpactTicker';
+import { HyperLocalMap } from './components/HyperLocalMap';
+import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SecondWind Logo">
@@ -180,6 +182,7 @@ const App: React.FC = () => {
         {/* GLOBAL OVERLAYS */}
         <CrisisOverlay isOpen={isCrisisMode} onClose={() => setCrisisMode(false)} />
         <LoginExperience isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} onLoginSuccess={handleLoginSuccess} />
+        <NotificationSystem />
 
         {/* MOBILE MENU - Lower Z-Index than Crisis Overlay but higher than content */}
         <div className={`fixed inset-0 z-[100] bg-brand-navy/95 backdrop-blur-xl text-white transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col ${isMobileMenuOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'}`}>
@@ -215,54 +218,64 @@ const App: React.FC = () => {
         </div>
 
         {/* HEADER */}
-        <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-brand-navy/90 backdrop-blur-md py-3 shadow-lg' : 'bg-transparent py-4 md:py-6'}`}>
-           <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 flex items-center justify-between">
-              <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('intro')}>
-                 <BrandLogo className={`w-8 h-8 md:w-10 md:h-10 transition-transform group-hover:rotate-12 ${isCalmMode || scrolled ? 'brightness-100' : 'brightness-0 md:brightness-100'}`} />
-                 <span className={`font-display font-bold text-xl tracking-tight ${isCalmMode || scrolled ? 'text-white' : 'text-brand-navy md:text-brand-navy opacity-0 md:opacity-100'}`}>SecondWind</span>
-              </div>
-              
-              <nav className="hidden lg:flex items-center gap-1 bg-white/80 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-sm absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                 {['intro', 'philosophy', 'donate', 'apply', 'ledger'].map((id) => (
-                    <button key={id} onClick={() => { navigate(id); playClick(); }} className={`px-5 py-2 rounded-full text-sm font-bold transition-all capitalize ${activeSection === id ? 'bg-brand-navy text-white shadow-md' : 'text-brand-navy/60 hover:text-brand-navy hover:bg-brand-navy/5'}`}>
-                      {id === 'intro' ? 'Home' : id}
-                    </button>
-                 ))}
-              </nav>
+        <div className="fixed top-0 left-0 right-0 z-50 flex flex-col">
+            <header className={`transition-all duration-300 w-full ${scrolled ? 'bg-brand-navy/90 backdrop-blur-md shadow-lg py-2' : 'bg-transparent py-4 md:py-6'}`}>
+               <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 flex items-center justify-between">
+                  <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('intro')}>
+                     <BrandLogo className={`w-8 h-8 md:w-10 md:h-10 transition-transform group-hover:rotate-12 ${isCalmMode || scrolled ? 'brightness-100' : 'brightness-0 md:brightness-100'}`} />
+                     <span className={`font-display font-bold text-xl tracking-tight ${isCalmMode || scrolled ? 'text-white' : 'text-brand-navy md:text-brand-navy opacity-0 md:opacity-100'}`}>SecondWind</span>
+                  </div>
+                  
+                  <nav className="hidden lg:flex items-center gap-1 bg-white/80 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-sm absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                     {['intro', 'philosophy', 'donate', 'apply', 'ledger'].map((id) => (
+                        <button key={id} onClick={() => { navigate(id); playClick(); }} className={`px-5 py-2 rounded-full text-sm font-bold transition-all capitalize ${activeSection === id ? 'bg-brand-navy text-white shadow-md' : 'text-brand-navy/60 hover:text-brand-navy hover:bg-brand-navy/5'}`}>
+                          {id === 'intro' ? 'Home' : id}
+                        </button>
+                     ))}
+                  </nav>
 
-              <div className="flex items-center gap-3">
-                 <button onClick={toggleSound} className={`p-2.5 rounded-full transition-colors hidden sm:flex ${scrolled ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-brand-navy/40 hover:text-brand-navy hover:bg-brand-navy/5'}`} aria-label="Toggle sound">
-                    {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
-                 </button>
-                 <button onClick={toggleCalmMode} className={`p-2.5 rounded-full transition-colors hidden sm:flex ${scrolled ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-brand-navy/40 hover:text-brand-navy hover:bg-brand-navy/5'}`} aria-label="Toggle calm mode">
-                    {isCalmMode ? <EyeOff size={20} /> : <Eye size={20} />}
-                 </button>
-                 {userType ? (
-                    <button onClick={() => navigate(userType === 'donor' ? 'donor-portal' : 'portal')} className="hidden sm:flex items-center gap-2 px-4 py-2 bg-brand-navy text-white rounded-full font-bold text-sm hover:bg-brand-teal transition-colors shadow-lg">
-                       <UserCircle size={18} /> <span>Dashboard</span>
-                    </button>
-                 ) : (
-                    <button onClick={() => setIsLoginOpen(true)} className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-colors border-2 ${scrolled ? 'border-white/20 text-white hover:bg-white hover:text-brand-navy' : 'border-brand-navy/10 text-brand-navy hover:border-brand-navy'}`}>
-                       <LogIn size={16} /> <span>Login</span>
-                    </button>
-                 )}
-                 <button onClick={() => setIsMobileMenuOpen(true)} className={`lg:hidden p-2 rounded-full ${scrolled ? 'text-white' : 'text-brand-navy'}`} aria-label="Open menu">
-                    <Menu size={24} />
-                 </button>
-              </div>
-           </div>
-        </header>
+                  <div className="flex items-center gap-3">
+                     <button onClick={toggleSound} className={`p-2.5 rounded-full transition-colors hidden sm:flex ${scrolled ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-brand-navy/40 hover:text-brand-navy hover:bg-brand-navy/5'}`} aria-label="Toggle sound">
+                        {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                     </button>
+                     <button onClick={toggleCalmMode} className={`p-2.5 rounded-full transition-colors hidden sm:flex ${scrolled ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-brand-navy/40 hover:text-brand-navy hover:bg-brand-navy/5'}`} aria-label="Toggle calm mode">
+                        {isCalmMode ? <EyeOff size={20} /> : <Eye size={20} />}
+                     </button>
+                     {userType ? (
+                        <button onClick={() => navigate(userType === 'donor' ? 'donor-portal' : 'portal')} className="hidden sm:flex items-center gap-2 px-4 py-2 bg-brand-navy text-white rounded-full font-bold text-sm hover:bg-brand-teal transition-colors shadow-lg">
+                           <UserCircle size={18} /> <span>Dashboard</span>
+                        </button>
+                     ) : (
+                        <button onClick={() => setIsLoginOpen(true)} className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-colors border-2 ${scrolled ? 'border-white/20 text-white hover:bg-white hover:text-brand-navy' : 'border-brand-navy/10 text-brand-navy hover:bg-brand-navy hover:text-white'}`}>
+                           <LogIn size={18} /> <span>Member Login</span>
+                        </button>
+                     )}
+                     <button onClick={() => setIsMobileMenuOpen(true)} className={`lg:hidden p-2 rounded-lg ${scrolled ? 'text-white' : 'text-brand-navy'}`}>
+                       <div className="space-y-1.5">
+                         <div className="w-6 h-0.5 bg-current"></div>
+                         <div className="w-6 h-0.5 bg-current"></div>
+                         <div className="w-6 h-0.5 bg-current"></div>
+                       </div>
+                     </button>
+                  </div>
+               </div>
+            </header>
+            
+            {/* Impact Ticker below header */}
+            <ImpactTicker />
+        </div>
 
-        <main id="main-content" className="flex-grow flex flex-col relative z-0">
+        {/* MAIN CONTENT */}
+        <main className="flex-grow pt-[120px]">
            {renderContent()}
         </main>
 
-        {/* SEO: Resource Directory (Footer-Adjacent) */}
+        {/* SEO COMPONENTS */}
         <RecoveryDirectory />
-        
+        <PartnerDirectory />
+        <HyperLocalMap />
+
         <Footer onNavigate={navigate} />
-        <NotificationSystem />
-        <Confetti />
       </div>
     </ErrorBoundary>
   );

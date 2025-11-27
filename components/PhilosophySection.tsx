@@ -39,6 +39,22 @@ const faqSchema = {
         "@type": "Answer",
         "text": "Yes. SecondWind is a 100% transparent protocol. Every donation is tracked on our public ledger and paid directly to verified vendors, not individuals."
       }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you fund CARR Certified homes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. SecondWind prioritizes funding for facilities certified by CARR (Colorado Association of Recovery Residences) to ensure safety and standards of care."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How to find Oxford House vacancies in Denver?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Our partner network tracks vacancies at Oxford House locations across Denver, Aurora, and Lakewood. Apply through our chat to see real-time availability and eligibility."
+      }
     }
   ]
 };
@@ -217,7 +233,6 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
              </div>
           </div>
 
-
           {/* PROTOCOL PIPELINE (Visual Flow) */}
           <div className="w-full relative z-10 mb-0">
              <div className="flex items-center justify-center gap-3 mb-12 opacity-80">
@@ -264,6 +279,46 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                    <p className="text-sm text-brand-navy/60 leading-relaxed">The transaction receipt is published to the live ledger. You get a notification that your specific dollar did the job.</p>
                 </div>
 
+             </div>
+          </div>
+          
+          {/* FAQ Section */}
+          <div className="w-full mt-24 max-w-4xl">
+             <div className="text-center mb-12">
+                 <h2 className="font-display font-bold text-3xl text-brand-navy">Common Questions</h2>
+                 <p className="text-brand-navy/50 mt-2">Everything you need to know about our funding protocol.</p>
+             </div>
+             
+             <div className="space-y-4">
+                 <details className="group bg-white rounded-2xl border border-brand-navy/5 open:border-brand-teal/30 open:ring-4 open:ring-brand-teal/5 transition-all">
+                     <summary className="p-6 cursor-pointer list-none flex justify-between items-center font-bold text-brand-navy">
+                         Do you fund CARR Certified homes?
+                         <ArrowDown className="group-open:rotate-180 transition-transform text-brand-teal" size={20} />
+                     </summary>
+                     <div className="px-6 pb-6 pt-0 text-brand-navy/70 leading-relaxed text-sm">
+                         Yes. SecondWind prioritizes funding for facilities certified by CARR (Colorado Association of Recovery Residences). These homes meet higher safety and management standards. We verify certification in real-time before releasing funds.
+                     </div>
+                 </details>
+
+                 <details className="group bg-white rounded-2xl border border-brand-navy/5 open:border-brand-teal/30 open:ring-4 open:ring-brand-teal/5 transition-all">
+                     <summary className="p-6 cursor-pointer list-none flex justify-between items-center font-bold text-brand-navy">
+                         How to find Oxford House vacancies in Denver?
+                         <ArrowDown className="group-open:rotate-180 transition-transform text-brand-teal" size={20} />
+                     </summary>
+                     <div className="px-6 pb-6 pt-0 text-brand-navy/70 leading-relaxed text-sm">
+                         Oxford House vacancies change daily. While we don't manage their list directly, our "Partner Network" tool tracks active houses where we have successfully placed residents recently. Start a chat with Windy to check eligibility for funding at specific locations.
+                     </div>
+                 </details>
+
+                 <details className="group bg-white rounded-2xl border border-brand-navy/5 open:border-brand-teal/30 open:ring-4 open:ring-brand-teal/5 transition-all">
+                     <summary className="p-6 cursor-pointer list-none flex justify-between items-center font-bold text-brand-navy">
+                         What if I relapse?
+                         <ArrowDown className="group-open:rotate-180 transition-transform text-brand-teal" size={20} />
+                     </summary>
+                     <div className="px-6 pb-6 pt-0 text-brand-navy/70 leading-relaxed text-sm">
+                         Recovery is non-linear. If you relapse, funding may be paused, but we do not ban you. We will require a new verified sobriety date and may redirect you to higher levels of care (Detox/Rehab) before resuming sober living rent payments.
+                     </div>
+                 </details>
              </div>
           </div>
 

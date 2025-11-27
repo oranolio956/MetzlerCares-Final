@@ -77,14 +77,14 @@ export const RecoveryDirectory: React.FC = () => {
            ))}
         </div>
 
-        {/* Long-tail Keyword Block (Hidden in plain sight via design) */}
+        {/* Long-tail Keyword Block */}
         <div className="mt-16 pt-12 border-t border-brand-lavender/5">
            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
               <div>
                  <span className="text-brand-lavender/40 text-xs font-bold uppercase tracking-widest block mb-2">Protocol Stats</span>
                  <p className="text-white/80 text-sm max-w-xl">
                     SecondWind is a 501(c)(3) non-profit organization complying with all Colorado BHA (Behavioral Health Administration) standards for recovery residences. 
-                    We function as a financial bridge for indigent applicants seeking entry into Oxford House™ and CARR (Colorado Association of Recovery Residences) certified homes.
+                    We function as a financial bridge for indigent applicants seeking entry into <a href="#partner" className="text-brand-teal hover:underline">Oxford House™</a> and CARR (Colorado Association of Recovery Residences) certified homes.
                  </p>
               </div>
               <a href="#apply" className="flex items-center gap-2 text-brand-teal font-bold text-sm hover:text-white transition-colors">
