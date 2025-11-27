@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Crown, X, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
@@ -18,7 +17,7 @@ export const MedicaidPromo: React.FC = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-8 md:bottom-8 z-[80] w-[calc(100%-2rem)] max-w-sm animate-in slide-in-from-bottom-10 fade-in duration-700">
+    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-6 md:bottom-24 z-[80] w-[calc(100%-2rem)] max-w-sm animate-in slide-in-from-bottom-10 fade-in duration-700">
       <div className="bg-brand-navy text-white p-1 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] border border-brand-teal/30 flex items-stretch relative overflow-hidden group">
         
         {/* Shine effect */}

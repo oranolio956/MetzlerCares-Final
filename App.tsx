@@ -24,6 +24,7 @@ import { MedicaidPromo } from './components/MedicaidPromo';
 import { RecoveryKnowledgeGraph } from './components/RecoveryKnowledgeGraph';
 import { CoachChat } from './components/CoachChat';
 import { VisionBoard } from './components/VisionBoard';
+import { GlobalChat } from './components/GlobalChat';
 import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2, Sparkles, Image, Shield } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
@@ -171,9 +172,10 @@ const App: React.FC = () => {
               id="apply" 
               title="Apply for Recovery Funding" 
               description="Immediate rent assistance and rehab funding for Colorado residents."
+              className="pt-24 pb-4 md:py-24 min-h-[auto]" // Updated Padding for optimized viewport usage
             >
-               <div className="flex flex-col items-center gap-8 w-full max-w-4xl mx-auto px-4">
-                 <div className="text-center max-w-2xl mx-auto mb-4 md:mb-8">
+               <div className="flex flex-col items-center gap-4 md:gap-8 w-full max-w-4xl mx-auto px-2 md:px-4 h-full">
+                 <div className="text-center max-w-2xl mx-auto mb-2 md:mb-8 shrink-0">
                     <h2 className="font-display font-bold text-3xl md:text-5xl text-brand-navy mb-4">Let's get you sorted.</h2>
                     <p className="text-brand-navy/60 text-lg">No long forms. Just a chat. Tell us what you need.</p>
                  </div>
@@ -247,6 +249,7 @@ const App: React.FC = () => {
         <NotificationSystem />
         {/* MedicaidPromo is properly layered via z-index in CSS, mobile menu is z-[100], promo is z-[80] */}
         <MedicaidPromo />
+        <GlobalChat />
 
         {/* MOBILE MENU */}
         <div className={`fixed inset-0 z-[100] bg-brand-navy/95 backdrop-blur-xl text-white transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col ${isMobileMenuOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'}`}>

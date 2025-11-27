@@ -75,7 +75,7 @@ export const CoachChat: React.FC = () => {
 
     try {
         const response = await sendMessageToGemini(text, chatRef.current);
-        setMessages(prev => [...prev, { id: Date.now().toString(), role: 'model', text: response }]);
+        setMessages(prev => [...prev, { id: Date.now().toString(), role: 'model', text: response.text }]);
     } catch (e) {
         setMessages(prev => [...prev, { id: Date.now().toString(), role: 'model', text: "I'm having trouble connecting to the Pro network. Please try again." }]);
     } finally {

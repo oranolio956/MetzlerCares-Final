@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Activity, Shield, Zap, LifeBuoy, CornerDownLeft, ArrowRight, FileCheck, MapPin, User, Trash2, Lock } from 'lucide-react';
+import { Mic, MicOff, Activity, Shield, Zap, LifeBuoy, CornerDownLeft, ArrowRight, FileCheck, MapPin, User, Trash2, Lock, Sparkles } from 'lucide-react';
 import { startIntakeSession, sendMessageToGemini } from '../services/geminiService';
 import { useGeminiLive } from '../hooks/useGeminiLive';
 import { Message } from '../types';
@@ -7,15 +8,6 @@ import { Mascot, MascotProps } from './Mascot';
 import { useTypewriter } from '../hooks/useTypewriter';
 import { useStore } from '../context/StoreContext';
 import { useSound } from '../hooks/useSound';
-
-const QUICK_CHIPS = [
-    "Yes, I'm in Colorado",
-    "No, I don't have insurance",
-    "I have Medicaid",
-    "Oxford House",
-    "Homeless / Shelter",
-    "Less than 30 days sober"
-];
 
 const MessageItem: React.FC<{ message: Message; isLast: boolean }> = ({ message, isLast }) => {
   const { isCalmMode } = useStore();
@@ -58,6 +50,7 @@ export const IntakeChat: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [mascotExpression, setMascotExpression] = useState<MascotProps['expression']>('happy');
+  const [smartChips, setSmartChips] = useState<string[]>([]);
   
   // Session State (Ephemeral, not in LocalStorage)
   const sessionRef = useRef<any>(null); 
@@ -89,6 +82,40 @@ export const IntakeChat: React.FC = () => {
      }
   }, [mode, isSpeaking, volume]);
 
+  // SMART REPLIES LOGIC (Context Aware)
+  useEffect(() => {
+      if (messages.length === 0) {
+          setSmartChips(["I'm in Denver", "I'm in Boulder", "Colorado Springs", "Outside Colorado"]);
+          return;
+      }
+      
+      const lastModelMsg = [...messages].reverse().find(m => m.role === 'model');
+      if (lastModelMsg && !isAiTyping) {
+          const fullText = lastModelMsg.text;
+          // Prioritize the last sentence for context as it usually contains the question
+          const sentences = fullText.split(/[.?!]/).filter(s => s.trim().length > 0);
+          const lastSentence = sentences[sentences.length - 1]?.toLowerCase() || fullText.toLowerCase();
+          
+          if (lastSentence.includes("safe") || lastSentence.includes("sleep") || lastSentence.includes("homeless")) {
+              setSmartChips(["I have a safe place", "I am homeless", "In a shelter", "Couch surfing"]);
+          } else if (lastSentence.includes("insurance") || lastSentence.includes("medicaid")) {
+              setSmartChips(["Yes, I have Medicaid", "Private Insurance", "No Insurance", "I don't know"]);
+          } else if (lastSentence.includes("specific") || lastSentence.includes("need") || lastSentence.includes("funding")) {
+              setSmartChips(["Rent Deposit", "Bus Pass", "Work Laptop", "ID Retrieval"]);
+          } else if (lastSentence.includes("sobriety") || lastSentence.includes("sober") || lastSentence.includes("clean")) {
+              setSmartChips(["Less than 30 Days", "1-6 Months", "6+ Months", "Just relapsed"]);
+          } else if (lastSentence.includes("colorado") || lastSentence.includes("located")) {
+              setSmartChips(["Denver Metro", "Boulder", "Colorado Springs", "Not in CO"]);
+          } else if (lastSentence.includes("ready") || lastSentence.includes("start")) {
+              setSmartChips(["I'm ready", "How does this work?"]);
+          } else {
+              setSmartChips(["Yes", "No", "Explain more"]);
+          }
+      } else {
+          setSmartChips([]); // Hide while typing
+      }
+  }, [messages, isAiTyping]);
+
   const handleResetSession = () => {
       if (window.confirm("Start a new intake session? This will clear all temporary data.")) {
           playClick();
@@ -96,7 +123,6 @@ export const IntakeChat: React.FC = () => {
           setHasStarted(false);
           setHasConsent(false);
           sessionRef.current = null;
-          // Clean up any backend sessions here if needed
       }
   };
 
@@ -109,7 +135,7 @@ export const IntakeChat: React.FC = () => {
           // Simulate network delay for realism
           setTimeout(async () => {
               const response = await sendMessageToGemini("Hello, I am ready to start.", sessionRef.current);
-              setMessages([{ id: 'init', role: 'model', text: response }]);
+              setMessages([{ id: 'init', role: 'model', text: response.text }]);
               setIsAiTyping(false);
           }, 800);
       }
@@ -132,14 +158,14 @@ export const IntakeChat: React.FC = () => {
     if (inputRef.current) inputRef.current.focus();
 
     try {
-      const responseText = await sendMessageToGemini(text, sessionRef.current);
+      const response = await sendMessageToGemini(text, sessionRef.current);
       
       // Proactive Crisis Check (Client Side Safety Net)
-      if (responseText.toLowerCase().includes("988") || responseText.toLowerCase().includes("suicide")) {
+      if (response.text.toLowerCase().includes("988") || response.text.toLowerCase().includes("suicide")) {
          setCrisisMode(true);
       }
       
-      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'model', text: responseText }]);
+      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'model', text: response.text }]);
     } catch (e) {
       setMessages(prev => [...prev, { id: 'err', role: 'model', text: "Connection interrupted. Please check your internet."}]);
     } finally {
@@ -149,14 +175,14 @@ export const IntakeChat: React.FC = () => {
 
   if (!hasStarted) {
     return (
-      <div className="w-full max-w-6xl mx-auto bg-brand-navy rounded-3xl md:rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row relative min-h-[600px]">
+      <div className="w-full max-w-6xl mx-auto bg-brand-navy rounded-3xl md:rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row relative h-auto md:h-[600px]">
          {/* Left Side: Info */}
-         <div className="flex-1 p-8 md:p-14 flex flex-col justify-center relative overflow-hidden text-white border-b md:border-b-0 md:border-r border-white/5">
+         <div className="flex-1 p-6 md:p-14 flex flex-col justify-center relative overflow-hidden text-white border-b md:border-b-0 md:border-r border-white/5">
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-teal opacity-10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-            <h1 className="font-display font-bold text-4xl sm:text-5xl md:text-6xl leading-[0.9] tracking-tight mb-8 relative z-10">COLORADO<br/>RECOVERY INTAKE</h1>
+            <h1 className="font-display font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[0.9] tracking-tight mb-4 md:mb-8 relative z-10">COLORADO<br/>RECOVERY INTAKE</h1>
             <div className="relative z-10">
-               <p className="text-brand-lavender text-lg mb-8 font-medium">Direct-action assistance for Denver & Boulder residents.</p>
-               <div className="bg-white/5 rounded-2xl p-6 mb-8 text-left border border-white/10">
+               <p className="text-brand-lavender text-base md:text-lg mb-6 md:mb-8 font-medium">Direct-action assistance for Denver & Boulder residents.</p>
+               <div className="bg-white/5 rounded-2xl p-4 md:p-6 mb-6 md:mb-8 text-left border border-white/10 hidden sm:block">
                   <span className="text-xs font-bold uppercase tracking-widest text-brand-teal mb-4 block">Checklist:</span>
                   <ul className="space-y-3 text-sm text-white/80">
                     <li className="flex items-center gap-3"><MapPin size={16} className="text-brand-coral" /> <span>Current location/Oxford House</span></li>
@@ -172,16 +198,16 @@ export const IntakeChat: React.FC = () => {
          </div>
          
          {/* Right Side: Consent & Start */}
-         <div className="flex-1 bg-[#FDFBF7] p-8 md:p-14 flex flex-col justify-center items-center relative">
+         <div className="flex-1 bg-[#FDFBF7] p-6 md:p-14 flex flex-col justify-center items-center relative">
             <div className="w-full max-w-sm space-y-6 relative z-10">
-               <div className="mb-4 flex justify-center"><div className="w-32 h-32 relative"><Mascot expression="happy" className="w-full h-full" /></div></div>
+               <div className="mb-4 flex justify-center"><div className="w-24 h-24 md:w-32 md:h-32 relative"><Mascot expression="happy" className="w-full h-full" /></div></div>
                
                {!hasConsent ? (
                  <div className="bg-white border border-brand-navy/10 rounded-xl p-6 animate-slide-up shadow-lg">
                     <h4 className="font-bold text-brand-navy mb-2 flex items-center gap-2"><Shield size={16}/> Privacy & Consent</h4>
                     <p className="text-xs text-brand-navy/60 mb-4 leading-relaxed">
                       This system uses AI to process your intake. By proceeding, you agree to our <button onClick={() => setShowLegalDocs(true)} className="text-brand-teal underline font-bold">Terms & Privacy Policy</button>. 
-                      We do not store your chat history permanently on this device. All data is transmitted securely to our backend.
+                      We do not store your chat history permanently on this device.
                     </p>
                     <div className="flex items-center gap-3 mb-4 p-3 bg-brand-navy/5 rounded-lg border border-brand-navy/5">
                         <input type="checkbox" id="consent" className="w-5 h-5 rounded border-brand-navy text-brand-teal focus:ring-brand-teal" onChange={(e) => e.target.checked && playClick()} />
@@ -196,8 +222,8 @@ export const IntakeChat: React.FC = () => {
                  </div>
                ) : (
                  <div className="space-y-4 animate-slide-up">
-                    <button onClick={() => { playSuccess(); setHasStarted(true); }} className="w-full bg-brand-navy text-white h-16 rounded-xl font-bold text-lg hover:bg-brand-teal transition-all flex items-center justify-between px-6 group shadow-lg active:scale-95"><span>Begin Session</span><ArrowRight className="group-hover:translate-x-1 transition-transform" /></button>
-                    <button onClick={() => { playClick(); setHasStarted(true); toggleVoiceMode(); }} className="w-full bg-white border-2 border-brand-navy/10 text-brand-navy h-16 rounded-xl font-bold text-lg hover:border-brand-navy/30 transition-all flex items-center justify-between px-6 group active:scale-95"><span>Voice Mode (Beta)</span><Mic size={20} className="text-brand-coral group-hover:scale-110 transition-transform" /></button>
+                    <button onClick={() => { playSuccess(); setHasStarted(true); }} className="w-full bg-brand-navy text-white h-14 md:h-16 rounded-xl font-bold text-lg hover:bg-brand-teal transition-all flex items-center justify-between px-6 group shadow-lg active:scale-95"><span>Begin Session</span><ArrowRight className="group-hover:translate-x-1 transition-transform" /></button>
+                    <button onClick={() => { playClick(); setHasStarted(true); toggleVoiceMode(); }} className="w-full bg-white border-2 border-brand-navy/10 text-brand-navy h-14 md:h-16 rounded-xl font-bold text-lg hover:border-brand-navy/30 transition-all flex items-center justify-between px-6 group active:scale-95"><span>Voice Mode (Beta)</span><Mic size={20} className="text-brand-coral group-hover:scale-110 transition-transform" /></button>
                  </div>
                )}
             </div>
@@ -206,28 +232,29 @@ export const IntakeChat: React.FC = () => {
     );
   }
 
+  // --- CHAT INTERFACE ---
   return (
-    <div className="flex flex-col h-[90dvh] max-h-[800px] md:h-[700px] w-full max-w-4xl mx-auto bg-white rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl border-2 md:border-4 border-white/50 ring-1 ring-brand-navy/5 relative font-sans">
+    <div className="flex flex-col w-full max-w-4xl mx-auto bg-white rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl border-2 md:border-4 border-white/50 ring-1 ring-brand-navy/5 relative font-sans h-[calc(100dvh-120px)] md:h-[700px]">
       
       {/* HEADER */}
-      <header className="shrink-0 h-16 md:h-20 flex items-center justify-between px-4 md:px-8 border-b border-brand-navy/5 bg-white/90 backdrop-blur-md z-20">
+      <header className="shrink-0 h-16 flex items-center justify-between px-4 md:px-6 border-b border-brand-navy/5 bg-white/90 backdrop-blur-md z-20">
          <div className="flex items-center gap-3 md:gap-4">
-            <div className="w-10 h-10 bg-brand-navy/5 rounded-xl flex items-center justify-center overflow-hidden">
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-brand-navy/5 rounded-xl flex items-center justify-center overflow-hidden">
                <Mascot expression={mascotExpression} className="w-full h-full scale-125 translate-y-1" />
             </div>
             <div>
-               <h3 className="font-bold text-brand-navy leading-none">Intake Assistant</h3>
-               <div className="flex items-center gap-1.5 mt-1">
+               <h3 className="font-bold text-brand-navy leading-none text-sm md:text-base">Intake Assistant</h3>
+               <div className="flex items-center gap-1.5 mt-0.5 md:mt-1">
                   <div className={`w-1.5 h-1.5 rounded-full ${mode === 'voice' ? 'bg-brand-coral animate-pulse' : 'bg-brand-teal'}`}></div>
                   <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40">{mode === 'voice' ? 'Voice Encrypted' : 'Secure Session'}</span>
                </div>
             </div>
          </div>
-         <div className="flex gap-2">
-            <button onClick={handleResetSession} className="p-3 text-brand-navy/40 hover:text-brand-coral hover:bg-brand-coral/10 rounded-xl transition-colors" title="Clear Data & Reset"><Trash2 size={20} /></button>
-            <button onClick={() => setCrisisMode(true)} className="p-3 text-brand-coral hover:bg-brand-coral/10 rounded-xl transition-colors" title="Crisis Help"><LifeBuoy size={20} /></button>
-            <button onClick={toggleVoiceMode} className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${mode === 'voice' ? 'bg-brand-coral text-white shadow-md' : 'bg-brand-navy/5 text-brand-navy hover:bg-brand-navy/10'}`}>
-               {mode === 'voice' ? <><MicOff size={16}/> End Call</> : <><Mic size={16}/> Voice</>}
+         <div className="flex gap-1 md:gap-2">
+            <button onClick={handleResetSession} className="p-2 md:p-3 text-brand-navy/40 hover:text-brand-coral hover:bg-brand-coral/10 rounded-xl transition-colors" title="Clear Data & Reset"><Trash2 size={18} /></button>
+            <button onClick={() => setCrisisMode(true)} className="p-2 md:p-3 text-brand-coral hover:bg-brand-coral/10 rounded-xl transition-colors" title="Crisis Help"><LifeBuoy size={18} /></button>
+            <button onClick={toggleVoiceMode} className={`px-3 md:px-4 py-2 rounded-xl text-xs md:text-sm font-bold flex items-center gap-2 transition-all ${mode === 'voice' ? 'bg-brand-coral text-white shadow-md' : 'bg-brand-navy/5 text-brand-navy hover:bg-brand-navy/10'}`}>
+               {mode === 'voice' ? <><MicOff size={16}/> Stop</> : <><Mic size={16}/> Voice</>}
             </button>
          </div>
       </header>
@@ -272,23 +299,26 @@ export const IntakeChat: React.FC = () => {
       </div>
 
       {/* INPUT AREA */}
-      <div className={`shrink-0 bg-white border-t border-brand-navy/5 transition-transform duration-300 ${mode === 'voice' ? 'translate-y-full hidden' : 'translate-y-0 block'}`}>
+      <div className={`shrink-0 bg-white border-t border-brand-navy/5 transition-transform duration-300 pb-safe ${mode === 'voice' ? 'translate-y-full hidden' : 'translate-y-0 block'}`}>
          
-         {/* QUICK CHIPS */}
-         <div className="px-4 pt-4 flex gap-2 overflow-x-auto no-scrollbar pb-2">
-            {QUICK_CHIPS.map((chip) => (
-                <button
-                   key={chip}
-                   onClick={() => handleSend(chip)}
-                   className="whitespace-nowrap px-4 py-2 rounded-full bg-brand-navy/5 text-brand-navy/70 text-xs font-bold hover:bg-brand-navy hover:text-white transition-colors border border-brand-navy/5 flex-shrink-0"
-                >
-                   {chip}
-                </button>
-            ))}
-         </div>
+         {/* SMART CHIPS (Dynamic) */}
+         {smartChips.length > 0 && (
+             <div className="px-4 pt-4 flex gap-2 overflow-x-auto no-scrollbar pb-2 mask-linear-fade">
+                {smartChips.map((chip, idx) => (
+                    <button
+                    key={`${chip}-${idx}`}
+                    onClick={() => handleSend(chip)}
+                    className="whitespace-nowrap px-4 py-2 rounded-full bg-brand-navy/5 text-brand-navy/70 text-xs font-bold hover:bg-brand-navy hover:text-white transition-colors border border-brand-navy/5 flex-shrink-0 animate-slide-up"
+                    style={{ animationDelay: `${idx * 0.05}s` }}
+                    >
+                    {chip}
+                    </button>
+                ))}
+             </div>
+         )}
 
-         <div className="p-4 md:p-6">
-            <div className="flex items-center gap-3 relative">
+         <div className="p-3 md:p-4 lg:p-6">
+            <div className="flex items-center gap-2 md:gap-3 relative">
                 <input 
                 ref={inputRef}
                 type="text" 
@@ -296,7 +326,7 @@ export const IntakeChat: React.FC = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 placeholder="Type your message..."
-                className="w-full bg-brand-navy/5 text-brand-navy placeholder:text-brand-navy/30 rounded-xl px-4 py-3 md:py-4 font-medium focus:outline-none focus:ring-2 focus:ring-brand-teal/20 transition-all pr-12"
+                className="w-full bg-brand-navy/5 text-brand-navy placeholder:text-brand-navy/30 rounded-xl px-4 py-3 md:py-4 font-medium focus:outline-none focus:ring-2 focus:ring-brand-teal/20 transition-all pr-12 text-sm md:text-base"
                 aria-label="Message input"
                 />
                 <button 
@@ -307,9 +337,6 @@ export const IntakeChat: React.FC = () => {
                 >
                 <CornerDownLeft size={18} />
                 </button>
-            </div>
-            <div className="text-center mt-3 hidden md:block">
-                <p className="text-[10px] text-brand-navy/30 font-bold uppercase tracking-widest flex items-center justify-center gap-1.5"><Shield size={10} /> Private & Encrypted • HIPAA Compliant Protocol</p>
             </div>
          </div>
       </div>

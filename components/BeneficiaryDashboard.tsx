@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CheckCircle2, Clock, AlertCircle, Calendar, UploadCloud, ChevronRight, Star, LifeBuoy, Sparkles, Image } from 'lucide-react';
 import { Mascot } from './Mascot';
@@ -44,7 +43,7 @@ export const BeneficiaryDashboard: React.FC = () => {
     <>
       <button 
         onClick={() => setCrisisMode(true)}
-        className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[80] bg-brand-coral text-white px-6 py-4 rounded-full shadow-[0_10px_40px_-10px_rgba(255,138,117,0.6)] hover:scale-105 transition-all flex items-center gap-3 font-bold group border-4 border-white/20 hover:border-white"
+        className="fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[80] bg-brand-coral text-white px-6 py-4 rounded-full shadow-[0_10px_40px_-10px_rgba(255,138,117,0.6)] hover:scale-105 transition-all flex items-center gap-3 font-bold group border-4 border-white/20 hover:border-white"
         aria-label="Get crisis help"
       >
         <LifeBuoy className="animate-pulse" />

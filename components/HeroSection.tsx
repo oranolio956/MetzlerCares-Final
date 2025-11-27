@@ -69,60 +69,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
          schema={{
            "@context": "https://schema.org",
            "@type": "NGO",
-           "@id": "https://secondwind.org/#organization",
-           "name": "SecondWind",
-           "alternateName": ["SecondWind Protocol", "SecondWind Colorado Recovery", "SecondWind Recovery"],
-           "legalName": "SecondWind Recovery Foundation",
-           "description": "A 501(c)(3) non-profit providing direct financial aid for sober living rent, rehab transit, and recovery technology in Colorado. Zero red tape, 100% verified vendor payments.",
-           "url": "https://secondwind.org",
-           "logo": {
-             "@type": "ImageObject",
-             "url": "https://secondwind.org/social-card.png",
-             "width": 1200,
-             "height": 630
+           "name": "SecondWind Colorado Recovery",
+           "alternateName": "SecondWind Protocol",
+           "areaServed": {
+             "@type": "State",
+             "name": "Colorado"
            },
-           "image": "https://secondwind.org/social-card.png",
-           "address": {
-             "@type": "PostalAddress",
-             "addressLocality": "Denver",
-             "addressRegion": "CO",
-             "addressCountry": "US"
-           },
-           "areaServed": [
-             { "@type": "State", "name": "Colorado" },
-             { "@type": "City", "name": "Denver" },
-             { "@type": "City", "name": "Boulder" },
-             { "@type": "City", "name": "Colorado Springs" }
-           ],
-           "serviceType": ["Sober Living Funding", "Rehab Transit Assistance", "Recovery Technology Grants", "Peer Recovery Coaching"],
-           "nonprofitStatus": "Nonprofit501c3",
-           "foundingDate": "2024",
-           "knowsAbout": ["Addiction Recovery", "Sober Living", "Substance Abuse Treatment", "Medicaid Enrollment", "Peer Coaching"],
-           "slogan": "Invest in Human Potential",
-           "sameAs": [
-             "https://twitter.com/secondwindco",
-             "https://www.facebook.com/secondwindco",
-             "https://www.linkedin.com/company/secondwindco",
-             "https://www.instagram.com/secondwindco"
-           ],
-           "contactPoint": {
-             "@type": "ContactPoint",
-             "contactType": "customer support",
-             "availableLanguage": ["English", "Spanish"],
-             "areaServed": "US-CO"
-           },
-           "potentialAction": [
-             {
-               "@type": "DonateAction",
-               "target": "https://secondwind.org/#donate",
-               "name": "Donate to Recovery Funding"
-             },
-             {
-               "@type": "ApplyAction",
-               "target": "https://secondwind.org/#apply",
-               "name": "Apply for Recovery Assistance"
-             }
-           ]
+           "mainEntityOfPage": "https://secondwind.org",
+           "description": "Providing direct financial aid for sober living and addiction recovery in Colorado."
          }}
       />
 
