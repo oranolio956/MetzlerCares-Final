@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ShieldCheck, ArrowDownLeft, FileText, ExternalLink, Filter, Check, RefreshCw, Receipt } from 'lucide-react';
+import { ShieldCheck, ArrowDownLeft, FileText, ExternalLink, Filter, Check, RefreshCw, Receipt, X } from 'lucide-react';
 import { LedgerItem } from '../types';
 import { useStore } from '../context/StoreContext';
 
@@ -100,6 +100,7 @@ const ReceiptStream: React.FC = () => {
 export const TransparencyLedger: React.FC = () => {
   const [activeTx, setActiveTx] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
   // Auto-refresh simulation
   useEffect(() => {
@@ -109,6 +110,14 @@ export const TransparencyLedger: React.FC = () => {
      }, 5000);
      return () => clearInterval(interval);
   }, []);
+
+  const filteredLedger = activeFilter 
+    ? MOCK_LEDGER.filter(item => item.category === activeFilter) 
+    : MOCK_LEDGER;
+
+  const toggleFilter = (category: string) => {
+      setActiveFilter(prev => prev === category ? null : category);
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 md:px-0">
@@ -130,7 +139,7 @@ export const TransparencyLedger: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           
-          {/* VISUAL RECEIPT STREAM (Replacing generic map) */}
+          {/* VISUAL RECEIPT STREAM */}
           <div className="lg:col-span-3 bg-[#EAEBED] border-2 border-brand-navy/5 rounded-[2.5rem] h-64 md:h-96 relative overflow-hidden shadow-inner group">
              <div className="absolute top-6 left-6 z-10">
                 <div className="flex items-center gap-2 bg-white/80 backdrop-blur px-4 py-2 rounded-full border border-brand-navy/10 shadow-sm">
@@ -145,14 +154,31 @@ export const TransparencyLedger: React.FC = () => {
 
           <div className="lg:col-span-3 bg-white rounded-[2.5rem] shadow-xl border border-brand-navy/10 overflow-hidden flex flex-col">
             
-            <div className="border-b border-brand-navy/5 p-4 md:p-6 flex items-center justify-between bg-gray-50/50">
+            <div className="border-b border-brand-navy/5 p-4 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between bg-gray-50/50 gap-4">
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full bg-green-500 ${isUpdating ? 'opacity-100' : 'opacity-50'}`}></div>
                   <span className="text-xs font-bold uppercase tracking-widest text-brand-navy/60">Live Feed</span>
                 </div>
-                <div className="flex gap-2">
-                  <button className="text-brand-navy/40 hover:text-brand-navy transition-colors p-1"><RefreshCw size={16} className={isUpdating ? "animate-spin" : ""} /></button>
-                  <button className="text-brand-navy/40 hover:text-brand-navy transition-colors p-1"><Filter size={16} /></button>
+                
+                {/* FILTERS */}
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar w-full md:w-auto">
+                   <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/30 mr-2 flex items-center gap-1"><Filter size={12} /> Filter:</span>
+                   
+                   {['RENT', 'TRANSPORT', 'TECH'].map(cat => (
+                       <button 
+                         key={cat}
+                         onClick={() => toggleFilter(cat)}
+                         className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${activeFilter === cat ? 'bg-brand-navy text-white border-brand-navy' : 'bg-white border-brand-navy/10 text-brand-navy/60 hover:border-brand-navy/30'}`}
+                       >
+                          {cat}
+                       </button>
+                   ))}
+                   
+                   {activeFilter && (
+                       <button onClick={() => setActiveFilter(null)} className="ml-2 p-1.5 text-brand-navy/40 hover:text-brand-coral transition-colors" title="Clear Filter">
+                           <X size={14} />
+                       </button>
+                   )}
                 </div>
             </div>
 
@@ -165,7 +191,10 @@ export const TransparencyLedger: React.FC = () => {
             </div>
 
             <div className="divide-y divide-brand-navy/5 max-h-[500px] overflow-y-auto custom-scrollbar">
-                {MOCK_LEDGER.map((item, index) => (
+                {filteredLedger.length === 0 ? (
+                    <div className="p-12 text-center text-brand-navy/40 font-medium">No transactions found for this filter.</div>
+                ) : (
+                filteredLedger.map((item, index) => (
                 <div 
                    key={item.id} 
                    className={`grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 px-6 md:px-8 py-4 md:py-5 items-start md:items-center hover:bg-brand-cream/30 transition-colors group cursor-default ${activeTx === item.id ? 'bg-brand-teal/5 ring-1 ring-inset ring-brand-teal/20' : index % 2 === 0 ? 'bg-gray-50/30' : 'bg-white'}`} 
@@ -198,7 +227,12 @@ export const TransparencyLedger: React.FC = () => {
 
                     <div className="col-span-3 flex justify-between md:justify-start items-center mt-2 md:mt-0 w-full">
                         <div className="md:hidden text-[10px] font-bold text-brand-navy/30 uppercase tracking-widest">Category</div>
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${item.category === 'RENT' ? 'bg-brand-coral/5 border-brand-coral/20 text-brand-coral' : item.category === 'TECH' ? 'bg-brand-teal/5 border-brand-teal/20 text-brand-teal' : 'bg-brand-lavender/10 border-brand-lavender/20 text-brand-navy'}`}>{item.category}</span>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); toggleFilter(item.category); }}
+                            className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border hover:scale-105 transition-transform ${item.category === 'RENT' ? 'bg-brand-coral/5 border-brand-coral/20 text-brand-coral' : item.category === 'TECH' ? 'bg-brand-teal/5 border-brand-teal/20 text-brand-teal' : 'bg-brand-lavender/10 border-brand-lavender/20 text-brand-navy'}`}
+                        >
+                            {item.category}
+                        </button>
                     </div>
 
                     <div className="col-span-2 text-right hidden md:block"><span className="font-mono font-bold text-brand-navy text-sm tracking-tight">${item.amount.toFixed(2)}</span></div>
@@ -208,7 +242,7 @@ export const TransparencyLedger: React.FC = () => {
                         {item.status === 'CLEARED' ? <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-brand-teal bg-brand-teal/5 px-2 py-1 rounded-md"><Check className="w-3 h-3" /> Cleared</div> : <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-brand-yellow bg-brand-yellow/10 px-2 py-1 rounded-md"><div className="w-1.5 h-1.5 rounded-full bg-brand-yellow animate-ping"></div> Pending</div>}
                     </div>
                 </div>
-                ))}
+                )))}
             </div>
 
             <div className="p-4 md:p-6 bg-gray-50/50 border-t border-brand-navy/5 text-center">

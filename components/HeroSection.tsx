@@ -1,5 +1,6 @@
+
 import React, { useEffect, useRef } from 'react';
-import { HeartHandshake, ArrowRight, Wind, ChevronDown, Activity, Building2, Sparkles, ArrowUpRight, Crown, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { HeartHandshake, ArrowRight, Wind, ChevronDown, Activity, Building2, Sparkles, ArrowUpRight, Crown, CheckCircle2, ShieldCheck, Clock, Zap } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { SEOHead } from './SEOHead';
 import { useStore } from '../context/StoreContext';
@@ -167,53 +168,41 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                          <Mascot expression="excited" variant="tech" className="w-full h-full drop-shadow-2xl" reactToScroll={true} />
                       </div>
 
-                      {/* Cards Stack - Overlapping Mascot slightly */}
-                      <div className="flex flex-col gap-4 w-full max-w-sm relative z-20 -mt-12 lg:-mt-24 lg:mr-8">
+                      {/* SYSTEM STATUS BOARD - Scarcity vs Access */}
+                      <div className="flex flex-col gap-3 w-full max-w-sm relative z-20 -mt-12 lg:-mt-32 lg:mr-8">
                           
-                          {/* MANIFESTO CARD */}
-                          <div className="bg-white/80 backdrop-blur-xl p-6 rounded-2xl border border-white/60 shadow-xl hover:rotate-1 transition-transform duration-500 group animate-slide-up opacity-0" style={{ animationDelay: '0.6s' }}>
-                             <div className="flex items-center gap-2 mb-3 text-brand-navy/40 font-mono text-xs uppercase tracking-widest">
-                                <Wind size={14} className="animate-pulse text-brand-teal" /> The Protocol
-                             </div>
-                             <p className="font-medium text-brand-navy text-base leading-relaxed">
-                                We bridge the gap. <span className="text-brand-teal font-bold bg-brand-teal/10 px-1 rounded cursor-default">Direct-to-vendor payments</span> ensure every dollar hits the target.
-                             </p>
+                          {/* STATUS HEADER */}
+                          <div className="bg-brand-navy text-white px-4 py-2 rounded-t-xl flex items-center justify-between text-xs font-bold uppercase tracking-widest shadow-lg animate-slide-up opacity-0" style={{ animationDelay: '0.55s' }}>
+                              <span>Network Status</span>
+                              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-brand-teal animate-pulse"></div> Online</div>
                           </div>
 
-                          {/* PEER COACHING CARD (THE UNLOCK) */}
-                          <div 
-                            onClick={() => onNavigate('peer-coaching')}
-                            className="relative overflow-hidden p-[2px] rounded-2xl shadow-2xl cursor-pointer transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 group animate-slide-up opacity-0"
-                            style={{ animationDelay: '0.7s' }}
-                          >
-                             {/* Animated Border Gradient */}
-                             <div className="absolute inset-0 bg-gradient-to-tr from-brand-yellow via-brand-coral to-brand-teal opacity-80 group-hover:opacity-100 animate-spin-slow" style={{ animationDuration: '4s' }}></div>
-                             
-                             {/* Card Body */}
-                             <div className="relative bg-brand-navy h-full rounded-[14px] p-5 flex items-center justify-between">
-                                {/* Glass Shine */}
-                                <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
-                                
-                                <div className="flex flex-col gap-1 relative z-10">
-                                   <div className="flex items-center gap-2 mb-1">
-                                      <div className="bg-brand-yellow/20 text-brand-yellow p-1.5 rounded-lg">
-                                        <Crown size={16} fill="currentColor" />
-                                      </div>
-                                      <span className="text-xs font-bold uppercase tracking-widest text-brand-yellow">Benefit Unlocked</span>
-                                   </div>
-                                   <h4 className="font-bold text-white text-lg leading-tight">Peer Recovery Agent</h4>
-                                   <div className="flex items-center gap-2 mt-1">
-                                      <span className="text-white/40 text-xs line-through">$500/mo Value</span>
-                                      <span className="text-brand-teal font-bold text-xs bg-brand-teal/10 px-2 py-0.5 rounded flex items-center gap-1">
-                                        Free with Medicaid <CheckCircle2 size={10} />
-                                      </span>
-                                   </div>
-                                </div>
-
-                                <div className="bg-white/10 p-3 rounded-full group-hover:bg-brand-yellow group-hover:text-brand-navy transition-all duration-300">
-                                   <ArrowRight size={20} />
+                          {/* RENT GRANT (Waitlist) */}
+                          <div className="bg-white/90 backdrop-blur-xl p-4 rounded-b-none rounded-xl border border-white/60 shadow-lg flex items-center justify-between animate-slide-up opacity-0" style={{ animationDelay: '0.6s' }}>
+                             <div className="flex items-center gap-3">
+                                <div className="p-2 bg-brand-yellow/10 rounded-lg text-brand-yellow"><Clock size={18} /></div>
+                                <div>
+                                    <div className="font-bold text-brand-navy text-sm">Rent Grants</div>
+                                    <div className="text-[10px] text-brand-navy/50 font-bold uppercase tracking-wider">High Demand</div>
                                 </div>
                              </div>
+                             <span className="px-2 py-1 bg-brand-yellow/10 text-brand-yellow rounded text-xs font-bold">Waitlist</span>
+                          </div>
+
+                          {/* PEER COACHING (Instant) */}
+                          <div 
+                            onClick={() => onNavigate('peer-coaching')}
+                            className="bg-brand-teal text-white p-4 rounded-xl shadow-xl flex items-center justify-between cursor-pointer transform hover:scale-105 transition-all duration-300 ring-4 ring-white/20 animate-slide-up opacity-0" 
+                            style={{ animationDelay: '0.7s' }}
+                          >
+                             <div className="flex items-center gap-3">
+                                <div className="p-2 bg-white/20 rounded-lg text-white"><Zap size={18} fill="currentColor" /></div>
+                                <div>
+                                    <div className="font-bold text-white text-sm">Peer Coaching</div>
+                                    <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Medicaid Unlocks</div>
+                                </div>
+                             </div>
+                             <span className="px-2 py-1 bg-white text-brand-teal rounded text-xs font-bold flex items-center gap-1">Instant <ArrowRight size={10} /></span>
                           </div>
 
                       </div>

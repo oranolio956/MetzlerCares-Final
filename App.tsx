@@ -21,6 +21,7 @@ import { RecoveryDirectory } from './components/RecoveryDirectory';
 import { PartnerDirectory } from './components/PartnerDirectory';
 import { ImpactTicker } from './components/ImpactTicker';
 import { HyperLocalMap } from './components/HyperLocalMap';
+import { MedicaidPromo } from './components/MedicaidPromo';
 import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
@@ -183,6 +184,7 @@ const App: React.FC = () => {
         <CrisisOverlay isOpen={isCrisisMode} onClose={() => setCrisisMode(false)} />
         <LoginExperience isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} onLoginSuccess={handleLoginSuccess} />
         <NotificationSystem />
+        <MedicaidPromo />
 
         {/* MOBILE MENU - Lower Z-Index than Crisis Overlay but higher than content */}
         <div className={`fixed inset-0 z-[100] bg-brand-navy/95 backdrop-blur-xl text-white transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col ${isMobileMenuOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'}`}>

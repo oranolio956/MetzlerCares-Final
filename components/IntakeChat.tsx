@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Activity, Shield, Zap, LifeBuoy, CornerDownLeft, ArrowRight, FileCheck, MapPin, User, Clock, Trash2 } from 'lucide-react';
+import { Mic, MicOff, Activity, Shield, Zap, LifeBuoy, CornerDownLeft, ArrowRight, FileCheck, MapPin, User, Clock, Trash2, MessageCircle } from 'lucide-react';
 import { startIntakeSession, sendMessageToGemini } from '../services/geminiService';
 import { useGeminiLive } from '../hooks/useGeminiLive';
 import { Message } from '../types';
@@ -12,6 +12,16 @@ import { useSound } from '../hooks/useSound';
 
 const SESSION_KEY = 'secondwind_intake_session_v1';
 const SESSION_EXPIRY = 24 * 60 * 60 * 1000;
+
+// QUICK CHIPS - Suggested replies
+const QUICK_CHIPS = [
+    "Yes, I'm in Colorado",
+    "No, I don't have insurance",
+    "I have Medicaid",
+    "Oxford House",
+    "Homeless / Shelter",
+    "Less than 30 days sober"
+];
 
 const MessageItem: React.FC<{ message: Message; isLast: boolean }> = ({ message, isLast }) => {
   const { isCalmMode } = useStore();
@@ -148,18 +158,18 @@ export const IntakeChat: React.FC = () => {
     }
   }, [messages, isAiTyping]);
 
-  const handleSend = async () => {
-    if (!inputText.trim()) return;
+  const handleSend = async (text: string = inputText) => {
+    if (!text.trim()) return;
     playClick();
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', text: inputText };
+    const userMsg: Message = { id: Date.now().toString(), role: 'user', text: text };
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
     setIsAiTyping(true);
     if (inputRef.current) inputRef.current.focus();
 
     try {
-      const responseText = await sendMessageToGemini(inputText, chatRef.current);
-      // Basic heuristic to detect crisis response if model doesn't use tools (fallback)
+      const responseText = await sendMessageToGemini(text, chatRef.current);
+      // Basic heuristic to detect crisis response
       if (responseText.toLowerCase().includes("988") || responseText.toLowerCase().includes("suicide")) {
          setCrisisMode(true);
       }
@@ -206,7 +216,6 @@ export const IntakeChat: React.FC = () => {
     );
   }
 
-  // Use dvh for mobile viewport stability, with max-height constraint
   return (
     <div className="flex flex-col h-[90dvh] max-h-[800px] md:h-[700px] w-full max-w-4xl mx-auto bg-white rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl border-2 md:border-4 border-white/50 ring-1 ring-brand-navy/5 relative font-sans">
       
@@ -233,7 +242,7 @@ export const IntakeChat: React.FC = () => {
          </div>
       </header>
 
-      {/* CHAT AREA - Accessibility Fix: aria-hidden when voice is active */}
+      {/* CHAT AREA */}
       <div className="flex-1 relative overflow-hidden bg-[#FDFBF7]" aria-live="polite">
          <div 
             className={`absolute inset-0 overflow-y-auto custom-scrollbar p-4 md:p-8 transition-opacity duration-300 ${mode === 'voice' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
@@ -273,29 +282,45 @@ export const IntakeChat: React.FC = () => {
       </div>
 
       {/* INPUT AREA */}
-      <div className={`shrink-0 p-4 md:p-6 bg-white border-t border-brand-navy/5 transition-transform duration-300 ${mode === 'voice' ? 'translate-y-full hidden' : 'translate-y-0 block'}`}>
-         <div className="flex items-center gap-3 relative">
-            <input 
-               ref={inputRef}
-               type="text" 
-               value={inputText}
-               onChange={(e) => setInputText(e.target.value)}
-               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-               placeholder="Type your message..."
-               className="w-full bg-brand-navy/5 text-brand-navy placeholder:text-brand-navy/30 rounded-xl px-4 py-3 md:py-4 font-medium focus:outline-none focus:ring-2 focus:ring-brand-teal/20 transition-all pr-12"
-               aria-label="Message input"
-            />
-            <button 
-               onClick={handleSend}
-               disabled={!inputText.trim()}
-               className="absolute right-2 p-2 bg-brand-navy text-white rounded-lg hover:bg-brand-teal disabled:opacity-50 disabled:hover:bg-brand-navy transition-all"
-               aria-label="Send message"
-            >
-               <CornerDownLeft size={18} />
-            </button>
+      <div className={`shrink-0 bg-white border-t border-brand-navy/5 transition-transform duration-300 ${mode === 'voice' ? 'translate-y-full hidden' : 'translate-y-0 block'}`}>
+         
+         {/* QUICK CHIPS - Suggested Replies */}
+         <div className="px-4 pt-4 flex gap-2 overflow-x-auto no-scrollbar pb-2">
+            {QUICK_CHIPS.map((chip) => (
+                <button
+                   key={chip}
+                   onClick={() => handleSend(chip)}
+                   className="whitespace-nowrap px-4 py-2 rounded-full bg-brand-navy/5 text-brand-navy/70 text-xs font-bold hover:bg-brand-navy hover:text-white transition-colors border border-brand-navy/5 flex-shrink-0"
+                >
+                   {chip}
+                </button>
+            ))}
          </div>
-         <div className="text-center mt-3 hidden md:block">
-            <p className="text-[10px] text-brand-navy/30 font-bold uppercase tracking-widest flex items-center justify-center gap-1.5"><Shield size={10} /> Private & Encrypted • HIPAA Compliant Protocol</p>
+
+         <div className="p-4 md:p-6">
+            <div className="flex items-center gap-3 relative">
+                <input 
+                ref={inputRef}
+                type="text" 
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                placeholder="Type your message..."
+                className="w-full bg-brand-navy/5 text-brand-navy placeholder:text-brand-navy/30 rounded-xl px-4 py-3 md:py-4 font-medium focus:outline-none focus:ring-2 focus:ring-brand-teal/20 transition-all pr-12"
+                aria-label="Message input"
+                />
+                <button 
+                onClick={() => handleSend()}
+                disabled={!inputText.trim()}
+                className="absolute right-2 p-2 bg-brand-navy text-white rounded-lg hover:bg-brand-teal disabled:opacity-50 disabled:hover:bg-brand-navy transition-all"
+                aria-label="Send message"
+                >
+                <CornerDownLeft size={18} />
+                </button>
+            </div>
+            <div className="text-center mt-3 hidden md:block">
+                <p className="text-[10px] text-brand-navy/30 font-bold uppercase tracking-widest flex items-center justify-center gap-1.5"><Shield size={10} /> Private & Encrypted • HIPAA Compliant Protocol</p>
+            </div>
          </div>
       </div>
 
