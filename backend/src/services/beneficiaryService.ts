@@ -1,7 +1,7 @@
 import { getDatabasePool } from '../config/database.js';
 import { BeneficiaryProfile, InsuranceStatus, ApplicationStatus } from '../types/index.js';
 import { logger } from '../utils/logger.js';
-import { NotFoundError, DatabaseError, ValidationError } from '../utils/errors.js';
+import { DatabaseError, ValidationError } from '../utils/errors.js';
 
 export const getBeneficiaryProfile = async (userId: string): Promise<BeneficiaryProfile | null> => {
   const pool = getDatabasePool();
@@ -46,7 +46,7 @@ export const createOrUpdateBeneficiaryProfile = async (
         values.push(updates.next_milestone);
       }
 
-      if (updates.insurance_status !== undefined) {
+      if (updates.insurance_status !== undefined && updates.insurance_status !== null) {
         const validStatuses: InsuranceStatus[] = ['verified', 'pending', 'none'];
         if (!validStatuses.includes(updates.insurance_status)) {
           throw new ValidationError(`Invalid insurance status. Must be one of: ${validStatuses.join(', ')}`);

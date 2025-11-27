@@ -6,7 +6,7 @@ import { getEnv } from '../config/env.js';
  * This prevents the server from running with missing critical config
  */
 export const validateEnvironment = (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ): void => {

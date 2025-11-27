@@ -48,11 +48,8 @@ export const createSubscription = async (
             recurring: {
               interval: 'month',
             },
-            product_data: {
-              name: 'SecondWind Network Membership',
-              description: 'Monthly network membership fee for partner facilities',
-            },
-          },
+            product: 'prod_secondwind_partner', // Product ID - create in Stripe dashboard
+          } as any, // Type assertion for PriceData compatibility
         },
       ],
       metadata: {
@@ -142,7 +139,7 @@ export const handleSubscriptionWebhook = async (
     case 'customer.subscription.deleted':
       // Subscription cancelled
       await updatePartner(partnerId, {
-        stripeSubscriptionId: null,
+        stripeSubscriptionId: undefined,
       });
       logger.info('Subscription cancelled, partner updated:', { partnerId });
       break;

@@ -1,5 +1,5 @@
 import { getDatabasePool } from '../config/database.js';
-import { Donation } from '../types/index.js';
+// import { Donation } from '../types/index.js';
 import { logger } from '../utils/logger.js';
 import { NotFoundError, DatabaseError } from '../utils/errors.js';
 

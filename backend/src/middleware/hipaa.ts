@@ -17,7 +17,7 @@ export interface HIPAAContext {
   userId: string;
   action: string;
   resourceType: string;
-  resourceId?: string;
+  resourceId?: string | undefined;
   ipAddress: string;
   userAgent: string;
 }
@@ -36,7 +36,7 @@ export const logPHIAccess = async (context: HIPAAContext): Promise<void> => {
         context.userId,
         `PHI_ACCESS:${context.action}`,
         context.resourceType,
-        context.resourceId || null,
+        context.resourceId ?? null,
         context.ipAddress,
         context.userAgent,
         JSON.stringify({
@@ -62,7 +62,7 @@ export const requireHIPAAAccess = (
     return req.user?.userId === req.params.userId;
   }
 ) => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     if (!req.user) {
       throw new AuthenticationError('Authentication required for PHI access');
     }
@@ -73,12 +73,13 @@ export const requireHIPAAAccess = (
     }
 
     // Log PHI access
+    const resourceId = req.params.id || req.params.userId;
     await logPHIAccess({
       userId: req.user.userId,
       action: `${req.method} ${req.path}`,
       resourceType,
-      resourceId: req.params.id || req.params.userId,
-      ipAddress: req.ip,
+      resourceId: resourceId || undefined,
+      ipAddress: req.ip || 'unknown',
       userAgent: req.get('user-agent') || 'unknown',
     });
 
@@ -93,7 +94,7 @@ export const requireHIPAAAccess = (
 export const enforceMinimumNecessary = (
   allowedFields: string[]
 ) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (_req: Request, res: Response, next: NextFunction): void => {
     // Filter response to only include allowed fields
     const originalJson = res.json.bind(res);
     res.json = function (data: any) {

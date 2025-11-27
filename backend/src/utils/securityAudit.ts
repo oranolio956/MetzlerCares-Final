@@ -1,6 +1,6 @@
-import { getDatabasePool, checkDatabaseHealth } from '../config/database.js';
-import { getRedisClient, checkRedisHealth } from '../config/redis.js';
-import { logger } from './logger.js';
+import { checkDatabaseHealth } from '../config/database.js';
+import { checkRedisHealth } from '../config/redis.js';
+// import { logger } from './logger.js';
 import { getEnv } from '../config/env.js';
 
 export interface SecurityAuditResult {

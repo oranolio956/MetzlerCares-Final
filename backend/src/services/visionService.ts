@@ -1,4 +1,4 @@
-import { sendChatMessage } from './geminiService.js';
+// import { sendChatMessage } from './geminiService.js';
 import { getDatabasePool } from '../config/database.js';
 import { logger } from '../utils/logger.js';
 import { ValidationError, DatabaseError } from '../utils/errors.js';
@@ -21,11 +21,11 @@ export interface VisionImage {
 }
 
 // Map size to dimensions
-const SIZE_DIMENSIONS: Record<ImageSize, { width: number; height: number }> = {
-  '1K': { width: 1024, height: 1024 },
-  '2K': { width: 2048, height: 2048 },
-  '4K': { width: 4096, height: 4096 },
-};
+// const SIZE_DIMENSIONS: Record<ImageSize, { width: number; height: number }> = {
+//   '1K': { width: 1024, height: 1024 },
+//   '2K': { width: 2048, height: 2048 },
+//   '4K': { width: 4096, height: 4096 },
+// };
 
 export const generateVisionImage = async (
   input: GenerateImageInput
@@ -44,7 +44,7 @@ export const generateVisionImage = async (
   const imageUrl = await generateImage(input.prompt.trim(), input.size);
 
   // Upload to storage (in production)
-  const { uploadFile } = await import('./storageService.js');
+  // const { uploadFile } = await import('./storageService.js');
   // For now, we'll use the URL directly
   // In production: const uploadResult = await uploadFile({ file: imageBuffer, fileName: 'vision.png', contentType: 'image/png', folder: `visions/${input.userId}` });
 
@@ -114,9 +114,9 @@ export const deleteVisionImage = async (
     [imageId]
   );
 
-  if (result.rows.length === 0) {
-    throw new NotFoundError('Vision image');
-  }
+    if (result.rows.length === 0) {
+      throw new (await import('../utils/errors.js')).NotFoundError('Vision image');
+    }
 
   if (result.rows[0].user_id !== userId) {
     throw new ValidationError('Vision image does not belong to user');

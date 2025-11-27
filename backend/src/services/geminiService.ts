@@ -54,20 +54,18 @@ export const sendChatMessage = async (
   request: ChatRequest
 ): Promise<string> => {
   try {
-    const client = getGeminiClient();
-    
-    const modelName = request.sessionType === 'COACH' 
-      ? 'gemini-3-pro-preview' 
-      : 'gemini-2.5-flash-lite';
-    
-    const systemInstruction = request.sessionType === 'COACH'
-      ? COACH_SYSTEM_INSTRUCTION
-      : INTAKE_SYSTEM_INSTRUCTION;
-
-    const model = client.models.getGenerativeModel({
-      model: modelName,
-      systemInstruction,
-    });
+    // TODO: Implement actual Gemini API integration
+    // const client = getGeminiClient();
+    // const modelName = request.sessionType === 'COACH' 
+    //   ? 'gemini-3-pro-preview' 
+    //   : 'gemini-2.5-flash-lite';
+    // const systemInstruction = request.sessionType === 'COACH'
+    //   ? COACH_SYSTEM_INSTRUCTION
+    //   : INTAKE_SYSTEM_INSTRUCTION;
+    // const model = client.models.getGenerativeModel({
+    //   model: modelName,
+    //   systemInstruction,
+    // });
 
     // Build conversation history
     const contents: ChatMessage[] = request.conversationHistory || [];
@@ -78,15 +76,16 @@ export const sendChatMessage = async (
       parts: [{ text: request.message }],
     });
 
-    // Generate response
-    const result = await model.generateContent({
-      contents: contents.map((msg) => ({
-        role: msg.role,
-        parts: msg.parts,
-      })),
-    });
-
-    const responseText = result.response.text();
+    // Placeholder response - implement actual Gemini API call
+    // const result = await model.generateContent({
+    //   contents: contents.map((msg) => ({
+    //     role: msg.role,
+    //     parts: msg.parts,
+    //   })),
+    // });
+    // const responseText = result.response.text();
+    
+    const responseText = 'AI response placeholder - implement Gemini API integration';
 
     // Check for crisis keywords
     const crisisKeywords = ['988', 'suicide', 'kill myself', 'hurt myself', 'end my life'];

@@ -1,7 +1,7 @@
 import { checkDatabaseHealth } from '../config/database.js';
 import { checkRedisHealth } from '../config/redis.js';
 import { getEnv } from '../config/env.js';
-import { logger } from './logger.js';
+// import { logger } from './logger.js';
 
 export interface HealthStatus {
   status: 'healthy' | 'degraded' | 'unhealthy';
@@ -15,7 +15,7 @@ export interface HealthStatus {
 }
 
 export const performHealthCheck = async (): Promise<HealthStatus> => {
-  const startTime = Date.now();
+  // const startTime = Date.now();
   const env = getEnv();
 
   const [dbHealth, redisHealth] = await Promise.all([
@@ -38,7 +38,7 @@ export const performHealthCheck = async (): Promise<HealthStatus> => {
     status = 'unhealthy';
   }
 
-  const uptime = Math.floor((Date.now() - startTime) / 1000);
+  // const uptime = Math.floor((Date.now() - startTime) / 1000);
 
   return {
     status,

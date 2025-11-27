@@ -1,7 +1,7 @@
 import { logger } from '../utils/logger.js';
-import { getEnv } from '../config/env.js';
+// import { getEnv } from '../config/env.js';
 
-const env = getEnv();
+// const env = getEnv();
 
 export interface UploadFileOptions {
   file: Buffer;

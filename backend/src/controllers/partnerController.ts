@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/errorHandler.js';
-import { AuthenticationError, ValidationError, NotFoundError } from '../utils/errors.js';
+import { AuthenticationError, ValidationError, NotFoundError, DatabaseError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
 import {
   createPartner,

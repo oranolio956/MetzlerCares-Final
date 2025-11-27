@@ -18,7 +18,7 @@ export interface CFR42Context {
   userId: string;
   action: 'ACCESS' | 'DISCLOSE' | 'MODIFY' | 'DELETE';
   resourceType: 'APPLICATION' | 'CHAT' | 'PROFILE' | 'DOCUMENT';
-  resourceId?: string;
+  resourceId?: string | undefined;
   disclosedTo?: string; // If disclosing to third party
   consentId?: string; // Written consent ID
   ipAddress: string;
@@ -39,7 +39,7 @@ export const logCFR42Access = async (context: CFR42Context): Promise<void> => {
         context.userId,
         `CFR42_${context.action}:${context.resourceType}`,
         context.resourceType,
-        context.resourceId || null,
+        context.resourceId ?? null,
         context.ipAddress,
         context.userAgent,
         JSON.stringify({
@@ -104,12 +104,13 @@ export const requireCFR42Compliance = (
     }
 
     // Log access
+    const resourceId = req.params.id || req.params.userId;
     await logCFR42Access({
       userId: req.user.userId,
       action: req.method === 'GET' ? 'ACCESS' : req.method === 'DELETE' ? 'DELETE' : 'MODIFY',
       resourceType,
-      resourceId: req.params.id || req.params.userId,
-      ipAddress: req.ip,
+      resourceId: resourceId || undefined,
+      ipAddress: req.ip || 'unknown',
       userAgent: req.get('user-agent') || 'unknown',
     });
 
@@ -122,7 +123,7 @@ export const requireCFR42Compliance = (
  * Records cannot be shared with third parties without explicit consent
  */
 export const preventRedisclosure = () => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (_req: Request, res: Response, next: NextFunction): void => {
     // Add header to prevent redisclosure
     res.setHeader('X-CFR42-No-Redisclosure', 'true');
     res.setHeader('X-CFR42-Confidential', 'true');

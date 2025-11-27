@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+// import { GoogleGenAI } from '@google/genai';
 import { getEnv } from '../config/env.js';
 import { logger } from '../utils/logger.js';
 import { ValidationError, DatabaseError } from '../utils/errors.js';
@@ -7,11 +7,11 @@ const env = getEnv();
 
 export type ImageSize = '1K' | '2K' | '4K';
 
-const SIZE_DIMENSIONS: Record<ImageSize, { width: number; height: number }> = {
-  '1K': { width: 1024, height: 1024 },
-  '2K': { width: 2048, height: 2048 },
-  '4K': { width: 4096, height: 4096 },
-};
+// const SIZE_DIMENSIONS: Record<ImageSize, { width: number; height: number }> = {
+//   '1K': { width: 1024, height: 1024 },
+//   '2K': { width: 2048, height: 2048 },
+//   '4K': { width: 4096, height: 4096 },
+// };
 
 /**
  * Generate image using Gemini Imagen API
@@ -26,7 +26,7 @@ export const generateImage = async (
   }
 
   try {
-    const client = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
+    // const client = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
     
     // In production, use Imagen API when available
     // For now, return a placeholder URL
