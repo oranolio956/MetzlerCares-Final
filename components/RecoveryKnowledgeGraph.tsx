@@ -42,14 +42,14 @@ const TERMS: Term[] = [
     definition: 'A treatment structure where patients attend therapy for 3-4 hours a day while living at home or in sober living. A key step after detox.',
     category: 'clinical',
     icon: Activity,
-    whyItMatters: "IOP allows you to work while getting treatment. We often fund the transport (Bus passes) to get you there.",
+    whyItMatters: "IOP allows you to work while getting treatment. It provides the stability needed for finding a sponsor in Boulder or Denver before full independence.",
     color: 'text-brand-navy'
   },
   {
     id: 'medicaid',
     term: 'Health First Colorado',
     acronym: 'Medicaid',
-    definition: 'State-funded health insurance. In Colorado, this covers Peer Coaching, mental health, and substance use treatment at zero cost to the member.',
+    definition: 'State-funded health insurance. In Colorado, this provides comprehensive Colorado Medicaid rehab coverage for residential treatment, detox, and Peer Coaching at zero cost.',
     category: 'financial',
     icon: Zap,
     whyItMatters: "If you have this, you have a 'budget'. It unlocks Peer Coaching which we can activate immediately.",
@@ -62,14 +62,14 @@ const TERMS: Term[] = [
     definition: 'A trained professional with lived experience in addiction. They help navigate systems, find jobs, and provide mentorship. Covered by Medicaid.',
     category: 'clinical',
     icon: GraduationCap,
-    whyItMatters: "A professional friend who knows the system. They can approve expenses that SecondWind can't.",
+    whyItMatters: "A professional ally who knows the system. They connect you to vocational training for recovering addicts and can approve expenses that SecondWind can't.",
     color: 'text-brand-lavender'
   },
   {
     id: 'oxford',
     term: 'Oxford House',
     acronym: 'OH',
-    definition: 'A democratically run, self-supporting drug-free home. There are no staff; residents elect officers to manage the house. SecondWind pays entry deposits here.',
+    definition: 'A democratically run, self-supporting drug-free home. Residents elect officers to enforce Denver sober living requirements like curfews and chores.',
     category: 'housing',
     icon: BookOpen,
     whyItMatters: "The most affordable and autonomous option. Great for people who want independence but need a safety net.",
@@ -86,7 +86,7 @@ export const RecoveryKnowledgeGraph: React.FC = () => {
     "@context": "https://schema.org",
     "@type": "DefinedTermSet",
     "name": "Colorado Recovery Glossary",
-    "description": "Definitions of key addiction recovery terms used in Colorado's behavioral health system.",
+    "description": "Definitions of key addiction recovery terms used in Colorado's behavioral health system, covering Medicaid coverage, housing requirements, and vocational resources.",
     "hasDefinedTerm": TERMS.map(t => ({
       "@type": "DefinedTerm",
       "name": t.term,

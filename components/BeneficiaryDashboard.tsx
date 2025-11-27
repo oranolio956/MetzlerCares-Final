@@ -1,13 +1,15 @@
 
 import React, { useState } from 'react';
-import { CheckCircle2, Clock, AlertCircle, Calendar, UploadCloud, ChevronRight, Star, LifeBuoy } from 'lucide-react';
+import { CheckCircle2, Clock, AlertCircle, Calendar, UploadCloud, ChevronRight, Star, LifeBuoy, Sparkles, Image } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { ApplicationStatus } from '../types';
 import { useStore } from '../context/StoreContext';
+import { useRouter } from '../hooks/useRouter';
 
 export const BeneficiaryDashboard: React.FC = () => {
   const { beneficiaryProfile, verifyInsurance, submitIntakeRequest, setCrisisMode } = useStore();
   const [isVerifying, setIsVerifying] = useState(false);
+  const { navigate } = useRouter();
 
   const getStatusColor = (status: ApplicationStatus) => {
     switch (status) {
@@ -76,6 +78,45 @@ export const BeneficiaryDashboard: React.FC = () => {
              </div>
              <p className="text-xs text-brand-navy/60 mt-2 text-right">{60 - beneficiaryProfile.daysSober} days to next chip</p>
           </div>
+        </div>
+
+        {/* AI Tools Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <button 
+                onClick={() => navigate('coach')}
+                className="bg-brand-yellow text-brand-navy p-6 rounded-3xl border-2 border-brand-navy/10 hover:border-brand-navy hover:shadow-lg transition-all flex items-center justify-between group"
+            >
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <Sparkles size={24} />
+                    </div>
+                    <div className="text-left">
+                        <h4 className="font-bold text-xl">Recovery Coach Pro</h4>
+                        <p className="text-brand-navy/60 text-sm">Advanced AI Career & Life Planning</p>
+                    </div>
+                </div>
+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-brand-navy group-hover:text-white transition-colors">
+                    <ChevronRight size={20} />
+                </div>
+            </button>
+
+            <button 
+                onClick={() => navigate('vision')}
+                className="bg-brand-teal text-white p-6 rounded-3xl border-2 border-transparent hover:border-white hover:shadow-lg transition-all flex items-center justify-between group"
+            >
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <Image size={24} />
+                    </div>
+                    <div className="text-left">
+                        <h4 className="font-bold text-xl">Vision Board</h4>
+                        <p className="text-white/80 text-sm">Visualize your goals with Nano Banana Pro</p>
+                    </div>
+                </div>
+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-brand-teal transition-colors">
+                    <ChevronRight size={20} />
+                </div>
+            </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

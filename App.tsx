@@ -23,7 +23,9 @@ import { ImpactTicker } from './components/ImpactTicker';
 import { HyperLocalMap } from './components/HyperLocalMap';
 import { MedicaidPromo } from './components/MedicaidPromo';
 import { RecoveryKnowledgeGraph } from './components/RecoveryKnowledgeGraph';
-import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2 } from 'lucide-react';
+import { CoachChat } from './components/CoachChat';
+import { VisionBoard } from './components/VisionBoard';
+import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2, Sparkles, Image } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SecondWind Logo">
@@ -147,6 +149,24 @@ const App: React.FC = () => {
         case 'portal': 
           if (userType !== 'beneficiary') { setTimeout(() => navigate('intro'), 0); return null; }
           return <SectionWrapper id="portal" title="My Dashboard"><BeneficiaryDashboard /></SectionWrapper>;
+        case 'coach':
+          if (userType !== 'beneficiary') { setTimeout(() => navigate('intro'), 0); return null; }
+          return (
+            <SectionWrapper id="coach" title="Recovery Coach (Pro)">
+                <div className="max-w-4xl mx-auto text-center mb-8">
+                    <h2 className="font-display font-bold text-3xl text-brand-navy mb-2">Deep Work</h2>
+                    <p className="text-brand-navy/60">Advanced AI coaching for career planning and life strategy.</p>
+                </div>
+                <CoachChat />
+            </SectionWrapper>
+          );
+        case 'vision':
+          if (userType !== 'beneficiary') { setTimeout(() => navigate('intro'), 0); return null; }
+          return (
+            <SectionWrapper id="vision" title="Vision Board">
+                <VisionBoard />
+            </SectionWrapper>
+          );
         case 'donor-portal': 
           if (userType !== 'donor') { setTimeout(() => navigate('intro'), 0); return null; }
           return <SectionWrapper id="donor-portal" title="Impact Portfolio"><DonorDashboard /></SectionWrapper>;
@@ -188,7 +208,7 @@ const App: React.FC = () => {
         {/* MedicaidPromo is properly layered via z-index in CSS, mobile menu is z-[100], promo is z-[80] */}
         <MedicaidPromo />
 
-        {/* MOBILE MENU - Lower Z-Index than Crisis Overlay but higher than content */}
+        {/* MOBILE MENU */}
         <div className={`fixed inset-0 z-[100] bg-brand-navy/95 backdrop-blur-xl text-white transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col ${isMobileMenuOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'}`}>
            <div className="flex justify-between items-center p-4 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-3 opacity-50">
@@ -213,6 +233,16 @@ const App: React.FC = () => {
                   <item.icon size={24} /> {item.label}
                 </button>
               ))}
+              {userType === 'beneficiary' && (
+                  <>
+                    <button onClick={() => { navigate('coach'); setIsMobileMenuOpen(false); }} className="flex items-center gap-4 p-4 text-2xl font-display font-bold text-brand-yellow hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                      <Sparkles size={24} /> Recovery Coach (Pro)
+                    </button>
+                    <button onClick={() => { navigate('vision'); setIsMobileMenuOpen(false); }} className="flex items-center gap-4 p-4 text-2xl font-display font-bold text-brand-teal hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                      <Image size={24} /> Vision Board
+                    </button>
+                  </>
+              )}
            </div>
            <div className="p-4 border-t border-white/10 shrink-0">
               {userType ? (

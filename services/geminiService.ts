@@ -76,24 +76,75 @@ If the user rambles, talks about aliens, the weather, or tries to avoid a questi
 *   **Good**: "I can't make that work right now. We have strict rules on this."
 `;
 
+export const COACH_SYSTEM_INSTRUCTION = `
+You are "Windy (Pro)", a highly advanced Peer Recovery Coach for SecondWind.
+Your goal is to provide detailed, thoughtful, and reasoned advice to beneficiaries in recovery.
+You have access to advanced reasoning capabilities. Use them to help users plan their careers, navigate complex emotional situations, and build long-term sobriety strategies.
+You are encouraging, professional, and deeply knowledgeable about addiction science, Colorado resources, and life skills.
+`;
+
 export const startIntakeSession = (restoredHistory?: Content[]): Chat => {
   const client = getAiClient();
   
   // Transform simplified history if needed or pass as is
-  // The SDK expects Content[] which is { role: string, parts: Part[] }[]
   const validHistory = restoredHistory?.map(h => ({
     role: h.role,
     parts: h.parts
   })) || [];
 
   return client.chats.create({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-flash-lite', // Using Fast AI for Intake
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
-      temperature: 0.4, // Lower temperature for more consistent rule-following
+      temperature: 0.4, 
+      tools: [{ googleSearch: {} }]
     },
     history: validHistory
   });
+};
+
+export const startCoachSession = (restoredHistory?: Content[]): Chat => {
+  const client = getAiClient();
+  
+  const validHistory = restoredHistory?.map(h => ({
+    role: h.role,
+    parts: h.parts
+  })) || [];
+
+  return client.chats.create({
+    model: 'gemini-3-pro-preview', // Using Pro for deep coaching
+    config: {
+      systemInstruction: COACH_SYSTEM_INSTRUCTION,
+      temperature: 0.7,
+    },
+    history: validHistory
+  });
+};
+
+export const generateVisionImage = async (prompt: string, size: '1K' | '2K' | '4K'): Promise<string> => {
+  const client = getAiClient();
+  try {
+    const response = await client.models.generateContent({
+        model: 'gemini-3-pro-image-preview',
+        contents: { parts: [{ text: prompt }] },
+        config: {
+            imageConfig: {
+                aspectRatio: "1:1",
+                imageSize: size
+            }
+        }
+    });
+    
+    for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+            return `data:image/png;base64,${part.inlineData.data}`;
+        }
+    }
+    throw new Error("No image generated");
+  } catch (error) {
+    console.error("Image Gen Error:", error);
+    throw error;
+  }
 };
 
 export const sendMessageToGemini = async (message: string, chat: Chat): Promise<string> => {
@@ -115,19 +166,40 @@ export const sendMessageToGemini = async (message: string, chat: Chat): Promise<
          return "I'm having trouble processing that request under our current guidelines. Could you be more specific?";
     }
 
+    let text = "";
+
     // Access text via getter
     try {
-        const text = result.text;
-        if (text) return text;
+        if (result.text) text = result.text;
     } catch (e) {
         // Fallback for parsing structure manually if getter fails
         if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
              const part = candidate.content.parts[0];
-             if ('text' in part) return part.text as string;
+             if ('text' in part) text = part.text as string;
         }
     }
 
-    return "I'm having a little trouble connecting to the intake server. Can you repeat that?";
+    // Process Grounding Metadata (Sources)
+    if (candidate.groundingMetadata?.groundingChunks) {
+        console.log("Grounding Metadata:", candidate.groundingMetadata); // Explicit logging for debugging
+
+        const sources = candidate.groundingMetadata.groundingChunks
+            .map((chunk: any) => {
+                const web = chunk.web;
+                if (web?.uri) {
+                    const title = web.title || 'Source';
+                    return `• ${title}: ${web.uri}`;
+                }
+                return null;
+            })
+            .filter(Boolean);
+        
+        if (sources.length > 0) {
+            text += "\n\nVerified Sources:\n" + sources.join('\n');
+        }
+    }
+
+    return text || "I'm having a little trouble connecting to the intake server. Can you repeat that?";
   } catch (error) {
     console.error("Gemini Error:", error);
     return "System interruption. Let's try that again.";

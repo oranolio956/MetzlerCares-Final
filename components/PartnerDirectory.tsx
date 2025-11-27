@@ -1,13 +1,22 @@
 
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, Building2, MapPin, ShieldCheck, Activity, Search, X, Phone, Globe, Users, Wifi, Coffee, Bus, Ban, ArrowRight, HeartHandshake, BedDouble, FileCheck, Share2, Copy, ExternalLink, Clock } from 'lucide-react';
+import { CheckCircle2, Building2, MapPin, ShieldCheck, Activity, Search, X, Phone, Globe, Users, Wifi, Coffee, Bus, Ban, ArrowRight, HeartHandshake, BedDouble, FileCheck, Share2, Copy, ExternalLink, Clock, Moon, UserX, Briefcase, BookOpen, ChevronDown, Filter } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { useSound } from '../hooks/useSound';
+import { SEOHead } from './SEOHead';
+
+interface ProgramRequirements {
+  curfew: string;
+  guests: string;
+  meetings: string;
+  work: string;
+}
 
 interface FacilityDetails {
   description: string;
   amenities: string[];
   rules: string[];
+  programRequirements: ProgramRequirements;
   website?: string;
   phone: string;
   capacity: string;
@@ -27,6 +36,54 @@ interface Partner {
 
 const PARTNERS: Partner[] = [
   { 
+    id: "tribe-recovery",
+    name: "Tribe Recovery Homes", 
+    type: "Structured Sober Living", 
+    location: "Denver, CO", 
+    neighborhood: "Metro Area", 
+    status: 'active', 
+    carrCertified: true,
+    details: {
+      description: "A comprehensive recovery community focusing on peer support and structured living. Tribe operates multiple homes across the Denver Metro area, providing a safe, sober environment with a strong emphasis on community reintegration.",
+      amenities: ["House Managers", "Weekly UA", "Job Placement Help", "Community Events"],
+      rules: ["Zero Tolerance Policy", "Chore Rotation", "Good Neighbor Policy"],
+      programRequirements: {
+        curfew: "10:00 PM (Sun-Thu) / 12:00 AM (Fri-Sat)",
+        guests: "No overnight guests. Visitors allowed in common areas until 9 PM.",
+        meetings: "Mandatory 5 meetings per week (12-step or alternatives).",
+        work: "Must be employed, looking for work (30hrs+), or in school."
+      },
+      phone: "(720) 900-3693",
+      website: "https://triberecoveryhomes.com",
+      capacity: "Multiple Locations",
+      fundingEligible: ["Deposit", "2 Weeks Rent", "Bus Pass"]
+    }
+  },
+  { 
+    id: "choice-house",
+    name: "Choice House", 
+    type: "Men's Transitional", 
+    location: "Boulder, CO", 
+    neighborhood: "Mountain Shadows", 
+    status: 'limited', 
+    carrCertified: true,
+    details: {
+      description: "Premier men's recovery program in Boulder combining clinical excellence with outdoor adventure therapy. Focus on long-term brotherhood and vulnerability.",
+      amenities: ["Mountain Setting", "Clinical Integration", "Hiking/Skiing", "Chef Prepared Meals"],
+      rules: ["Clinical Engagement", "No Personal Vehicles (Phase 1)", "Sober Transport"],
+      programRequirements: {
+        curfew: "9:30 PM Nightly. Strict accountability.",
+        guests: "Family visitation only during approved weekend hours.",
+        meetings: "Daily group therapy + 3 outside 12-step meetings.",
+        work: "Focus on treatment first. Work integration in Phase 2."
+      },
+      phone: "(720) 577-4422",
+      website: "https://choicehousecolorado.com",
+      capacity: "Waitlist",
+      fundingEligible: ["Insurance Deductible", "Gear Grant"]
+    }
+  },
+  { 
     id: "oxford-union",
     name: "Oxford House Union", 
     type: "Sober Living (Men)", 
@@ -35,29 +92,42 @@ const PARTNERS: Partner[] = [
     status: 'active', 
     carrCertified: false,
     details: {
-      description: "A historic Victorian home converted into a democratically run sober living environment. Located in the heart of Cap Hill, walking distance to meetings and jobs.",
+      description: "A historic Victorian home converted into a democratically run sober living environment. Located in the heart of Cap Hill, walking distance to meetings and jobs. Self-run, self-supported.",
       amenities: ["High-Speed Wifi", "In-house Laundry", "Shared Kitchen", "Close to Bus 15"],
-      rules: ["Zero Tolerance", "Weekly House Meeting", "Chore Rotation", "Curfew (11 PM)"],
+      rules: ["Equal Expense Sharing", "Officer Elections", "Disruptive Behavior Eviction"],
+      programRequirements: {
+        curfew: "Determined by house vote. Typically 11 PM for new members.",
+        guests: "No overnight guests without majority house vote.",
+        meetings: "MANDATORY weekly House Business Meeting (usually Sunday).",
+        work: "Must pay equal share of rent. No specific work hours mandated."
+      },
       phone: "(303) 555-0199",
       capacity: "9 Beds",
       fundingEligible: ["Deposit", "1st Month Rent"]
     }
   },
   { 
-    id: "oxford-park-hill",
-    name: "Oxford House Park Hill", 
-    type: "Sober Living (Women)", 
-    location: "Denver, CO", 
-    neighborhood: "Park Hill", 
+    id: "jaywalker-lodge",
+    name: "Jaywalker Lodge", 
+    type: "Extended Care (Men)", 
+    location: "Carbondale, CO", 
+    neighborhood: "Roaring Fork", 
     status: 'active', 
-    carrCertified: false,
+    carrCertified: true,
     details: {
-      description: "Quiet residential neighborhood home focused on women in early recovery. Large backyard and community garden space.",
-      amenities: ["Garden", "Parking", "Streaming Services", "Single Rooms Avail"],
-      rules: ["Zero Tolerance", "3 Guest Limit", "Weekly Dinner"],
-      phone: "(303) 555-0244",
-      capacity: "7 Beds",
-      fundingEligible: ["Deposit", "Rent Assistance"]
+      description: "An extended care community for men seeking freedom from addiction in the Rocky Mountains. Emphasizes the 12 Steps and mountain expeditions.",
+      amenities: ["Expedition Training", "Main Street Access", "Alumni Program", "CrossFit"],
+      rules: ["90-Day Commitment", "Expedition Participation", "Morning Meditation"],
+      programRequirements: {
+        curfew: "10:00 PM. Accountability checks throughout the day.",
+        guests: "Closed campus during initial blackout period.",
+        meetings: "Daily 12-step meeting attendance required.",
+        work: "Service work focus. Employment in later phases."
+      },
+      phone: "(866) 529-9255",
+      website: "https://jaywalkerlodge.com",
+      capacity: "Open",
+      fundingEligible: ["Travel Aid", "Partial Scholarship"]
     }
   },
   { 
@@ -71,8 +141,15 @@ const PARTNERS: Partner[] = [
     details: {
       description: "Professionally managed recovery residence with on-site house manager. Structured living with emphasis on accountability and community reintegration.",
       amenities: ["House Manager", "UA Testing", "Job Board", "Rec Room"],
-      rules: ["Daily Check-in", "Mandatory Meeting Sheet", "No Overnight Guests"],
-      phone: "(720) 555-0881",
+      rules: ["Daily Check-in", "Mandatory Meeting Sheet", "Cleanliness Standards"],
+      programRequirements: {
+        curfew: "10:00 PM Nightly (11 PM Fri/Sat w/ privileges).",
+        guests: "No overnight guests. No opposite gender in bedrooms.",
+        meetings: "5 meetings per week minimum with signed sheet.",
+        work: "Must work, volunteer, or attend IOP (32+ hours/week)."
+      },
+      phone: "(303) 856-6649",
+      website: "https://hazelbrooksoberliving.com",
       capacity: "12 Beds",
       fundingEligible: ["Full Scholarship", "Gap Funding"]
     }
@@ -86,29 +163,19 @@ const PARTNERS: Partner[] = [
     status: 'limited', 
     carrCertified: true,
     details: {
-      description: "Long-term residential therapeutic community. 28-day intensive followed by long-term vocational training program.",
+      description: "Long-term residential therapeutic community. 28-day intensive followed by long-term vocational training program. A vital resource for indigent recovery.",
       amenities: ["Vocational Training", "Clinical Staff", "Dining Hall", "Gym"],
-      rules: ["Blackout Period", "Structured Schedule", "Phone Restrictions"],
-      phone: "(303) 555-9911",
+      rules: ["Blackout Period (30 days)", "No Personal Phone (Phase 1)"],
+      programRequirements: {
+        curfew: "Strict on-campus requirement. 24/7 monitoring.",
+        guests: "Visitation only on Sundays (after blackout period).",
+        meetings: "Daily therapeutic groups and TC meetings.",
+        work: "Full-time vocational training rotation within the facility."
+      },
+      phone: "(303) 321-2533",
+      website: "https://www.stoutstreet.org",
       capacity: "Waitlist Only",
       fundingEligible: ["Entry Fee", "Hygiene Supplies"]
-    }
-  },
-  { 
-    id: "sobriety-house",
-    name: "Sobriety House", 
-    type: "Transitional Housing", 
-    location: "Denver, CO", 
-    neighborhood: "Baker", 
-    status: 'active', 
-    carrCertified: true,
-    details: {
-        description: "Oldest recovery center in Denver. Stepped care model from intensive residential to independent sober living apartments.",
-        amenities: ["Clinical Support", "Downtown Access", "Substance Free", "Counseling"],
-        rules: ["Curfew", "Breathalyzer", "Case Management"],
-        phone: "(303) 555-1234",
-        capacity: "Varies",
-        fundingEligible: ["Treatment Copay", "Rent"]
     }
   },
   { 
@@ -120,80 +187,19 @@ const PARTNERS: Partner[] = [
     status: 'active', 
     carrCertified: true,
     details: {
-        description: "Men's residential recovery program helping low-income men overcome addiction through sobriety, work, and accountability.",
+        description: "Men's residential recovery program helping low-income men overcome addiction through sobriety, work, and accountability. Peer-recovery model.",
         amenities: ["Career Coaching", "Dorm Style", "Meals Provided", "Gym Access"],
-        rules: ["Work Requirement", "Sober Campus", "Early Curfew"],
-        phone: "(303) 555-5555",
+        rules: ["Daily Breathalyzer", "Sober Campus", "Dress Code"],
+        programRequirements: {
+            curfew: "6:00 PM initially. Extends with phase advancement.",
+            guests: "No guests in living areas. Lobby visitation only.",
+            meetings: "3 in-house meetings per week + phase work.",
+            work: "Mandatory full-time employment within 30 days."
+        },
+        phone: "(303) 295-7837",
+        website: "https://stepdenver.org",
         capacity: "Open Enrollment",
         fundingEligible: ["Work Boots", "Bus Pass"]
-    }
-  },
-  { 
-    id: "oxford-lakewood",
-    name: "Oxford House Lakewood", 
-    type: "Sober Living (Co-Ed)", 
-    location: "Lakewood, CO", 
-    neighborhood: "Belmar", 
-    status: 'active', 
-    carrCertified: false,
-    details: {
-        description: "Co-ed democratically run house near Belmar shopping district. Strong community focus.",
-        amenities: ["Near Lightrail", "Large Kitchen", "Pet Friendly (Review)"],
-        rules: ["Democratic Vote", "Weekly Chores", "Financial Officer Audit"],
-        phone: "(303) 555-8822",
-        capacity: "8 Beds",
-        fundingEligible: ["Deposit", "Rent"]
-    }
-  },
-  { 
-    id: "harmony",
-    name: "Harmony Foundation", 
-    type: "Addiction Treatment", 
-    location: "Estes Park, CO", 
-    neighborhood: "Estes Park", 
-    status: 'active', 
-    carrCertified: true,
-    details: {
-        description: "Residential addiction treatment center in the Rocky Mountains. Evidence-based clinical care.",
-        amenities: ["Mountain Views", "Medical Detox", "Family Program", "Alumni Network"],
-        rules: ["Clinical Driven", "No Electronics (Phase 1)"],
-        phone: "(970) 555-4321",
-        capacity: "Intake Daily",
-        fundingEligible: ["Transportation to Admit", "Insurance Deductible"]
-    }
-  },
-  { 
-    id: "cedar",
-    name: "CeDAR", 
-    type: "Treatment Center", 
-    location: "Aurora, CO", 
-    neighborhood: "Anschutz", 
-    status: 'active', 
-    carrCertified: true,
-    details: {
-        description: "Center for Dependency, Addiction and Rehabilitation at UCHealth. Hospital-affiliated high-acuity care.",
-        amenities: ["Medical Staff", "Psychiatry", "Fitness Center", "Spiritual Care"],
-        rules: ["Medical Clearance", "Tobacco Free Campus"],
-        phone: "(720) 555-9000",
-        capacity: "Assessment Req",
-        fundingEligible: ["Ride Share Funding"]
-    }
-  },
-  { 
-    id: "phoenix",
-    name: "The Phoenix", 
-    type: "Recovery Community", 
-    location: "Denver, CO", 
-    neighborhood: "Five Points", 
-    status: 'active', 
-    carrCertified: false,
-    details: {
-        description: "Active sober community gym and event center. Free to anyone with 48 hours of sobriety.",
-        amenities: ["CrossFit Gym", "Rock Climbing", "Social Events", "Yoga"],
-        rules: ["48 Hours Sober", "Code of Conduct"],
-        phone: "(720) 555-1111",
-        capacity: "Unlimited",
-        fundingEligible: ["Gym Gear", "Transport"]
     }
   },
   { 
@@ -205,29 +211,18 @@ const PARTNERS: Partner[] = [
     status: 'active', 
     carrCertified: false,
     details: {
-        description: "Established house in Olde Town Arvada. Close to G-Line train station.",
+        description: "Established house in Olde Town Arvada. Close to G-Line train station. Democratically run and self-supported.",
         amenities: ["Train Access", "Garage", "BBQ Area"],
-        rules: ["Zero Tolerance", "Weekly Meeting"],
+        rules: ["Zero Tolerance", "Pay Rent on Time", "Chore Accountability"],
+        programRequirements: {
+            curfew: "11:00 PM - 1:00 AM depending on house vote.",
+            guests: "No overnights without vote. Guests must be sober.",
+            meetings: "Mandatory weekly house meeting. 3 outside meetings/week.",
+            work: "Must be employed and paying equal share of expenses."
+        },
         phone: "(303) 555-7777",
         capacity: "8 Beds",
         fundingEligible: ["Rent", "Deposit"]
-    }
-  },
-  { 
-    id: "ready-to-work",
-    name: "Ready To Work", 
-    type: "Employment Housing", 
-    location: "Boulder, CO", 
-    neighborhood: "Boulder Central", 
-    status: 'limited', 
-    carrCertified: true,
-    details: {
-        description: "Bridge House program combining paid work with housing and support services.",
-        amenities: ["Case Management", "Paid Traineeship", "Dorm Living"],
-        rules: ["Work Crew Participation", "Savings Requirement"],
-        phone: "(303) 555-4444",
-        capacity: "Application Only",
-        fundingEligible: ["Work Clothing", "Hygiene"]
     }
   }
 ];
@@ -265,9 +260,38 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* DYNAMIC SEO for "Individual Page" Effect */}
+            <SEOHead 
+                title={`${partner.name} - Sober Living Funding | SecondWind`} 
+                description={`Apply for rent assistance and funding for ${partner.name} in ${partner.location}. ${partner.details.description}`}
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "LocalBusiness",
+                    "name": partner.name,
+                    "image": "https://secondwind.org/social-card.svg",
+                    "telephone": partner.details.phone,
+                    "address": {
+                        "@type": "PostalAddress",
+                        "streetAddress": partner.neighborhood,
+                        "addressLocality": partner.location.split(',')[0],
+                        "addressRegion": "CO",
+                        "addressCountry": "US"
+                    },
+                    "description": partner.details.description,
+                    "url": partner.details.website || window.location.href
+                }}
+            />
+
             <div className="absolute inset-0 bg-brand-navy/80 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} aria-hidden="true"></div>
             
-            <div className="relative w-full max-w-3xl bg-[#FDFBF7] rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90dvh] flex flex-col">
+            <div 
+                className="relative w-full max-w-4xl bg-[#FDFBF7] rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90dvh] flex flex-col"
+                itemScope
+                itemType="https://schema.org/LocalBusiness"
+            >
+                {/* Fallback schema image */}
+                <meta itemProp="image" content="https://secondwind.org/social-card.svg" />
+                <meta itemProp="priceRange" content="$" />
                 
                 {/* Header Image Area */}
                 <div className="h-40 bg-brand-navy relative shrink-0">
@@ -292,9 +316,9 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
 
                 <div className="px-8 pt-12 pb-8 overflow-y-auto custom-scrollbar flex-1">
                     
-                    <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
                         <div>
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-2">
                                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 ${partner.status === 'active' ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-yellow/10 text-brand-yellow'}`}>
                                     {partner.status === 'active' ? <CheckCircle2 size={10} /> : <Activity size={10} />}
                                     {partner.status === 'active' ? 'Funding Active' : 'Limited Space'}
@@ -305,10 +329,14 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                                     </span>
                                 )}
                             </div>
-                            <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-navy">{partner.name}</h2>
-                            <div className="flex items-center gap-2 text-brand-navy/60 font-medium mt-1">
+                            <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-navy" itemProp="name">{partner.name}</h2>
+                            <p className="text-brand-navy/50 font-bold uppercase tracking-widest text-xs mt-2 mb-1">{partner.type}</p>
+                            <div className="flex items-center gap-2 text-brand-navy/60 font-medium mt-1" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
                                 <MapPin size={16} className="text-brand-coral" />
-                                <span>{partner.location} • {partner.neighborhood}</span>
+                                <span>
+                                    <span itemProp="addressLocality">{partner.location.split(',')[0]}</span>, <span itemProp="addressRegion">CO</span> • <span itemProp="streetAddress">{partner.neighborhood}</span>
+                                </span>
+                                <meta itemProp="addressCountry" content="US" />
                             </div>
                         </div>
                         
@@ -329,33 +357,64 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Main Content */}
-                        <div className="md:col-span-2 space-y-8">
+                        <div className="lg:col-span-2 space-y-8">
                             <div className="prose prose-sm text-brand-navy/80 leading-relaxed bg-white p-6 rounded-2xl border border-brand-navy/5 shadow-sm">
-                                <p className="text-lg">{partner.details.description}</p>
+                                <p className="text-lg" itemProp="description">{partner.details.description}</p>
+                            </div>
+
+                            {/* PROTOCOL GRID: Real Data Visualization */}
+                            <div>
+                                <h4 className="font-bold text-brand-navy mb-4 flex items-center gap-2"><FileCheck size={18} /> House Protocols</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    
+                                    {/* Curfew */}
+                                    <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-navy/5">
+                                        <div className="flex items-center gap-2 text-brand-navy mb-2 font-bold text-sm">
+                                            <Moon size={16} className="text-brand-teal" /> Curfew Policy
+                                        </div>
+                                        <p className="text-sm text-brand-navy/70 leading-relaxed">{partner.details.programRequirements?.curfew || "Contact house for details."}</p>
+                                    </div>
+
+                                    {/* Guests */}
+                                    <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-navy/5">
+                                        <div className="flex items-center gap-2 text-brand-navy mb-2 font-bold text-sm">
+                                            <UserX size={16} className="text-brand-coral" /> Guest Policy
+                                        </div>
+                                        <p className="text-sm text-brand-navy/70 leading-relaxed">{partner.details.programRequirements?.guests || "Contact house for details."}</p>
+                                    </div>
+
+                                    {/* Meetings */}
+                                    <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-navy/5">
+                                        <div className="flex items-center gap-2 text-brand-navy mb-2 font-bold text-sm">
+                                            <Users size={16} className="text-brand-yellow" /> Meeting Quota
+                                        </div>
+                                        <p className="text-sm text-brand-navy/70 leading-relaxed">{partner.details.programRequirements?.meetings || "Mandatory house meeting weekly."}</p>
+                                    </div>
+
+                                    {/* Work */}
+                                    <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-navy/5">
+                                        <div className="flex items-center gap-2 text-brand-navy mb-2 font-bold text-sm">
+                                            <Briefcase size={16} className="text-brand-lavender" /> Productivity
+                                        </div>
+                                        <p className="text-sm text-brand-navy/70 leading-relaxed">{partner.details.programRequirements?.work || "Must pay rent."}</p>
+                                    </div>
+
+                                </div>
                             </div>
 
                             <div>
                                 <h4 className="font-bold text-brand-navy mb-4 flex items-center gap-2"><Wifi size={18} /> Amenities</h4>
                                 <div className="grid grid-cols-2 gap-3">
                                     {partner.details.amenities.map(a => (
-                                        <div key={a} className="flex items-center gap-2 text-sm text-brand-navy/70 bg-white p-2 rounded-lg border border-brand-navy/5">
-                                            <div className="w-1.5 h-1.5 bg-brand-teal rounded-full"></div> {a}
+                                        <div key={a} className="flex items-center gap-2 text-sm text-brand-navy/70 bg-white p-2 rounded-lg border border-brand-navy/5" itemProp="amenityFeature" itemScope itemType="https://schema.org/LocationFeatureSpecification">
+                                            <div className="w-1.5 h-1.5 bg-brand-teal rounded-full"></div> 
+                                            <span itemProp="value">{a}</span>
+                                            <meta itemProp="name" content={a} />
                                         </div>
                                     ))}
                                 </div>
-                            </div>
-
-                            <div>
-                                <h4 className="font-bold text-brand-navy mb-4 flex items-center gap-2"><FileCheck size={18} /> House Rules</h4>
-                                <ul className="space-y-2">
-                                    {partner.details.rules.map(r => (
-                                        <li key={r} className="flex items-center gap-2 text-sm text-brand-navy/70">
-                                            <CheckCircle2 size={14} className="text-brand-navy/30" /> {r}
-                                        </li>
-                                    ))}
-                                </ul>
                             </div>
                         </div>
 
@@ -374,7 +433,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                             </div>
 
                             <div className="space-y-3">
-                                <a href={`tel:${partner.details.phone}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy group">
+                                <a href={`tel:${partner.details.phone}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy group" itemProp="telephone">
                                     <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center group-hover:bg-brand-teal group-hover:text-white transition-colors"><Phone size={14} /></div>
                                     <div className="text-sm font-bold">{partner.details.phone}</div>
                                 </a>
@@ -383,7 +442,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                                     <div className="text-sm font-bold">Capacity: {partner.details.capacity}</div>
                                 </div>
                                 {partner.details.website && (
-                                    <a href={partner.details.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy group">
+                                    <a href={partner.details.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy group" itemProp="url">
                                         <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center group-hover:bg-brand-teal group-hover:text-white transition-colors"><ExternalLink size={14} /></div>
                                         <div className="text-sm font-bold underline">Visit Website</div>
                                     </a>
@@ -400,8 +459,14 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
 
 export const PartnerDirectory: React.FC = () => {
   const [filter, setFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [carrOnly, setCarrOnly] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const { playClick } = useSound();
+
+  // Get unique facility types for the dropdown
+  const uniqueTypes = Array.from(new Set(PARTNERS.map(p => p.type)));
 
   // DEEP LINKING LOGIC
   useEffect(() => {
@@ -459,17 +524,23 @@ export const PartnerDirectory: React.FC = () => {
     }
   };
 
-  const filteredPartners = PARTNERS.filter(p => 
-    p.name.toLowerCase().includes(filter.toLowerCase()) || 
-    p.location.toLowerCase().includes(filter.toLowerCase())
-  );
+  const filteredPartners = PARTNERS.filter(p => {
+    const matchesText = p.name.toLowerCase().includes(filter.toLowerCase()) || 
+                        p.location.toLowerCase().includes(filter.toLowerCase()) ||
+                        p.neighborhood.toLowerCase().includes(filter.toLowerCase());
+    const matchesType = typeFilter === 'all' || p.type === typeFilter;
+    const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
+    const matchesCarr = !carrOnly || p.carrCertified;
+    
+    return matchesText && matchesType && matchesStatus && matchesCarr;
+  });
 
   return (
     <>
       <section id="partner-directory" className="w-full bg-[#FDFBF7] py-16 border-t border-brand-navy/5" aria-label="Verified Sober Living Network">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-6">
              <div>
                 <div className="flex items-center gap-2 text-brand-teal font-bold uppercase tracking-widest text-xs mb-2">
                    <Activity size={14} className="animate-pulse" /> Live Network Status
@@ -493,53 +564,138 @@ export const PartnerDirectory: React.FC = () => {
              </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-             {filteredPartners.map((partner) => (
-               <button 
-                  key={partner.id}
-                  onClick={() => openPartner(partner)}
-                  className="bg-white border border-brand-navy/5 rounded-xl p-6 hover:shadow-lg hover:border-brand-teal/30 transition-all group text-left relative overflow-hidden"
-                  itemScope 
-                  itemType="https://schema.org/Place"
-               >
-                  <div className="absolute right-0 top-0 w-20 h-20 bg-brand-navy/5 rounded-bl-[4rem] -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
-                  
-                  <div className="flex justify-between items-start mb-4 relative z-10">
-                     <div className="w-10 h-10 bg-brand-navy/5 rounded-lg flex items-center justify-center text-brand-navy/40 group-hover:bg-brand-navy group-hover:text-white transition-colors">
-                        <Building2 size={20} />
-                     </div>
-                     <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 ${partner.status === 'active' ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-yellow/10 text-brand-yellow'}`}>
-                        {partner.status === 'active' ? <CheckCircle2 size={10} /> : <Activity size={10} />}
-                        {partner.status === 'active' ? 'Funding Active' : 'Limited Space'}
-                     </div>
+          {/* ADVANCED FILTERING TOOLBAR */}
+          <div className="flex flex-wrap items-center gap-3 mb-8 pb-8 border-b border-brand-navy/5 animate-slide-up">
+              {/* Type Filter */}
+              <div className="relative">
+                  <select 
+                      value={typeFilter}
+                      onChange={(e) => { setTypeFilter(e.target.value); playClick(); }}
+                      className="appearance-none bg-white border border-brand-navy/10 hover:border-brand-navy/30 rounded-xl px-4 py-2 pr-8 text-sm font-bold text-brand-navy focus:outline-none focus:border-brand-teal transition-colors cursor-pointer"
+                  >
+                      <option value="all">All Facility Types</option>
+                      {uniqueTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 text-brand-navy">
+                      <ChevronDown size={14} />
                   </div>
+              </div>
 
-                  <h3 className="font-bold text-lg text-brand-navy mb-1 group-hover:text-brand-teal transition-colors" itemProp="name">{partner.name}</h3>
-                  <p className="text-xs text-brand-navy/50 font-bold uppercase tracking-wider mb-4" itemProp="description">{partner.type}</p>
-                  
-                  <div className="space-y-2 text-sm text-brand-navy/70" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
-                     <div className="flex items-center gap-2">
-                        <MapPin size={14} className="text-brand-coral" />
-                        <span><span itemProp="addressLocality">{partner.location}</span> • {partner.neighborhood}</span>
-                     </div>
-                     {partner.carrCertified && (
-                        <div className="flex items-center gap-2 text-brand-navy/60">
-                           <ShieldCheck size={14} />
-                           <span>CARR Certified / Verified</span>
-                        </div>
-                     )}
-                  </div>
-                  
-                  <div className="mt-4 pt-4 border-t border-brand-navy/5 flex items-center text-xs font-bold text-brand-navy/40 group-hover:text-brand-navy transition-colors">
-                      View Facility Profile <ArrowRight size={12} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                  </div>
+              {/* Status Filter */}
+              <div className="flex bg-white rounded-xl p-1 border border-brand-navy/10">
+                  <button 
+                      onClick={() => { setStatusFilter('all'); playClick(); }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${statusFilter === 'all' ? 'bg-brand-navy text-white shadow-sm' : 'text-brand-navy/60 hover:text-brand-navy hover:bg-brand-navy/5'}`}
+                  >
+                      All
+                  </button>
+                  <button 
+                      onClick={() => { setStatusFilter('active'); playClick(); }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${statusFilter === 'active' ? 'bg-brand-teal text-white shadow-sm' : 'text-brand-navy/60 hover:text-brand-teal hover:bg-brand-teal/10'}`}
+                  >
+                      Active
+                  </button>
+                  <button 
+                      onClick={() => { setStatusFilter('limited'); playClick(); }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${statusFilter === 'limited' ? 'bg-brand-yellow text-brand-navy shadow-sm' : 'text-brand-navy/60 hover:text-brand-yellow hover:bg-brand-yellow/10'}`}
+                  >
+                      Limited
+                  </button>
+              </div>
 
-                  {/* Meta data for Search Engines */}
-                  <meta itemProp="addressRegion" content="CO" />
-                  <meta itemProp="addressCountry" content="US" />
-               </button>
-             ))}
+              {/* CARR Toggle */}
+              <button 
+                  onClick={() => { setCarrOnly(!carrOnly); playClick(); }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${carrOnly ? 'bg-brand-navy/5 border-brand-navy text-brand-navy' : 'bg-white border-brand-navy/10 text-brand-navy/60 hover:border-brand-navy/30'}`}
+              >
+                  <ShieldCheck size={16} className={carrOnly ? 'text-brand-teal' : ''} />
+                  <span className="text-sm font-bold">CARR Certified</span>
+              </button>
+
+              {/* Reset Filters */}
+              {(typeFilter !== 'all' || statusFilter !== 'all' || carrOnly || filter) && (
+                  <button 
+                      onClick={() => {
+                          setFilter('');
+                          setTypeFilter('all');
+                          setStatusFilter('all');
+                          setCarrOnly(false);
+                          playClick();
+                      }}
+                      className="text-xs font-bold text-brand-coral hover:underline ml-auto flex items-center gap-1"
+                  >
+                      <X size={12} /> Reset Filters
+                  </button>
+              )}
           </div>
+
+          {filteredPartners.length === 0 ? (
+             <div className="text-center py-20 bg-brand-navy/5 rounded-3xl border-2 border-dashed border-brand-navy/10">
+                <Filter size={48} className="mx-auto text-brand-navy/20 mb-4" />
+                <h3 className="font-bold text-xl text-brand-navy">No facilities found.</h3>
+                <p className="text-brand-navy/50 text-sm mt-2">Try adjusting your filters or search terms.</p>
+                <button 
+                    onClick={() => {
+                        setFilter('');
+                        setTypeFilter('all');
+                        setStatusFilter('all');
+                        setCarrOnly(false);
+                    }}
+                    className="mt-6 text-brand-teal font-bold text-sm hover:underline"
+                >
+                    Clear all filters
+                </button>
+             </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredPartners.map((partner) => (
+                <button 
+                    key={partner.id}
+                    onClick={() => openPartner(partner)}
+                    className="bg-white border border-brand-navy/5 rounded-xl p-6 hover:shadow-lg hover:border-brand-teal/30 transition-all group text-left relative overflow-hidden"
+                    itemScope 
+                    itemType="https://schema.org/Place"
+                >
+                    <div className="absolute right-0 top-0 w-20 h-20 bg-brand-navy/5 rounded-bl-[4rem] -mr-10 -mt-10 transition-transform group-hover:scale-150"></div>
+                    
+                    <div className="flex justify-between items-start mb-4 relative z-10">
+                        <div className="w-10 h-10 bg-brand-navy/5 rounded-lg flex items-center justify-center text-brand-navy/40 group-hover:bg-brand-navy group-hover:text-white transition-colors">
+                            <Building2 size={20} />
+                        </div>
+                        <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 ${partner.status === 'active' ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-yellow/10 text-brand-yellow'}`}>
+                            {partner.status === 'active' ? <CheckCircle2 size={10} /> : <Activity size={10} />}
+                            {partner.status === 'active' ? 'Funding Active' : 'Limited Space'}
+                        </div>
+                    </div>
+
+                    <h3 className="font-bold text-lg text-brand-navy mb-1 group-hover:text-brand-teal transition-colors" itemProp="name">{partner.name}</h3>
+                    <p className="text-xs text-brand-navy/50 font-bold uppercase tracking-wider mb-4" itemProp="description">{partner.type}</p>
+                    
+                    <div className="space-y-2 text-sm text-brand-navy/70" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+                        <div className="flex items-center gap-2">
+                            <MapPin size={14} className="text-brand-coral" />
+                            <span><span itemProp="addressLocality">{partner.location.split(',')[0]}</span>, <span itemProp="addressRegion">CO</span> • {partner.neighborhood}</span>
+                        </div>
+                        {partner.carrCertified && (
+                            <div className="flex items-center gap-2 text-brand-navy/60">
+                            <ShieldCheck size={14} />
+                            <span>CARR Certified / Verified</span>
+                            </div>
+                        )}
+                        <meta itemProp="addressCountry" content="US" />
+                    </div>
+                    
+                    <div className="mt-4 pt-4 border-t border-brand-navy/5 flex items-center text-xs font-bold text-brand-navy/40 group-hover:text-brand-navy transition-colors">
+                        View Facility Profile <ArrowRight size={12} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                    </div>
+
+                    {/* Meta data for Search Engines */}
+                    <meta itemProp="addressRegion" content="CO" />
+                    <meta itemProp="addressCountry" content="US" />
+                </button>
+                ))}
+            </div>
+          )}
           
           <div className="mt-8 text-center">
               <p className="text-xs text-brand-navy/30 font-bold uppercase tracking-widest">
