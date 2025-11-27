@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { IntakeChat } from './components/IntakeChat';
 import { DonationFlow } from './components/DonationFlow';
@@ -16,6 +17,7 @@ import { useRouter } from './hooks/useRouter';
 import { useStore } from './context/StoreContext';
 import { useSound } from './hooks/useSound';
 import { Confetti } from './components/Confetti';
+import { Footer } from './components/Footer';
 import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, TrendingUp, Twitter, Instagram, Linkedin, Activity, Globe, LogIn, LogOut, Menu, X, ArrowRight, Zap, MapPin } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
@@ -264,13 +266,14 @@ const App: React.FC = () => {
         <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-brand-navy/90 backdrop-blur-md py-3 shadow-lg' : 'bg-transparent py-4 md:py-6'}`}>
            <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 flex items-center justify-between">
               
+              {/* Logo - Anchored Left */}
               <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('intro')}>
                  <BrandLogo className={`w-8 h-8 md:w-10 md:h-10 transition-transform group-hover:rotate-12 ${isCalmMode || scrolled ? 'brightness-100' : 'brightness-0 md:brightness-100'}`} />
                  <span className={`font-display font-bold text-xl tracking-tight ${isCalmMode || scrolled ? 'text-white' : 'text-brand-navy md:text-brand-navy opacity-0 md:opacity-100'}`}>SecondWind</span>
               </div>
 
-              {/* Desktop Nav */}
-              <nav className="hidden lg:flex items-center gap-1 bg-white/80 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-sm">
+              {/* Desktop Nav - Anchored Center - VISIBLE ON LG+ */}
+              <nav className="hidden lg:flex items-center gap-1 bg-white/80 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-sm absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                  {[
                    { id: 'intro', label: 'Home' },
                    { id: 'philosophy', label: 'Protocol' },
@@ -288,7 +291,7 @@ const App: React.FC = () => {
                  ))}
               </nav>
 
-              {/* Controls */}
+              {/* Controls - Anchored Right */}
               <div className="flex items-center gap-3">
                  <button onClick={toggleSound} className={`p-2.5 rounded-full transition-colors hidden sm:flex ${scrolled ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-brand-navy/40 hover:text-brand-navy hover:bg-brand-navy/5'}`}>
                     {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
@@ -309,6 +312,7 @@ const App: React.FC = () => {
                     </button>
                  )}
 
+                 {/* Mobile Menu Button - HIDDEN ON LG+ */}
                  <button onClick={() => setIsMobileMenuOpen(true)} className={`lg:hidden p-2 rounded-full ${scrolled ? 'text-white' : 'text-brand-navy'}`}>
                     <Menu size={24} />
                  </button>
@@ -322,6 +326,7 @@ const App: React.FC = () => {
            {renderContent()}
         </main>
 
+        <Footer onNavigate={navigate} />
         <NotificationSystem />
         <Confetti />
 

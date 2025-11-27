@@ -52,7 +52,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
         id="philosophy" 
         title="How It Works | SecondWind Colorado" 
         description="Charity is broken. We fixed the incentives with direct-to-vendor payments for Colorado sober living and rehab assistance."
-        className="overflow-visible pb-0"
+        className="overflow-visible pb-0 pt-16 md:pt-24" // Adjusted PT for better flow
         schema={faqSchema}
       >
         <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4 md:px-0">
