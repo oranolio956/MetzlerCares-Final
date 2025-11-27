@@ -47,7 +47,7 @@ const CrisisOverlay = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
       aria-modal="true"
       aria-labelledby="crisis-title"
     >
-        <button onClick={onClose} className="absolute top-6 right-6 text-white hover:bg-white/20 p-2 rounded-full transition-colors" aria-label="Close crisis help">
+        <button onClick={onClose} className="absolute top-safe right-6 text-white hover:bg-white/20 p-2 rounded-full transition-colors" aria-label="Close crisis help">
           <X size={32} />
         </button>
         <LifeBuoy size={64} className="text-white mb-6 animate-pulse" />
@@ -73,7 +73,7 @@ const CrisisOverlay = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
 const LegalOverlay = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pt-safe pb-safe" role="dialog" aria-modal="true">
             <div className="absolute inset-0 bg-brand-navy/60 backdrop-blur-sm" onClick={onClose}></div>
             <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl relative z-10 max-h-[80vh] flex flex-col overflow-hidden animate-slide-up">
                 <div className="p-6 border-b border-brand-navy/5 flex justify-between items-center bg-brand-cream shrink-0">
@@ -318,7 +318,7 @@ const App: React.FC = () => {
         <GlobalChat activeSection={activeSection} />
 
         {/* MOBILE MENU */}
-        <div className={`fixed inset-0 z-[100] bg-brand-navy/95 backdrop-blur-xl text-white transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col ${isMobileMenuOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'}`}>
+        <div className={`fixed inset-0 z-[100] bg-brand-navy/95 backdrop-blur-xl text-white transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col pt-safe ${isMobileMenuOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'}`}>
            <div className="flex justify-between items-center p-4 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-3 opacity-50">
                  <BrandLogo className="w-8 h-8 grayscale brightness-200" />
@@ -353,7 +353,7 @@ const App: React.FC = () => {
                   </>
               )}
            </div>
-           <div className="p-4 border-t border-white/10 shrink-0">
+           <div className="p-4 border-t border-white/10 shrink-0 pb-safe">
               {isAuthenticated ? (
                 <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="w-full bg-white/10 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2"><LogOut size={20} /> Sign Out</button>
               ) : (

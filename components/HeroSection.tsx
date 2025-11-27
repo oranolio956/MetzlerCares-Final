@@ -109,11 +109,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                   Using order-1 on mobile ensures text comes first.
                */}
                <div className="lg:col-span-7 flex flex-col justify-center items-start leading-[0.85] select-none order-1">
-                   <h1 className="font-display font-bold text-[clamp(4rem,13vw,9rem)] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.1s' }}>
+                   <h1 className="font-display font-bold text-[clamp(2.75rem,12vw,9rem)] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.1s' }}>
                       INVEST IN
                    </h1>
                    <div className="flex items-center gap-4 w-full">
-                      <h2 className="font-display font-bold text-[clamp(4rem,13vw,9rem)] text-brand-teal tracking-[-0.04em] animate-slide-up opacity-0 whitespace-nowrap" style={{ animationDelay: '0.2s' }}>
+                      <h2 className="font-display font-bold text-[clamp(2.75rem,12vw,9rem)] text-brand-teal tracking-[-0.04em] animate-slide-up opacity-0 whitespace-nowrap" style={{ animationDelay: '0.2s' }}>
                          COLORADO
                       </h2>
                       {/* Line Decorator */}
@@ -121,7 +121,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                          <div className="absolute inset-0 bg-brand-navy/10 animate-slide-left" style={{ width: '200%', background: 'linear-gradient(90deg, transparent, rgba(26,42,58,0.2), transparent)' }}></div>
                       </div>
                    </div>
-                   <h2 className="font-display font-bold text-[clamp(4rem,13vw,9rem)] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.3s' }}>
+                   <h2 className="font-display font-bold text-[clamp(2.75rem,12vw,9rem)] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.3s' }}>
                       RECOVERY<span className="text-brand-coral">.</span>
                    </h2>
                    

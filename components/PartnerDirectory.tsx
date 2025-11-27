@@ -163,7 +163,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
     }, [onClose]);
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4" role="dialog" aria-modal="true" aria-labelledby="facility-title">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4 pt-safe" role="dialog" aria-modal="true" aria-labelledby="facility-title">
             {/* DYNAMIC SEO for "Individual Page" Effect */}
             <SEOHead 
                 title={`${partner.name} - Sober Living Funding | SecondWind`} 
@@ -198,7 +198,8 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                     <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
                     <div className="absolute inset-0 bg-gradient-to-t from-[#FDFBF7] to-transparent"></div>
                     
-                    <div className="absolute top-safe right-4 flex gap-2 pt-4 md:pt-0">
+                    {/* Close Buttons with Safe Area Handling */}
+                    <div className="absolute top-4 right-4 flex gap-2 md:pt-0 pt-safe pr-safe z-20">
                         <button onClick={handleShare} className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors backdrop-blur-md" title="Copy Link" aria-label="Copy link to clipboard">
                             {copied ? <CheckCircle2 size={24} className="text-brand-teal" /> : <Share2 size={24} />}
                         </button>
@@ -214,7 +215,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                     </div>
                 </div>
 
-                <div className="px-6 md:px-8 pt-12 pb-24 md:pb-8 overflow-y-auto custom-scrollbar flex-1">
+                <div className="px-6 md:px-8 pt-12 pb-24 md:pb-8 overflow-y-auto custom-scrollbar flex-1 pb-safe">
                     
                     <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
                         <div>

@@ -199,11 +199,14 @@ export const DonationFlow: React.FC = () => {
                               value={multiplier} 
                               onChange={(e) => handleSliderChange(parseInt(e.target.value))} 
                               className="w-full absolute z-20 opacity-0 cursor-pointer h-24 top-1/2 -translate-y-1/2 focus:outline-none touch-none" 
-                              style={{ touchAction: 'none' }}
+                              style={{ touchAction: 'none' }} // Critical for mobile
                               aria-label="Adjust donation multiplier"
                            />
-                           <div className="absolute h-14 w-14 top-1/2 -translate-y-1/2 bg-white border-4 border-brand-navy rounded-xl shadow-[0_8px_16px_rgba(0,0,0,0.2)] z-10 transition-all duration-150 pointer-events-none flex items-center justify-center transform group-active:scale-95 group-active:shadow-[0_2px_8px_rgba(0,0,0,0.2)]" style={{ left: `calc(${((multiplier - 1) / 9) * 100}% - ${multiplier === 10 ? 56 : multiplier === 1 ? 0 : 28}px)` }}>
-                              <div className="w-1 h-6 bg-brand-navy/20 rounded-full"></div><div className="w-1 h-6 bg-brand-navy/20 rounded-full mx-1.5"></div><div className="w-1 h-6 bg-brand-navy/20 rounded-full"></div>
+                           {/* Slider Thumb with Larger Touch Target */}
+                           <div className="absolute top-1/2 -translate-y-1/2 z-10 transition-all duration-150 pointer-events-none flex items-center justify-center transform group-active:scale-95" style={{ left: `calc(${((multiplier - 1) / 9) * 100}% - ${multiplier === 10 ? 56 : multiplier === 1 ? 0 : 28}px)` }}>
+                              <div className="h-14 w-14 bg-white border-4 border-brand-navy rounded-xl shadow-[0_8px_16px_rgba(0,0,0,0.2)] flex items-center justify-center group-active:shadow-[0_2px_8px_rgba(0,0,0,0.2)]">
+                                 <div className="w-1 h-6 bg-brand-navy/20 rounded-full"></div><div className="w-1 h-6 bg-brand-navy/20 rounded-full mx-1.5"></div><div className="w-1 h-6 bg-brand-navy/20 rounded-full"></div>
+                              </div>
                            </div>
                         </div>
 
