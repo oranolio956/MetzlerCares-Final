@@ -1,6 +1,5 @@
-
 import React, { useEffect, useRef } from 'react';
-import { HeartHandshake, ArrowRight, Wind, ChevronDown, Activity, Building2, Sparkles, ArrowUpRight, Crown, CheckCircle2, ShieldCheck, Clock, Zap } from 'lucide-react';
+import { HeartHandshake, ArrowRight, ChevronDown, Activity, Building2, ArrowUpRight, ShieldCheck, Clock, Zap } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { SEOHead } from './SEOHead';
 import { useStore } from '../context/StoreContext';
@@ -107,7 +106,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
 
         {/* CONTENT CONTAINER - Z-Index 10 */}
         {/* GRID LAYOUT: Strict separation of Text (Left) and Visuals (Right) on Desktop */}
-        <div className="relative z-10 w-full max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 flex-grow flex flex-col justify-center pt-24 pb-8 lg:pt-0 lg:pb-0">
+        <div className="relative z-10 w-full max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 flex-grow flex flex-col justify-center pt-28 pb-12 lg:py-0">
            
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center h-full">
                
@@ -158,7 +157,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                {/* 
                   RIGHT COLUMN: VISUAL COMPOSITION (5 Columns)
                */}
-               <div className="lg:col-span-5 relative flex flex-col items-center lg:items-end justify-center order-2 mt-8 lg:mt-0">
+               <div className="lg:col-span-5 relative flex flex-col items-center lg:items-end justify-center order-2 mt-8 lg:mt-0 lg:mb-12">
                   
                   {/* Visual Cluster Container */}
                   <div className="relative w-full max-w-md lg:max-w-full flex flex-col items-center lg:items-end">
@@ -169,40 +168,46 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                       </div>
 
                       {/* SYSTEM STATUS BOARD - Scarcity vs Access */}
-                      <div className="flex flex-col gap-3 w-full max-w-sm relative z-20 -mt-12 lg:-mt-32 lg:mr-8">
+                      <div className="flex flex-col gap-3 w-full max-w-sm relative z-20 -mt-12 lg:-mt-32 lg:mr-8 transition-transform duration-300">
                           
                           {/* STATUS HEADER */}
-                          <div className="bg-brand-navy text-white px-4 py-2 rounded-t-xl flex items-center justify-between text-xs font-bold uppercase tracking-widest shadow-lg animate-slide-up opacity-0" style={{ animationDelay: '0.55s' }}>
+                          <div className="bg-brand-navy text-white px-4 py-3 rounded-t-xl flex items-center justify-between text-xs font-bold uppercase tracking-widest shadow-lg animate-slide-up opacity-0 border-b border-white/10" style={{ animationDelay: '0.55s' }}>
                               <span>Network Status</span>
                               <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-brand-teal animate-pulse"></div> Online</div>
                           </div>
 
                           {/* RENT GRANT (Waitlist) */}
-                          <div className="bg-white/90 backdrop-blur-xl p-4 rounded-b-none rounded-xl border border-white/60 shadow-lg flex items-center justify-between animate-slide-up opacity-0" style={{ animationDelay: '0.6s' }}>
-                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-brand-yellow/10 rounded-lg text-brand-yellow"><Clock size={18} /></div>
+                          <div className="bg-white/95 backdrop-blur-xl p-4 rounded-b-none rounded-xl border border-brand-navy/10 shadow-lg flex items-center justify-between animate-slide-up opacity-0 relative overflow-hidden" style={{ animationDelay: '0.6s' }}>
+                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-yellow"></div>
+                             <div className="flex items-center gap-3 pl-2">
+                                <div className="p-2 bg-brand-yellow/10 rounded-lg text-brand-yellow shrink-0"><Clock size={18} /></div>
                                 <div>
                                     <div className="font-bold text-brand-navy text-sm">Rent Grants</div>
                                     <div className="text-[10px] text-brand-navy/50 font-bold uppercase tracking-wider">High Demand</div>
                                 </div>
                              </div>
-                             <span className="px-2 py-1 bg-brand-yellow/10 text-brand-yellow rounded text-xs font-bold">Waitlist</span>
+                             <span className="px-2 py-1 bg-brand-yellow/10 text-brand-yellow rounded text-[10px] font-bold uppercase tracking-wide border border-brand-yellow/20">Waitlist</span>
                           </div>
 
                           {/* PEER COACHING (Instant) */}
                           <div 
                             onClick={() => onNavigate('peer-coaching')}
-                            className="bg-brand-teal text-white p-4 rounded-xl shadow-xl flex items-center justify-between cursor-pointer transform hover:scale-105 transition-all duration-300 ring-4 ring-white/20 animate-slide-up opacity-0" 
+                            className="bg-brand-teal text-white p-4 rounded-xl shadow-xl flex items-center justify-between cursor-pointer transform hover:scale-105 transition-all duration-300 ring-4 ring-white/20 animate-slide-up opacity-0 relative overflow-hidden group" 
                             style={{ animationDelay: '0.7s' }}
                           >
-                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-white/20 rounded-lg text-white"><Zap size={18} fill="currentColor" /></div>
+                             {/* Shine Effect */}
+                             <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                             
+                             <div className="flex items-center gap-3 relative z-10">
+                                <div className="p-2 bg-white/20 rounded-lg text-white shrink-0"><Zap size={18} fill="currentColor" /></div>
                                 <div>
                                     <div className="font-bold text-white text-sm">Peer Coaching</div>
                                     <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Medicaid Unlocks</div>
                                 </div>
                              </div>
-                             <span className="px-2 py-1 bg-white text-brand-teal rounded text-xs font-bold flex items-center gap-1">Instant <ArrowRight size={10} /></span>
+                             <span className="px-3 py-1.5 bg-white text-brand-teal rounded text-xs font-bold flex items-center gap-1 shadow-sm group-hover:bg-brand-navy group-hover:text-white transition-colors relative z-10">
+                                Instant <ArrowRight size={10} />
+                             </span>
                           </div>
 
                       </div>
@@ -215,13 +220,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
 
         {/* --- BOTTOM HUD / FLOATING DOCK (Desktop Only) --- */}
         <div className="hidden lg:block relative z-30 mt-auto px-12 w-full max-w-[1800px] mx-auto pb-8">
-           <div className="bg-white/80 backdrop-blur-md border border-white/20 rounded-[2rem] p-3 flex items-center gap-4 shadow-[0_8px_32px_rgba(26,42,58,0.08)] animate-slide-up opacity-0" style={{ animationDelay: '0.8s' }}>
+           <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-[2rem] p-3 flex items-center gap-4 shadow-[0_8px_32px_rgba(26,42,58,0.08)] animate-slide-up opacity-0 hover:shadow-xl transition-shadow duration-300" style={{ animationDelay: '0.8s' }}>
               
               {/* Stat Ticker */}
               <div className="flex-1 flex items-center gap-5 px-6 border-r border-brand-navy/5 pr-8">
-                 <div className="w-12 h-12 bg-brand-navy text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden">
+                 <div className="w-12 h-12 bg-brand-navy text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-tr from-brand-navy to-brand-teal opacity-50"></div>
-                    <Activity size={20} className="relative z-10" />
+                    <Activity size={20} className="relative z-10 group-hover:scale-110 transition-transform" />
                  </div>
                  <div className="flex flex-col min-w-0">
                     <div className="flex items-center gap-2">
@@ -233,7 +238,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                          <AnimatedCounter end={1240402} />
                        </span>
                        <span className="text-brand-navy/20 text-xl font-light">|</span>
-                       <span className="font-mono text-xs font-bold text-brand-yellow bg-brand-navy/5 px-2 py-1 rounded border border-brand-navy/5 flex items-center gap-1">
+                       <span className="font-mono text-xs font-bold text-brand-yellow bg-brand-navy/5 px-2 py-1 rounded border border-brand-navy/5 flex items-center gap-1 cursor-help" title="Active Medicaid contracts available">
                           <ShieldCheck size={10} /> Medicaid Coaching Available
                        </span>
                     </div>
@@ -265,12 +270,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
       </section>
 
       {/* --- TRUST SIGNALS --- */}
-      <div className="w-full bg-brand-navy/5 py-8 border-y border-brand-navy/5 overflow-hidden">
+      <div className="w-full bg-brand-navy/5 py-12 border-y border-brand-navy/5 overflow-hidden">
          <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 flex flex-col md:flex-row items-center gap-8 md:gap-12">
             <div className="text-brand-navy/40 text-xs font-bold uppercase tracking-widest whitespace-nowrap shrink-0">
                Directly Paying Verified Vendors:
             </div>
-            <div className="flex items-center gap-12 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 overflow-x-auto no-scrollbar w-full md:w-auto">
+            <div className="flex items-center gap-12 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 overflow-x-auto no-scrollbar w-full md:w-auto mask-linear-fade">
                <div className="flex items-center gap-2 shrink-0">
                   <Building2 size={24} />
                   <span className="font-display font-bold text-lg text-brand-navy">Oxford House CO</span>
