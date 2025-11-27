@@ -18,10 +18,10 @@ const faqSchema = {
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "How can I get funding for sober living in Colorado?",
+      "name": "How do I find sober living in Denver?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "SecondWind provides direct-to-vendor payments for sober living rent. We partner with Oxford Houses and verified sober living homes in Denver, Boulder, and Colorado Springs. Start the intake chat to apply."
+        "text": "SecondWind connects you with verified Oxford Houses and CARR-certified sober living homes in Denver, Aurora, and Lakewood. Use our Partner Directory to see real-time vacancies and apply for immediate rent funding."
       }
     },
     {
@@ -29,7 +29,23 @@ const faqSchema = {
       "name": "Does SecondWind pay for rehab transport?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. We fund monthly bus passes and transit solutions specifically for accessing rehab, therapy, and recovery meetings across Colorado."
+        "text": "Yes. We fund monthly RTD bus passes and ride-share credits specifically for Colorado residents accessing detox, intensive outpatient (IOP), and recovery meetings."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is CARR certification?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CARR (Colorado Association of Recovery Residences) certification ensures a sober living home meets strict safety, management, and ethical standards. SecondWind prioritizes funding for these verified facilities to ensure your safety."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Am I eligible for help if I have Colorado Medicaid?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. If you have active Health First Colorado (Medicaid), you automatically qualify for our Peer Recovery Coaching service. This provides dedicated support for ID retrieval, food stamps (SNAP), and job placement at no cost to you."
       }
     },
     {
@@ -38,22 +54,6 @@ const faqSchema = {
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Yes. SecondWind is a 100% transparent protocol. Every donation is tracked on our public ledger and paid directly to verified vendors, not individuals."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you fund CARR Certified homes?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. SecondWind prioritizes funding for facilities certified by CARR (Colorado Association of Recovery Residences) to ensure safety and standards of care."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How to find Oxford House vacancies in Denver?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Our partner network tracks vacancies at Oxford House locations across Denver, Aurora, and Lakewood. Apply through our chat to see real-time availability and eligibility."
       }
     }
   ]
@@ -307,6 +307,16 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                      </summary>
                      <div className="px-6 pb-6 pt-0 text-brand-navy/70 leading-relaxed text-sm">
                          Oxford House vacancies change daily. While we don't manage their list directly, our "Partner Network" tool tracks active houses where we have successfully placed residents recently. Start a chat with Windy to check eligibility for funding at specific locations.
+                     </div>
+                 </details>
+
+                 <details className="group bg-white rounded-2xl border border-brand-navy/5 open:border-brand-teal/30 open:ring-4 open:ring-brand-teal/5 transition-all">
+                     <summary className="p-6 cursor-pointer list-none flex justify-between items-center font-bold text-brand-navy">
+                         Am I eligible for help if I have Colorado Medicaid?
+                         <ArrowDown className="group-open:rotate-180 transition-transform text-brand-teal" size={20} />
+                     </summary>
+                     <div className="px-6 pb-6 pt-0 text-brand-navy/70 leading-relaxed text-sm">
+                         Yes. If you have active Health First Colorado (Medicaid), you automatically qualify for our Peer Recovery Coaching service. This provides dedicated support for ID retrieval, food stamps (SNAP), and job placement at no cost to you.
                      </div>
                  </details>
 

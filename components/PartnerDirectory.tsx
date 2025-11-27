@@ -259,7 +259,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
     }, [onClose]);
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="facility-title">
             {/* DYNAMIC SEO for "Individual Page" Effect */}
             <SEOHead 
                 title={`${partner.name} - Sober Living Funding | SecondWind`} 
@@ -299,10 +299,10 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                     <div className="absolute inset-0 bg-gradient-to-t from-[#FDFBF7] to-transparent"></div>
                     
                     <div className="absolute top-4 right-4 flex gap-2">
-                        <button onClick={handleShare} className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors backdrop-blur-md" title="Copy Link">
+                        <button onClick={handleShare} className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors backdrop-blur-md" title="Copy Link" aria-label="Copy link to clipboard">
                             {copied ? <CheckCircle2 size={24} className="text-brand-teal" /> : <Share2 size={24} />}
                         </button>
-                        <button onClick={onClose} className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors backdrop-blur-md">
+                        <button onClick={onClose} className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors backdrop-blur-md" aria-label="Close details">
                             <X size={24} />
                         </button>
                     </div>
@@ -319,7 +319,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                     <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
                         <div>
                             <div className="flex items-center gap-2 mb-2">
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 ${partner.status === 'active' ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-yellow/10 text-brand-yellow'}`}>
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 ${partner.status === 'active' ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-yellow/10 text-yellow-700'}`}>
                                     {partner.status === 'active' ? <CheckCircle2 size={10} /> : <Activity size={10} />}
                                     {partner.status === 'active' ? 'Funding Active' : 'Limited Space'}
                                 </span>
@@ -329,7 +329,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                                     </span>
                                 )}
                             </div>
-                            <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-navy" itemProp="name">{partner.name}</h2>
+                            <h2 id="facility-title" className="font-display font-bold text-3xl md:text-4xl text-brand-navy" itemProp="name">{partner.name}</h2>
                             <p className="text-brand-navy/50 font-bold uppercase tracking-widest text-xs mt-2 mb-1">{partner.type}</p>
                             <div className="flex items-center gap-2 text-brand-navy/60 font-medium mt-1" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
                                 <MapPin size={16} className="text-brand-coral" />
@@ -344,7 +344,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                             {activeApplication ? (
                                 <div className="flex-1 md:flex-none bg-brand-navy/5 text-brand-navy px-6 py-3 rounded-xl font-bold flex flex-col items-center justify-center border border-brand-navy/10 min-w-[160px]">
                                     <span className="text-[10px] uppercase tracking-widest text-brand-navy/50">Application Status</span>
-                                    <span className={`text-sm flex items-center gap-2 ${activeApplication.status === 'funded' ? 'text-brand-teal' : 'text-brand-yellow'}`}>
+                                    <span className={`text-sm flex items-center gap-2 ${activeApplication.status === 'funded' ? 'text-brand-teal' : 'text-yellow-700'}`}>
                                         {activeApplication.status === 'funded' ? <CheckCircle2 size={16} /> : <Clock size={16} />}
                                         {activeApplication.status === 'funded' ? 'Approved & Paid' : 'In Review'}
                                     </span>
@@ -388,7 +388,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                                     {/* Meetings */}
                                     <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-navy/5">
                                         <div className="flex items-center gap-2 text-brand-navy mb-2 font-bold text-sm">
-                                            <Users size={16} className="text-brand-yellow" /> Meeting Quota
+                                            <Users size={16} className="text-yellow-700" /> Meeting Quota
                                         </div>
                                         <p className="text-sm text-brand-navy/70 leading-relaxed">{partner.details.programRequirements?.meetings || "Mandatory house meeting weekly."}</p>
                                     </div>
@@ -433,7 +433,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                             </div>
 
                             <div className="space-y-3">
-                                <a href={`tel:${partner.details.phone}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy group" itemProp="telephone">
+                                <a href={`tel:${partner.details.phone}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy group" itemProp="telephone" aria-label={`Call ${partner.name}`}>
                                     <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center group-hover:bg-brand-teal group-hover:text-white transition-colors"><Phone size={14} /></div>
                                     <div className="text-sm font-bold">{partner.details.phone}</div>
                                 </a>
@@ -442,7 +442,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                                     <div className="text-sm font-bold">Capacity: {partner.details.capacity}</div>
                                 </div>
                                 {partner.details.website && (
-                                    <a href={partner.details.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy group" itemProp="url">
+                                    <a href={partner.details.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy group" itemProp="url" aria-label={`Visit website of ${partner.name}`}>
                                         <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center group-hover:bg-brand-teal group-hover:text-white transition-colors"><ExternalLink size={14} /></div>
                                         <div className="text-sm font-bold underline">Visit Website</div>
                                     </a>
@@ -662,7 +662,7 @@ export const PartnerDirectory: React.FC = () => {
                         <div className="w-10 h-10 bg-brand-navy/5 rounded-lg flex items-center justify-center text-brand-navy/40 group-hover:bg-brand-navy group-hover:text-white transition-colors">
                             <Building2 size={20} />
                         </div>
-                        <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 ${partner.status === 'active' ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-yellow/10 text-brand-yellow'}`}>
+                        <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 ${partner.status === 'active' ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-yellow/10 text-yellow-700'}`}>
                             {partner.status === 'active' ? <CheckCircle2 size={10} /> : <Activity size={10} />}
                             {partner.status === 'active' ? 'Funding Active' : 'Limited Space'}
                         </div>
