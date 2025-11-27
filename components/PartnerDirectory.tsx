@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Building2, MapPin, ShieldCheck, Activity, Search, X, Phone, Globe, Users, Wifi, Coffee, Bus, Ban, ArrowRight, HeartHandshake, BedDouble, FileCheck, Share2, Copy, ExternalLink, Clock, Moon, UserX, Briefcase, BookOpen, ChevronDown, Filter } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
@@ -107,30 +106,6 @@ const PARTNERS: Partner[] = [
     }
   },
   { 
-    id: "jaywalker-lodge",
-    name: "Jaywalker Lodge", 
-    type: "Extended Care (Men)", 
-    location: "Carbondale, CO", 
-    neighborhood: "Roaring Fork", 
-    status: 'active', 
-    carrCertified: true,
-    details: {
-      description: "An extended care community for men seeking freedom from addiction in the Rocky Mountains. Emphasizes the 12 Steps and mountain expeditions.",
-      amenities: ["Expedition Training", "Main Street Access", "Alumni Program", "CrossFit"],
-      rules: ["90-Day Commitment", "Expedition Participation", "Morning Meditation"],
-      programRequirements: {
-        curfew: "10:00 PM. Accountability checks throughout the day.",
-        guests: "Closed campus during initial blackout period.",
-        meetings: "Daily 12-step meeting attendance required.",
-        work: "Service work focus. Employment in later phases."
-      },
-      phone: "(866) 529-9255",
-      website: "https://jaywalkerlodge.com",
-      capacity: "Open",
-      fundingEligible: ["Travel Aid", "Partial Scholarship"]
-    }
-  },
-  { 
     id: "hazelbrook",
     name: "Hazelbrook Sober Living", 
     type: "Recovery Residence", 
@@ -152,77 +127,6 @@ const PARTNERS: Partner[] = [
       website: "https://hazelbrooksoberliving.com",
       capacity: "12 Beds",
       fundingEligible: ["Full Scholarship", "Gap Funding"]
-    }
-  },
-  { 
-    id: "stout-street",
-    name: "Stout Street Foundation", 
-    type: "Therapeutic Community", 
-    location: "Commerce City, CO", 
-    neighborhood: "Commerce City", 
-    status: 'limited', 
-    carrCertified: true,
-    details: {
-      description: "Long-term residential therapeutic community. 28-day intensive followed by long-term vocational training program. A vital resource for indigent recovery.",
-      amenities: ["Vocational Training", "Clinical Staff", "Dining Hall", "Gym"],
-      rules: ["Blackout Period (30 days)", "No Personal Phone (Phase 1)"],
-      programRequirements: {
-        curfew: "Strict on-campus requirement. 24/7 monitoring.",
-        guests: "Visitation only on Sundays (after blackout period).",
-        meetings: "Daily therapeutic groups and TC meetings.",
-        work: "Full-time vocational training rotation within the facility."
-      },
-      phone: "(303) 321-2533",
-      website: "https://www.stoutstreet.org",
-      capacity: "Waitlist Only",
-      fundingEligible: ["Entry Fee", "Hygiene Supplies"]
-    }
-  },
-  { 
-    id: "step-denver",
-    name: "Step Denver", 
-    type: "Men's Residential", 
-    location: "Denver, CO", 
-    neighborhood: "LoDo", 
-    status: 'active', 
-    carrCertified: true,
-    details: {
-        description: "Men's residential recovery program helping low-income men overcome addiction through sobriety, work, and accountability. Peer-recovery model.",
-        amenities: ["Career Coaching", "Dorm Style", "Meals Provided", "Gym Access"],
-        rules: ["Daily Breathalyzer", "Sober Campus", "Dress Code"],
-        programRequirements: {
-            curfew: "6:00 PM initially. Extends with phase advancement.",
-            guests: "No guests in living areas. Lobby visitation only.",
-            meetings: "3 in-house meetings per week + phase work.",
-            work: "Mandatory full-time employment within 30 days."
-        },
-        phone: "(303) 295-7837",
-        website: "https://stepdenver.org",
-        capacity: "Open Enrollment",
-        fundingEligible: ["Work Boots", "Bus Pass"]
-    }
-  },
-  { 
-    id: "oxford-arvada",
-    name: "Oxford House Arvada", 
-    type: "Sober Living (Men)", 
-    location: "Arvada, CO", 
-    neighborhood: "Olde Town", 
-    status: 'active', 
-    carrCertified: false,
-    details: {
-        description: "Established house in Olde Town Arvada. Close to G-Line train station. Democratically run and self-supported.",
-        amenities: ["Train Access", "Garage", "BBQ Area"],
-        rules: ["Zero Tolerance", "Pay Rent on Time", "Chore Accountability"],
-        programRequirements: {
-            curfew: "11:00 PM - 1:00 AM depending on house vote.",
-            guests: "No overnights without vote. Guests must be sober.",
-            meetings: "Mandatory weekly house meeting. 3 outside meetings/week.",
-            work: "Must be employed and paying equal share of expenses."
-        },
-        phone: "(303) 555-7777",
-        capacity: "8 Beds",
-        fundingEligible: ["Rent", "Deposit"]
     }
   }
 ];
@@ -259,7 +163,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
     }, [onClose]);
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="facility-title">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-4" role="dialog" aria-modal="true" aria-labelledby="facility-title">
             {/* DYNAMIC SEO for "Individual Page" Effect */}
             <SEOHead 
                 title={`${partner.name} - Sober Living Funding | SecondWind`} 
@@ -285,20 +189,16 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
             <div className="absolute inset-0 bg-brand-navy/80 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} aria-hidden="true"></div>
             
             <div 
-                className="relative w-full max-w-4xl bg-[#FDFBF7] rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90dvh] flex flex-col"
+                className="relative w-full max-w-4xl bg-[#FDFBF7] rounded-none md:rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 h-[100dvh] md:max-h-[90dvh] flex flex-col"
                 itemScope
                 itemType="https://schema.org/LocalBusiness"
             >
-                {/* Fallback schema image */}
-                <meta itemProp="image" content="https://secondwind.org/social-card.svg" />
-                <meta itemProp="priceRange" content="$" />
-                
                 {/* Header Image Area */}
                 <div className="h-40 bg-brand-navy relative shrink-0">
                     <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
                     <div className="absolute inset-0 bg-gradient-to-t from-[#FDFBF7] to-transparent"></div>
                     
-                    <div className="absolute top-4 right-4 flex gap-2">
+                    <div className="absolute top-safe right-4 flex gap-2 pt-4 md:pt-0">
                         <button onClick={handleShare} className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors backdrop-blur-md" title="Copy Link" aria-label="Copy link to clipboard">
                             {copied ? <CheckCircle2 size={24} className="text-brand-teal" /> : <Share2 size={24} />}
                         </button>
@@ -314,7 +214,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                     </div>
                 </div>
 
-                <div className="px-8 pt-12 pb-8 overflow-y-auto custom-scrollbar flex-1">
+                <div className="px-6 md:px-8 pt-12 pb-24 md:pb-8 overflow-y-auto custom-scrollbar flex-1">
                     
                     <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
                         <div>
@@ -329,15 +229,25 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                                     </span>
                                 )}
                             </div>
-                            <h2 id="facility-title" className="font-display font-bold text-3xl md:text-4xl text-brand-navy" itemProp="name">{partner.name}</h2>
+                            <h2 id="facility-title" className="font-display font-bold text-3xl md:text-4xl text-brand-navy leading-tight" itemProp="name">{partner.name}</h2>
                             <p className="text-brand-navy/50 font-bold uppercase tracking-widest text-xs mt-2 mb-1">{partner.type}</p>
-                            <div className="flex items-center gap-2 text-brand-navy/60 font-medium mt-1" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
-                                <MapPin size={16} className="text-brand-coral" />
-                                <span>
+                            
+                            {/* CLICKABLE MAP LINK */}
+                            <a 
+                                href={`https://maps.google.com/?q=${encodeURIComponent(`${partner.name}, ${partner.location}`)}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-brand-navy/60 font-medium mt-1 hover:text-brand-teal transition-colors group" 
+                                itemProp="address" 
+                                itemScope 
+                                itemType="https://schema.org/PostalAddress"
+                            >
+                                <MapPin size={16} className="text-brand-coral group-hover:scale-110 transition-transform" />
+                                <span className="group-hover:underline decoration-brand-teal underline-offset-2">
                                     <span itemProp="addressLocality">{partner.location.split(',')[0]}</span>, <span itemProp="addressRegion">CO</span> • <span itemProp="streetAddress">{partner.neighborhood}</span>
                                 </span>
-                                <meta itemProp="addressCountry" content="US" />
-                            </div>
+                                <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </a>
                         </div>
                         
                         <div className="flex gap-2 w-full md:w-auto">
@@ -364,43 +274,34 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                                 <p className="text-lg" itemProp="description">{partner.details.description}</p>
                             </div>
 
-                            {/* PROTOCOL GRID: Real Data Visualization */}
+                            {/* PROTOCOL GRID */}
                             <div>
                                 <h4 className="font-bold text-brand-navy mb-4 flex items-center gap-2"><FileCheck size={18} /> House Protocols</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    
-                                    {/* Curfew */}
                                     <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-navy/5">
                                         <div className="flex items-center gap-2 text-brand-navy mb-2 font-bold text-sm">
                                             <Moon size={16} className="text-brand-teal" /> Curfew Policy
                                         </div>
                                         <p className="text-sm text-brand-navy/70 leading-relaxed">{partner.details.programRequirements?.curfew || "Contact house for details."}</p>
                                     </div>
-
-                                    {/* Guests */}
                                     <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-navy/5">
                                         <div className="flex items-center gap-2 text-brand-navy mb-2 font-bold text-sm">
                                             <UserX size={16} className="text-brand-coral" /> Guest Policy
                                         </div>
                                         <p className="text-sm text-brand-navy/70 leading-relaxed">{partner.details.programRequirements?.guests || "Contact house for details."}</p>
                                     </div>
-
-                                    {/* Meetings */}
                                     <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-navy/5">
                                         <div className="flex items-center gap-2 text-brand-navy mb-2 font-bold text-sm">
                                             <Users size={16} className="text-yellow-700" /> Meeting Quota
                                         </div>
                                         <p className="text-sm text-brand-navy/70 leading-relaxed">{partner.details.programRequirements?.meetings || "Mandatory house meeting weekly."}</p>
                                     </div>
-
-                                    {/* Work */}
                                     <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-navy/5">
                                         <div className="flex items-center gap-2 text-brand-navy mb-2 font-bold text-sm">
                                             <Briefcase size={16} className="text-brand-lavender" /> Productivity
                                         </div>
                                         <p className="text-sm text-brand-navy/70 leading-relaxed">{partner.details.programRequirements?.work || "Must pay rent."}</p>
                                     </div>
-
                                 </div>
                             </div>
 
@@ -411,7 +312,6 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                                         <div key={a} className="flex items-center gap-2 text-sm text-brand-navy/70 bg-white p-2 rounded-lg border border-brand-navy/5" itemProp="amenityFeature" itemScope itemType="https://schema.org/LocationFeatureSpecification">
                                             <div className="w-1.5 h-1.5 bg-brand-teal rounded-full"></div> 
                                             <span itemProp="value">{a}</span>
-                                            <meta itemProp="name" content={a} />
                                         </div>
                                     ))}
                                 </div>
@@ -465,26 +365,21 @@ export const PartnerDirectory: React.FC = () => {
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const { playClick } = useSound();
 
-  // Get unique facility types for the dropdown
   const uniqueTypes = Array.from(new Set(PARTNERS.map(p => p.type)));
 
-  // DEEP LINKING LOGIC
   useEffect(() => {
-    // 1. Check URL on mount
     const params = new URLSearchParams(window.location.search);
     const facilityId = params.get('facility');
     if (facilityId) {
         const p = PARTNERS.find(x => x.id === facilityId);
         if(p) {
             setSelectedPartner(p);
-            // Optional: Scroll to directory if deep linked
             setTimeout(() => {
                 document.getElementById('partner-directory')?.scrollIntoView({ behavior: 'smooth' });
             }, 500);
         }
     }
     
-    // 2. Handle browser back/forward buttons
     const handlePopState = () => {
         const newParams = new URLSearchParams(window.location.search);
         const newId = newParams.get('facility');
@@ -502,7 +397,6 @@ export const PartnerDirectory: React.FC = () => {
   const openPartner = (p: Partner) => {
     playClick();
     setSelectedPartner(p);
-    // Update URL without reload (Wrapped in try/catch for sandboxed environments)
     try {
         const url = new URL(window.location.href);
         url.searchParams.set('facility', p.id);
@@ -514,7 +408,6 @@ export const PartnerDirectory: React.FC = () => {
 
   const closePartner = () => {
     setSelectedPartner(null);
-    // Clean URL (Wrapped in try/catch for sandboxed environments)
     try {
         const url = new URL(window.location.href);
         url.searchParams.delete('facility');
@@ -531,7 +424,6 @@ export const PartnerDirectory: React.FC = () => {
     const matchesType = typeFilter === 'all' || p.type === typeFilter;
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
     const matchesCarr = !carrOnly || p.carrCertified;
-    
     return matchesText && matchesType && matchesStatus && matchesCarr;
   });
 
@@ -564,10 +456,10 @@ export const PartnerDirectory: React.FC = () => {
              </div>
           </div>
 
-          {/* ADVANCED FILTERING TOOLBAR */}
-          <div className="flex flex-wrap items-center gap-3 mb-8 pb-8 border-b border-brand-navy/5 animate-slide-up">
+          {/* ADVANCED FILTERING TOOLBAR - SCROLLABLE */}
+          <div className="flex items-center gap-3 mb-8 pb-4 border-b border-brand-navy/5 animate-slide-up overflow-x-auto no-scrollbar snap-x touch-pan-x">
               {/* Type Filter */}
-              <div className="relative">
+              <div className="relative shrink-0 snap-start">
                   <select 
                       value={typeFilter}
                       onChange={(e) => { setTypeFilter(e.target.value); playClick(); }}
@@ -582,7 +474,7 @@ export const PartnerDirectory: React.FC = () => {
               </div>
 
               {/* Status Filter */}
-              <div className="flex bg-white rounded-xl p-1 border border-brand-navy/10">
+              <div className="flex bg-white rounded-xl p-1 border border-brand-navy/10 shrink-0 snap-start">
                   <button 
                       onClick={() => { setStatusFilter('all'); playClick(); }}
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${statusFilter === 'all' ? 'bg-brand-navy text-white shadow-sm' : 'text-brand-navy/60 hover:text-brand-navy hover:bg-brand-navy/5'}`}
@@ -606,10 +498,10 @@ export const PartnerDirectory: React.FC = () => {
               {/* CARR Toggle */}
               <button 
                   onClick={() => { setCarrOnly(!carrOnly); playClick(); }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${carrOnly ? 'bg-brand-navy/5 border-brand-navy text-brand-navy' : 'bg-white border-brand-navy/10 text-brand-navy/60 hover:border-brand-navy/30'}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all shrink-0 snap-start ${carrOnly ? 'bg-brand-navy/5 border-brand-navy text-brand-navy' : 'bg-white border-brand-navy/10 text-brand-navy/60 hover:border-brand-navy/30'}`}
               >
                   <ShieldCheck size={16} className={carrOnly ? 'text-brand-teal' : ''} />
-                  <span className="text-sm font-bold">CARR Certified</span>
+                  <span className="text-sm font-bold whitespace-nowrap">CARR Certified</span>
               </button>
 
               {/* Reset Filters */}
@@ -622,7 +514,7 @@ export const PartnerDirectory: React.FC = () => {
                           setCarrOnly(false);
                           playClick();
                       }}
-                      className="text-xs font-bold text-brand-coral hover:underline ml-auto flex items-center gap-1"
+                      className="text-xs font-bold text-brand-coral hover:underline ml-auto flex items-center gap-1 shrink-0 snap-start"
                   >
                       <X size={12} /> Reset Filters
                   </button>
@@ -635,12 +527,7 @@ export const PartnerDirectory: React.FC = () => {
                 <h3 className="font-bold text-xl text-brand-navy">No facilities found.</h3>
                 <p className="text-brand-navy/50 text-sm mt-2">Try adjusting your filters or search terms.</p>
                 <button 
-                    onClick={() => {
-                        setFilter('');
-                        setTypeFilter('all');
-                        setStatusFilter('all');
-                        setCarrOnly(false);
-                    }}
+                    onClick={() => { setFilter(''); setTypeFilter('all'); setStatusFilter('all'); setCarrOnly(false); }}
                     className="mt-6 text-brand-teal font-bold text-sm hover:underline"
                 >
                     Clear all filters
@@ -652,7 +539,7 @@ export const PartnerDirectory: React.FC = () => {
                 <button 
                     key={partner.id}
                     onClick={() => openPartner(partner)}
-                    className="bg-white border border-brand-navy/5 rounded-xl p-6 hover:shadow-lg hover:border-brand-teal/30 transition-all group text-left relative overflow-hidden"
+                    className="bg-white border border-brand-navy/5 rounded-xl p-6 hover:shadow-lg hover:border-brand-teal/30 transition-all group text-left relative overflow-hidden active:scale-[0.98]"
                     itemScope 
                     itemType="https://schema.org/Place"
                 >
@@ -664,7 +551,7 @@ export const PartnerDirectory: React.FC = () => {
                         </div>
                         <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 ${partner.status === 'active' ? 'bg-brand-teal/10 text-brand-teal' : 'bg-brand-yellow/10 text-yellow-700'}`}>
                             {partner.status === 'active' ? <CheckCircle2 size={10} /> : <Activity size={10} />}
-                            {partner.status === 'active' ? 'Funding Active' : 'Limited Space'}
+                            {partner.status === 'active' ? 'Active' : 'Limited'}
                         </div>
                     </div>
 
@@ -674,35 +561,17 @@ export const PartnerDirectory: React.FC = () => {
                     <div className="space-y-2 text-sm text-brand-navy/70" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
                         <div className="flex items-center gap-2">
                             <MapPin size={14} className="text-brand-coral" />
-                            <span><span itemProp="addressLocality">{partner.location.split(',')[0]}</span>, <span itemProp="addressRegion">CO</span> • {partner.neighborhood}</span>
+                            <span>{partner.location.split(',')[0]} • {partner.neighborhood}</span>
                         </div>
-                        {partner.carrCertified && (
-                            <div className="flex items-center gap-2 text-brand-navy/60">
-                            <ShieldCheck size={14} />
-                            <span>CARR Certified / Verified</span>
-                            </div>
-                        )}
-                        <meta itemProp="addressCountry" content="US" />
                     </div>
                     
                     <div className="mt-4 pt-4 border-t border-brand-navy/5 flex items-center text-xs font-bold text-brand-navy/40 group-hover:text-brand-navy transition-colors">
-                        View Facility Profile <ArrowRight size={12} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                        View Profile <ArrowRight size={12} className="ml-2 group-hover:translate-x-1 transition-transform" />
                     </div>
-
-                    {/* Meta data for Search Engines */}
-                    <meta itemProp="addressRegion" content="CO" />
-                    <meta itemProp="addressCountry" content="US" />
                 </button>
                 ))}
             </div>
           )}
-          
-          <div className="mt-8 text-center">
-              <p className="text-xs text-brand-navy/30 font-bold uppercase tracking-widest">
-                  * SecondWind is an independent 501(c)(3) funding source and is not owned by any listed facility.
-              </p>
-          </div>
-
         </div>
       </section>
 

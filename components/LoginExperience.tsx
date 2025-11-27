@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, TrendingUp, X, HeartHandshake, ArrowRight, Check, Apple, Loader2, Lock } from 'lucide-react';
 import { Mascot } from './Mascot';
@@ -96,7 +95,7 @@ export const LoginExperience: React.FC<LoginExperienceProps> = ({ isOpen, onClos
           <div className="relative z-10">
              <div className="flex items-center gap-2 opacity-50 mb-8">
                 <ShieldCheck size={16} />
-                <span className="text-xs font-bold uppercase tracking-widest">Secure Gateway</span>
+                <span className="text-xs font-bold uppercase tracking-widest">Member Login</span>
              </div>
              <h2 className="font-display font-bold text-4xl leading-tight mb-4 transition-all duration-300 drop-shadow-md">
                {selectedRole === 'donor' ? "Welcome back, Partner." : selectedRole === 'beneficiary' ? "Help is on the way." : "One platform. Two paths."}
@@ -106,7 +105,7 @@ export const LoginExperience: React.FC<LoginExperienceProps> = ({ isOpen, onClos
                  ? "Access your impact portfolio and track your social ROI in real-time." 
                  : selectedRole === 'beneficiary' 
                  ? "Connect with Windy to access rent, transit, and tech assistance immediately." 
-                 : "Select your role to access the SecondWind Protocol ecosystem."}
+                 : "Select your role to access the SecondWind ecosystem."}
              </p>
           </div>
 

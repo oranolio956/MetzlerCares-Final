@@ -1,6 +1,7 @@
-import React from 'react';
-import { HeartHandshake, MapPin, Mail, Phone, ArrowRight, Github, Twitter, Linkedin, Instagram } from 'lucide-react';
+import React, { useState } from 'react';
+import { HeartHandshake, MapPin, Mail, Phone, ArrowRight, Github, Twitter, Linkedin, Instagram, Check } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
+import { useSound } from '../hooks/useSound';
 
 const BrandLogo = ({ className = "w-8 h-8" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SecondWind Logo">
@@ -12,6 +13,19 @@ const BrandLogo = ({ className = "w-8 h-8" }: { className?: string }) => (
 
 export const Footer: React.FC<{ onNavigate: (route: string) => void }> = ({ onNavigate }) => {
   const { userType, setShowLegalDocs } = useStore();
+  const { playSuccess, playClick } = useSound();
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = (e: React.FormEvent) => {
+      e.preventDefault();
+      if(email) {
+          playSuccess();
+          setSubscribed(true);
+          setEmail('');
+          setTimeout(() => setSubscribed(false), 4000);
+      }
+  };
 
   return (
     <footer className="bg-brand-navy text-white pt-20 pb-10 relative overflow-hidden mt-0">
@@ -30,9 +44,30 @@ export const Footer: React.FC<{ onNavigate: (route: string) => void }> = ({ onNa
                  <span className="font-display font-bold text-2xl tracking-tight">SecondWind</span>
               </div>
               <p className="text-brand-lavender/60 text-sm leading-relaxed max-w-xs">
-                 The protocol for direct-action recovery. We replace bureaucracy with instant, verified funding for sober living in Colorado.
+                 The platform for direct-action recovery. We replace bureaucracy with instant, verified funding for sober living in Colorado.
               </p>
-              <div className="flex gap-4">
+              
+              {/* Interactive Subscribe */}
+              <form onSubmit={handleSubscribe} className="relative max-w-xs">
+                  <input 
+                    type="email" 
+                    placeholder="Newsletter..." 
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-brand-teal transition-colors"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={subscribed}
+                  />
+                  <button 
+                    type="submit" 
+                    className={`absolute right-2 top-2 p-1.5 rounded-lg transition-all ${subscribed ? 'bg-brand-teal text-white' : 'bg-white/10 text-white/60 hover:bg-white hover:text-brand-navy'}`}
+                    disabled={!email || subscribed}
+                    onClick={subscribed ? undefined : playClick}
+                  >
+                      {subscribed ? <Check size={14} /> : <ArrowRight size={14} />}
+                  </button>
+              </form>
+
+              <div className="flex gap-4 pt-2">
                  <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-teal hover:text-white transition-colors"><Twitter size={18} /></a>
                  <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-teal hover:text-white transition-colors"><Instagram size={18} /></a>
                  <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-teal hover:text-white transition-colors"><Linkedin size={18} /></a>
@@ -82,7 +117,7 @@ export const Footer: React.FC<{ onNavigate: (route: string) => void }> = ({ onNa
         {/* Bottom Bar */}
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
            <p className="text-xs text-brand-lavender/40 font-bold uppercase tracking-widest">
-              © 2024 SecondWind Protocol. All Rights Reserved.
+              © 2024 SecondWind Fund. All Rights Reserved.
            </p>
            <div className="flex gap-6 text-xs text-brand-lavender/40 font-bold uppercase tracking-widest">
               <button onClick={() => setShowLegalDocs(true)} className="hover:text-white transition-colors">Privacy</button>

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { ShieldCheck, ArrowDownLeft, FileText, ExternalLink, Filter, Check, RefreshCw, Receipt, X } from 'lucide-react';
 import { LedgerItem } from '../types';
@@ -45,25 +44,24 @@ const ReceiptCard: React.FC<{ item: LedgerItem; style: React.CSSProperties }> = 
 );
 
 const ReceiptStream: React.FC = () => {
-    const [receipts, setReceipts] = useState<{ id: string; item: LedgerItem; x: number; y: number; speed: number; delay: number }[]>([]);
+    const [receipts, setReceipts] = useState<{ id: string; item: LedgerItem; x: number; y: number; duration: number; delay: number }[]>([]);
     
     useEffect(() => {
         // Generate floating receipts based on mock data
         const items = MOCK_LEDGER.map((item, i) => ({
             id: item.id,
             item,
-            x: Math.random() * 80 + 10, // 10% to 90% width
+            x: Math.random() * 80 + 5, // 5% to 85% width to avoid clipping
             y: 120 + (i * 25), // Staggered start off-screen
-            speed: 0.2 + Math.random() * 0.3,
-            delay: i * 2
+            duration: 20 + Math.random() * 15, // Slow float (20s - 35s) for premium feel
+            delay: i * 3
         }));
         setReceipts(items);
     }, []);
 
     return (
         <div className="relative w-full h-full overflow-hidden bg-brand-cream/50">
-            {/* Background Grid */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#1A2A3A 1px, transparent 1px), linear-gradient(90deg, #1A2A3A 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+            {/* Background Grid - REMOVED for cleaner look */}
             
             {/* Floating Receipts */}
             {receipts.map((r, i) => (
@@ -73,12 +71,12 @@ const ReceiptStream: React.FC = () => {
                     style={{
                         left: `${r.x}%`,
                         bottom: '-150px',
-                        animation: `floatUp ${15 / r.speed}s linear infinite`,
+                        animation: `floatUp ${r.duration}s linear infinite`,
                         animationDelay: `${r.delay}s`,
-                        zIndex: Math.floor(r.speed * 10)
+                        zIndex: 10 + i
                     }}
                 >
-                    <ReceiptCard item={r.item} style={{ transform: `rotate(${Math.random() * 10 - 5}deg) scale(${0.8 + r.speed})` }} />
+                    <ReceiptCard item={r.item} style={{ transform: `rotate(${Math.random() * 10 - 5}deg) scale(0.9)` }} />
                 </div>
             ))}
             
@@ -128,7 +126,7 @@ export const TransparencyLedger: React.FC = () => {
                <ShieldCheck size={24} />
                <span className="font-bold uppercase tracking-widest text-xs">Verified Ledger</span>
             </div>
-            <h2 className="font-display font-bold text-3xl md:text-5xl text-brand-navy leading-none">Colorado Impact Ledger.</h2>
+            <h2 className="font-display font-bold text-3xl md:text-5xl text-brand-navy leading-none">Colorado Impact Report.</h2>
             <p className="text-brand-navy/60 text-base md:text-lg mt-4 max-w-lg">Radical transparency. Every cent is tracked from donation to vendor payment. <span className="font-bold text-brand-navy">The only public recovery audit in Colorado.</span></p>
          </div>
          <div className="flex gap-4 mt-6 md:mt-0 w-full md:w-auto">

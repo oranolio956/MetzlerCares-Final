@@ -10,9 +10,7 @@ import { useSound } from '../hooks/useSound';
 
 const MessageItem: React.FC<{ message: Message; isLast: boolean }> = ({ message, isLast }) => {
   const { isCalmMode } = useStore();
-  // Only animate if it's a new message in the current session view, 
-  // but for persistence, we might want to skip animation on restored messages.
-  // For simplicity, we just check if it's model role.
+  // Only animate if it's a new message in the current session view
   const shouldAnimate = message.role === 'model' && isLast && !isCalmMode;
   const displayText = useTypewriter(message.text, 20, shouldAnimate);
 
@@ -21,22 +19,22 @@ const MessageItem: React.FC<{ message: Message; isLast: boolean }> = ({ message,
        {message.role === 'model' ? (
         <div className="flex gap-3 md:gap-4 max-w-[90%] md:max-w-[85%] group">
           <div className="shrink-0 pt-1">
-             <div className="w-8 h-8 rounded-lg bg-brand-teal/10 flex items-center justify-center border border-brand-teal/20 text-brand-teal font-bold text-xs" aria-hidden="true">W</div>
+             <div className="w-8 h-8 rounded-lg bg-brand-teal/10 flex items-center justify-center border border-brand-teal/20 text-brand-teal font-bold text-xs shadow-sm" aria-hidden="true">W</div>
           </div>
           <div className="space-y-1">
-             <div className="text-brand-navy font-medium text-base md:text-lg leading-relaxed whitespace-pre-wrap">
+             <div className="text-brand-navy font-medium text-base md:text-lg leading-relaxed whitespace-pre-wrap bg-white/50 p-3 rounded-2xl rounded-tl-none border border-brand-navy/5 shadow-sm">
                 {displayText}
                 {shouldAnimate && displayText.length < message.text.length && (
                    <span className="inline-block w-2 h-4 bg-brand-teal ml-1 animate-pulse align-middle" aria-hidden="true"></span>
                 )}
              </div>
-             <div className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold uppercase tracking-widest text-brand-navy/30">
+             <div className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold uppercase tracking-widest text-brand-navy/30 pl-2">
                 Windy • {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
              </div>
           </div>
         </div>
        ) : (
-         <div className="max-w-[85%] md:max-w-[75%] bg-brand-navy text-white px-5 py-3 md:px-6 md:py-4 rounded-2xl rounded-tr-sm text-base md:text-lg font-medium shadow-md leading-relaxed">
+         <div className="max-w-[85%] md:max-w-[75%] bg-brand-navy text-white px-5 py-3 md:px-6 md:py-4 rounded-2xl rounded-tr-sm text-base md:text-lg font-medium shadow-lg leading-relaxed shadow-brand-navy/10">
             {message.text}
          </div>
        )}
@@ -102,7 +100,7 @@ export const IntakeChat: React.FC = () => {
      }
   }, [mode, isSpeaking, volume]);
 
-  // SMART REPLIES LOGIC (Revised to match Comprehensive Intake)
+  // SMART REPLIES LOGIC
   useEffect(() => {
       if (intakeSession.messages.length === 0) {
           setSmartChips(["I'm in Denver", "I'm in Boulder", "Colorado Springs", "Outside Colorado"]);
@@ -181,18 +179,16 @@ export const IntakeChat: React.FC = () => {
     if (inputRef.current) inputRef.current.focus();
 
     try {
-      // Send FULL history to the service to maintain context
       const response = await sendMessageToGemini(text, sessionRef.current, intakeSession.messages);
       
-      // Proactive Crisis Check (Client Side Safety Net)
+      // Proactive Crisis Check
       if (response.text.toLowerCase().includes("988") || response.text.toLowerCase().includes("suicide")) {
          setCrisisMode(true);
       }
       
-      // Update store with model response
       updateIntakeSession({ 
           messages: [...newHistory, { id: (Date.now() + 1).toString(), role: 'model', text: response.text }],
-          mockState: sessionRef.current?.mockState // Persist mock state if used
+          mockState: sessionRef.current?.mockState
       });
 
     } catch (e) {
@@ -311,20 +307,27 @@ export const IntakeChat: React.FC = () => {
             <div ref={messagesEndRef} className="h-4" />
          </div>
 
-         {/* VOICE OVERLAY */}
+         {/* VOICE OVERLAY - ENHANCED VISUALIZER */}
          <div 
             className={`absolute inset-0 bg-[#FDFBF7] z-10 flex flex-col items-center justify-center transition-transform duration-500 ${mode === 'voice' ? 'translate-y-0' : 'translate-y-full'}`} 
             aria-hidden={mode !== 'voice' ? 'true' : 'false'}
             aria-modal="true"
          >
-             <div className="relative w-72 h-72 flex items-center justify-center mb-8">
-                {!isSpeaking && connected && <div className="absolute inset-0 border-2 border-brand-coral/20 rounded-full animate-ping" style={{ animationDuration: '2s' }}></div>}
-                <div className={`absolute bg-brand-coral/10 rounded-full transition-all duration-75 ease-out`} style={{ width: `${50 + volume * 50}%`, height: `${50 + volume * 50}%`, opacity: 0.2 + volume }}></div>
-                <div className="relative z-20 w-40 h-40 bg-white rounded-full shadow-2xl flex items-center justify-center p-6"><Mascot expression={mascotExpression} className="w-full h-full" /></div>
+             <div className="relative w-80 h-80 flex items-center justify-center mb-8">
+                {/* Connecting Ping */}
+                {!isSpeaking && connected && <div className="absolute inset-0 border border-brand-coral/20 rounded-full animate-ping" style={{ animationDuration: '3s' }}></div>}
+                
+                {/* Harmonic Ripple Rings - Driven by Volume */}
+                <div className="absolute inset-0 bg-brand-teal/5 rounded-full transition-all duration-75 ease-out" style={{ transform: `scale(${1 + volume * 0.8})` }}></div>
+                <div className="absolute inset-0 border border-brand-teal/20 rounded-full transition-all duration-100 ease-out" style={{ transform: `scale(${1 + volume * 1.5})`, opacity: Math.max(0, 1 - volume) }}></div>
+                <div className="absolute inset-0 bg-brand-coral/10 rounded-full transition-all duration-150 ease-out" style={{ transform: `scale(${0.8 + volume * 0.5})` }}></div>
+                
+                {/* Core Mascot */}
+                <div className="relative z-20 w-48 h-48 bg-white rounded-full shadow-2xl flex items-center justify-center p-8 border-4 border-white"><Mascot expression={mascotExpression} className="w-full h-full" /></div>
              </div>
              
-             <h3 className="font-display font-bold text-2xl text-brand-navy mb-2 animate-slide-up">{connected ? "Listening..." : "Connecting..."}</h3>
-             <p className="text-brand-navy/40 font-medium mb-8">Speak naturally. Windy is listening.</p>
+             <h3 className="font-display font-bold text-3xl text-brand-navy mb-2 animate-slide-up transition-all">{connected ? (isSpeaking ? "Speaking..." : "Listening...") : "Connecting..."}</h3>
+             <p className="text-brand-navy/40 font-medium mb-8">Hands-free mode active.</p>
          </div>
       </div>
 

@@ -280,7 +280,7 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ activeSection }) => {
                     <h3 className="font-display font-bold text-white text-lg leading-tight">Windy Support</h3>
                     <div className="flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 bg-brand-teal rounded-full animate-pulse"></span>
-                        <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">Gemini 3 Pro • Search Active</span>
+                        <span className="text-[10px] text-white/60 font-bold uppercase tracking-widest">Search Active</span>
                     </div>
                 </div>
             </div>
@@ -335,9 +335,6 @@ export const GlobalChat: React.FC<GlobalChatProps> = ({ activeSection }) => {
                 >
                     <Send size={16} />
                 </button>
-            </div>
-            <div className="mt-2 text-center">
-                <span className="text-[10px] text-brand-navy/30 font-bold uppercase tracking-wider">Powered by Gemini 3 Pro</span>
             </div>
          </div>
 

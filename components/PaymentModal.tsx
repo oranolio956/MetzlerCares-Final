@@ -15,6 +15,7 @@ interface PaymentModalProps {
 
 export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, item, quantity, totalAmount, onSuccess }) => {
   const [step, setStep] = useState<'details' | 'processing' | 'success'>('details');
+  const [processingStatus, setProcessingStatus] = useState("Securing Funds...");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   
@@ -47,17 +48,23 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
     setErrors(null);
     setStep('processing');
     
+    // NARRATIVE LOADING SEQUENCE
+    setTimeout(() => setProcessingStatus("Securing Details..."), 800);
+    setTimeout(() => setProcessingStatus(`Verifying ${item.sub} Vendor ID...`), 1600);
+    setTimeout(() => setProcessingStatus("Generating Receipt..."), 2400);
+    
     // Simulate API Latency
     setTimeout(() => {
       setStep('success');
       generateShareCard();
       onSuccess();
-    }, 2500);
+    }, 3000);
   };
 
   useEffect(() => { 
       if (isOpen) { 
           setStep('details'); 
+          setProcessingStatus("Securing Funds...");
           setErrors(null); 
           setAcceptedTerms(false); 
           setCardNumber('');
@@ -116,7 +123,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
       <div className={`w-full max-w-2xl bg-white rounded-t-[2rem] md:rounded-3xl shadow-2xl relative overflow-hidden flex flex-col transition-all duration-500 max-h-[90dvh] h-full md:h-auto ${step === 'success' ? 'scale-100 md:scale-105' : 'scale-100'}`}>
         
         <div className="flex items-center justify-between px-6 py-4 md:px-8 md:py-6 border-b border-brand-navy/5 bg-brand-cream shrink-0">
-          <div className="flex items-center gap-3"><div className="bg-brand-navy p-2 rounded-lg text-white"><ShieldCheck size={20} /></div><span className="font-bold text-brand-navy text-sm md:text-base">Encrypted Checkout</span></div>
+          <div className="flex items-center gap-3"><div className="bg-brand-navy p-2 rounded-lg text-white"><ShieldCheck size={20} /></div><span className="font-bold text-brand-navy text-sm md:text-base">Secure Checkout</span></div>
           <button onClick={onClose} className="text-brand-navy/40 hover:text-brand-navy transition-colors p-2"><X size={24} /></button>
         </div>
 
@@ -210,7 +217,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, ite
           {step === 'processing' && (
             <div className="flex-1 flex flex-col items-center justify-center text-center animate-slide-up min-h-[300px]">
                <div className="w-32 h-32 md:w-48 md:h-48 mb-6 relative"><div className="absolute inset-0 bg-brand-teal/20 rounded-full animate-ping"></div><Mascot expression="thinking" className="relative z-10" /></div>
-               <h3 className="font-display font-bold text-2xl text-brand-navy mb-2">Securing Funds...</h3>
+               <h3 className="font-display font-bold text-2xl text-brand-navy mb-2 animate-pulse">{processingStatus}</h3>
                <p className="text-brand-navy/60 max-w-sm">We are routing this directly to the {item.sub} verified vendor account.</p>
             </div>
           )}

@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { SectionWrapper } from './SectionWrapper';
 import { Mascot } from './Mascot';
@@ -53,7 +52,7 @@ const faqSchema = {
       "name": "Is this a legitimate non-profit?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. SecondWind is a 100% transparent protocol. Every donation is tracked on our public ledger and paid directly to verified vendors, not individuals."
+        "text": "Yes. SecondWind is a 100% transparent organization. Every donation is tracked on our public ledger and paid directly to verified vendors, not individuals."
       }
     }
   ]
@@ -68,7 +67,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
         id="philosophy" 
         title="How It Works | SecondWind Colorado" 
         description="Charity is broken. We fixed the incentives with direct-to-vendor payments for Colorado sober living and rehab assistance."
-        className="overflow-visible pb-0 pt-16 md:pt-24" // Adjusted PT for better flow
+        className="overflow-visible pb-0 pt-16 md:pt-24"
         schema={faqSchema}
       >
         <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4 md:px-0">
@@ -90,7 +89,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
             </p>
           </div>
 
-          {/* SIDE-BY-SIDE COMPARISON (Restored) */}
+          {/* SIDE-BY-SIDE COMPARISON */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full mb-24 relative">
              
              {/* Center VS Badge (Desktop) */}
@@ -141,12 +140,10 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
              </div>
 
              {/* CARD 2: THE NEW WAY (Protocol) */}
-             <div className="relative group">
+             <div className="relative group mt-8 lg:mt-0">
                 <div className="absolute inset-0 bg-brand-teal transform rotate-[2deg] rounded-[2.5rem] scale-[0.98] opacity-20 group-hover:rotate-[3deg] transition-transform duration-500"></div>
                 <div className="relative bg-brand-navy rounded-[2.5rem] p-8 md:p-12 h-full flex flex-col items-center text-center border-4 border-brand-teal shadow-2xl overflow-hidden">
                     
-                    {/* Clean Grid Background */}
-                    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(#2D9C8E 1px, transparent 1px), linear-gradient(90deg, #2D9C8E 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
                     <div className="absolute top-0 left-0 w-full h-1 bg-brand-teal/50 shadow-[0_0_20px_#2D9C8E]"></div>
 
                     <div className="absolute top-10 right-10 bg-brand-teal text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-brand-teal/50 shadow-[0_0_15px_rgba(45,156,142,0.4)] animate-pulse">
@@ -189,7 +186,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
 
           </div>
 
-          {/* WHAT WE FUND GRID (CRITICAL FOR NEW USERS & SEO) */}
+          {/* WHAT WE FUND GRID */}
           <div className="w-full mb-24">
              <div className="flex items-center gap-4 mb-8">
                 <span className="h-px bg-brand-navy/10 flex-1"></span>
@@ -237,14 +234,17 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
           <div className="w-full relative z-10 mb-0">
              <div className="flex items-center justify-center gap-3 mb-12 opacity-80">
                 <div className="h-px bg-brand-navy/10 w-12 md:w-24"></div>
-                <h3 className="text-center font-display font-bold text-xl md:text-2xl text-brand-navy">How capital flows</h3>
+                <h3 className="text-center font-display font-bold text-xl md:text-2xl text-brand-navy">How funding works</h3>
                 <div className="h-px bg-brand-navy/10 w-12 md:w-24"></div>
              </div>
              
              <div className="relative flex flex-col md:flex-row justify-between items-stretch gap-6 max-w-6xl mx-auto">
                 
                 {/* Connector Line (Desktop) */}
-                <div className="absolute top-1/2 left-0 w-full h-1 -z-10 hidden md:block border-t-2 border-dashed border-brand-navy/10"></div>
+                <div className="absolute top-1/2 left-0 w-full h-1 -z-10 hidden md:block border-t-2 border-dashed border-brand-navy/10 overflow-hidden">
+                    {/* DATA PACKET ANIMATION */}
+                    <div className="absolute top-[-2px] left-0 w-20 h-1 bg-gradient-to-r from-transparent via-brand-teal to-transparent animate-slide-right" style={{ animationDuration: '2s' }}></div>
+                </div>
                 
                 {/* Step 1 */}
                 <div className="bg-white p-8 rounded-[2rem] border border-brand-navy/10 shadow-lg flex-1 relative group hover:-translate-y-2 transition-transform">
@@ -263,7 +263,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                    <div className="w-12 h-12 bg-brand-coral/10 rounded-2xl flex items-center justify-center mb-6 text-brand-coral group-hover:scale-110 transition-transform">
                       <Lock size={24} />
                    </div>
-                   <h4 className="font-bold text-xl text-brand-navy mb-2">2. Vendor Lock</h4>
+                   <h4 className="font-bold text-xl text-brand-navy mb-2">2. Direct Payment</h4>
                    <p className="text-sm text-brand-navy/60 leading-relaxed">Capital is routed directly to the service provider (e.g. Oxford House). Funds never touch the applicant's hands.</p>
                 </div>
 
@@ -275,7 +275,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                    <div className="w-12 h-12 bg-brand-teal/10 rounded-2xl flex items-center justify-center mb-6 text-brand-teal group-hover:scale-110 transition-transform">
                       <Fingerprint size={24} />
                    </div>
-                   <h4 className="font-bold text-xl text-brand-navy mb-2">3. Public Audit</h4>
+                   <h4 className="font-bold text-xl text-brand-navy mb-2">3. Transparency</h4>
                    <p className="text-sm text-brand-navy/60 leading-relaxed">The transaction receipt is published to the live ledger. You get a notification that your specific dollar did the job.</p>
                 </div>
 

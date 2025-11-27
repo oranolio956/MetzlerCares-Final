@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Clock, AlertCircle, Calendar, UploadCloud, ChevronRight, Star, LifeBuoy, Sparkles, Image } from 'lucide-react';
+import { CheckCircle2, Clock, AlertCircle, Calendar, UploadCloud, ChevronRight, Star, LifeBuoy, Sparkles, Image, Plus, FolderOpen } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { ApplicationStatus } from '../types';
 import { useStore } from '../context/StoreContext';
@@ -9,6 +9,9 @@ export const BeneficiaryDashboard: React.FC = () => {
   const { beneficiaryProfile, verifyInsurance, submitIntakeRequest, setCrisisMode } = useStore();
   const [isVerifying, setIsVerifying] = useState(false);
   const { navigate } = useRouter();
+
+  // Calculate progress percentage, capped at 100%
+  const progressPercent = Math.min(100, (beneficiaryProfile.daysSober / beneficiaryProfile.nextMilestone) * 100);
 
   const getStatusColor = (status: ApplicationStatus) => {
     switch (status) {
@@ -50,7 +53,7 @@ export const BeneficiaryDashboard: React.FC = () => {
         <span>Need Help?</span>
       </button>
 
-      <div className="w-full max-w-6xl mx-auto animate-float" style={{ animationDuration: '0.8s', animationIterationCount: 1 }}>
+      <div className="w-full max-w-6xl mx-auto animate-float pb-32" style={{ animationDuration: '0.8s', animationIterationCount: 1 }}>
         
         <div className="flex flex-col lg:flex-row items-end gap-6 mb-12">
           <div className="bg-brand-navy text-white p-6 md:p-8 rounded-[2.5rem] rounded-bl-none shadow-xl flex-1 relative overflow-hidden w-full">
@@ -73,9 +76,11 @@ export const BeneficiaryDashboard: React.FC = () => {
                {beneficiaryProfile.daysSober}<span className="text-2xl text-brand-teal">days</span>
              </div>
              <div className="mt-4 w-full bg-brand-navy/5 h-2 rounded-full overflow-hidden">
-               <div className="h-full bg-brand-teal w-[70%]"></div>
+               <div className="h-full bg-brand-teal transition-all duration-1000 ease-out" style={{ width: `${progressPercent}%` }}></div>
              </div>
-             <p className="text-xs text-brand-navy/60 mt-2 text-right">{60 - beneficiaryProfile.daysSober} days to next chip</p>
+             <p className="text-xs text-brand-navy/60 mt-2 text-right">
+                {Math.max(0, beneficiaryProfile.nextMilestone - beneficiaryProfile.daysSober)} days to next chip
+             </p>
           </div>
         </div>
 
@@ -83,7 +88,7 @@ export const BeneficiaryDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <button 
                 onClick={() => navigate('coach')}
-                className="bg-brand-yellow text-brand-navy p-6 rounded-3xl border-2 border-brand-navy/10 hover:border-brand-navy hover:shadow-lg transition-all flex items-center justify-between group"
+                className="bg-brand-yellow text-brand-navy p-6 rounded-3xl border-2 border-brand-navy/10 hover:border-brand-navy hover:shadow-lg transition-all flex items-center justify-between group active:scale-95"
             >
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
@@ -101,7 +106,7 @@ export const BeneficiaryDashboard: React.FC = () => {
 
             <button 
                 onClick={() => navigate('vision')}
-                className="bg-brand-teal text-white p-6 rounded-3xl border-2 border-transparent hover:border-white hover:shadow-lg transition-all flex items-center justify-between group"
+                className="bg-brand-teal text-white p-6 rounded-3xl border-2 border-transparent hover:border-white hover:shadow-lg transition-all flex items-center justify-between group active:scale-95"
             >
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
@@ -120,28 +125,46 @@ export const BeneficiaryDashboard: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-             <h3 className="font-display font-bold text-2xl text-brand-navy ml-4 flex items-center gap-2">
-               Active Requests <span className="bg-brand-navy/5 px-2 py-1 rounded-full text-sm font-bold text-brand-navy/50">{beneficiaryProfile.requests.length}</span>
-             </h3>
-             {beneficiaryProfile.requests.map((req) => (
-               <div key={req.id} className="group bg-white p-6 rounded-3xl border-2 border-brand-navy/5 hover:border-brand-navy transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${getStatusColor(req.status)}`}>{getStatusIcon(req.status)}</div>
-                    <div>
-                      <h4 className="font-bold text-lg text-brand-navy">{req.type}</h4>
-                      <span className="text-xs font-medium text-brand-navy/50">{req.date}</span>
-                    </div>
+             <div className="flex items-center justify-between ml-4 mr-2">
+                <h3 className="font-display font-bold text-2xl text-brand-navy flex items-center gap-2">
+                  Active Requests <span className="bg-brand-navy/5 px-2 py-1 rounded-full text-sm font-bold text-brand-navy/50">{beneficiaryProfile.requests.length}</span>
+                </h3>
+             </div>
+             
+             {beneficiaryProfile.requests.length === 0 ? (
+                <div className="bg-white p-12 rounded-3xl border-2 border-dashed border-brand-navy/10 flex flex-col items-center justify-center text-center opacity-60">
+                    <FolderOpen size={48} className="text-brand-navy/20 mb-4" />
+                    <h4 className="font-bold text-lg text-brand-navy">All Clear</h4>
+                    <p className="text-sm text-brand-navy/60">You have no pending funding requests.</p>
+                </div>
+             ) : (
+                beneficiaryProfile.requests.map((req) => (
+                  <div key={req.id} className="group bg-white p-6 rounded-3xl border-2 border-brand-navy/5 hover:border-brand-navy transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${getStatusColor(req.status)}`}>{getStatusIcon(req.status)}</div>
+                        <div>
+                          <h4 className="font-bold text-lg text-brand-navy">{req.type}</h4>
+                          <span className="text-xs font-medium text-brand-navy/50">{req.date}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
+                        {req.status === 'action_needed' && (
+                          <button className="bg-brand-coral text-brand-navy px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-brand-coral/80 transition-colors w-full sm:w-auto justify-center"><UploadCloud size={16} />{req.note}</button>
+                        )}
+                        {req.status === 'reviewing' && <span className="bg-brand-lavender/20 text-brand-navy px-4 py-2 rounded-xl font-bold text-sm">In Review</span>}
+                        {req.status === 'funded' && <span className="bg-brand-teal/10 text-brand-teal px-4 py-2 rounded-xl font-bold text-sm border border-brand-teal/20">Active</span>}
+                      </div>
                   </div>
-                  <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
-                    {req.status === 'action_needed' && (
-                      <button className="bg-brand-coral text-brand-navy px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-brand-coral/80 transition-colors w-full sm:w-auto justify-center"><UploadCloud size={16} />{req.note}</button>
-                    )}
-                    {req.status === 'reviewing' && <span className="bg-brand-lavender/20 text-brand-navy px-4 py-2 rounded-xl font-bold text-sm">In Review</span>}
-                  </div>
+                ))
+             )}
+             
+             <button 
+                onClick={() => navigate('apply')}
+                className="w-full py-4 rounded-3xl border-2 border-dashed border-brand-navy/20 text-brand-navy/40 font-bold hover:border-brand-teal hover:text-brand-teal hover:bg-brand-teal/5 transition-all flex items-center justify-center gap-2 group active:scale-[0.99]"
+             >
+               <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center group-hover:bg-brand-teal group-hover:text-white transition-colors">
+                  <Plus size={18} />
                </div>
-             ))}
-             <button className="w-full py-4 rounded-3xl border-2 border-dashed border-brand-navy/20 text-brand-navy/40 font-bold hover:border-brand-teal hover:text-brand-teal hover:bg-brand-teal/5 transition-all flex items-center justify-center gap-2 group">
-               <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center group-hover:bg-brand-teal group-hover:text-white transition-colors">+</div>
                Open New Request
              </button>
           </div>

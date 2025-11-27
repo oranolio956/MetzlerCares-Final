@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Building2, ShieldCheck, CheckCircle2, ArrowRight, AlertCircle, Lock, FileText, BadgeCheck, Stethoscope, Receipt, CheckSquare } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
@@ -109,12 +108,12 @@ export const PartnerFlow: React.FC = () => {
                     <span className="font-bold uppercase tracking-widest text-xs text-brand-navy/60">Partner Network</span>
                 </div>
                 <h2 className="font-display font-bold text-3xl md:text-4xl text-brand-navy leading-tight">
-                    Join the Liquidity Pool.
+                    Join the Provider Network.
                 </h2>
             </div>
 
             <p className="text-brand-navy/80 text-lg mb-12 leading-relaxed font-medium">
-              SecondWind is not a lead gen service. We are a <span className="text-brand-teal font-bold">funding protocol</span>. 
+              SecondWind is not a lead gen service. We are a <span className="text-brand-teal font-bold">funding program</span>. 
               We direct-deposit rent for vetted residents in exchange for strict safety standards and data transparency.
             </p>
             

@@ -1,6 +1,7 @@
-
 import React from 'react';
-import { Activity, ArrowUpRight, CheckCircle2, Building2, Bus, Laptop } from 'lucide-react';
+import { Activity, ArrowUpRight, CheckCircle2, Building2, Bus, Laptop, Check } from 'lucide-react';
+import { useSound } from '../hooks/useSound';
+import { useStore } from '../context/StoreContext';
 
 const TICKER_ITEMS = [
   { id: 1, label: "Rent / Oxford House Union", amount: "$500.00", time: "2m ago", icon: Building2 },
@@ -13,21 +14,34 @@ const TICKER_ITEMS = [
 ];
 
 export const ImpactTicker: React.FC = () => {
+  const { playSuccess } = useSound();
+  const { addNotification } = useStore();
+
+  const handleVerify = (item: any) => {
+      playSuccess();
+      addNotification('success', `Verified: ${item.label} (${item.amount})`);
+  };
+
   return (
     <div className="w-full bg-brand-navy border-b border-brand-teal/20 overflow-hidden h-10 flex items-center relative z-40">
-      <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-brand-navy to-transparent z-10"></div>
-      <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-brand-navy to-transparent z-10"></div>
+      <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-brand-navy to-transparent z-10 pointer-events-none"></div>
+      <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-brand-navy to-transparent z-10 pointer-events-none"></div>
       
       <div className="flex animate-slide-left hover:[animation-play-state:paused] whitespace-nowrap">
         {[...TICKER_ITEMS, ...TICKER_ITEMS, ...TICKER_ITEMS].map((item, idx) => (
-          <div key={`${item.id}-${idx}`} className="flex items-center gap-2 px-6 border-r border-white/10 opacity-80 hover:opacity-100 transition-opacity cursor-default">
+          <button 
+            key={`${item.id}-${idx}`} 
+            onClick={() => handleVerify(item)}
+            className="flex items-center gap-2 px-6 border-r border-white/10 opacity-70 hover:opacity-100 hover:bg-white/5 transition-all cursor-pointer h-10 focus:outline-none focus:bg-white/10"
+            title="Click to verify ledger entry"
+          >
             <item.icon size={14} className="text-brand-teal" />
             <span className="text-xs font-bold text-brand-lavender uppercase tracking-wider">{item.label}</span>
             <span className="text-xs font-mono font-bold text-white">{item.amount}</span>
             <span className="text-[10px] font-bold text-brand-teal flex items-center gap-0.5">
                <ArrowUpRight size={10} /> Live
             </span>
-          </div>
+          </button>
         ))}
       </div>
     </div>

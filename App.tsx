@@ -288,9 +288,9 @@ const App: React.FC = () => {
                 { id: 'intro', icon: Activity, label: 'Home' },
                 { id: 'apply', icon: HeartHandshake, label: 'Get Help' },
                 { id: 'peer-coaching', icon: UserCircle, label: 'Coaching' },
-                { id: 'donate', icon: Activity, label: 'Invest' },
+                { id: 'donate', icon: Activity, label: 'Donate' },
                 { id: 'partner', icon: Building2, label: 'Partner' },
-                { id: 'philosophy', icon: Globe, label: 'Protocol' },
+                { id: 'philosophy', icon: Globe, label: 'Our Model' },
                 { id: 'ledger', icon: Activity, label: 'Ledger' }
               ].map(item => (
                 <button key={item.id} onClick={() => { navigate(item.id); setIsMobileMenuOpen(false); }} className="flex items-center gap-4 p-4 text-2xl font-display font-bold text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all">
@@ -333,9 +333,9 @@ const App: React.FC = () => {
                   <nav className="hidden lg:flex items-center gap-1 bg-white/80 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-sm absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                      {[
                        { id: 'intro', label: 'Home' },
-                       { id: 'philosophy', label: 'Protocol' },
+                       { id: 'philosophy', label: 'Our Model' },
                        { id: 'peer-coaching', label: 'Coaching' },
-                       { id: 'donate', label: 'Invest' },
+                       { id: 'donate', label: 'Donate' },
                        { id: 'partner', label: 'Network' },
                        { id: 'apply', label: 'Apply' },
                        { id: 'ledger', label: 'Ledger' }

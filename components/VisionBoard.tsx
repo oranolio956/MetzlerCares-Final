@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Image, Sparkles, Download, RefreshCw, Loader2, Maximize2 } from 'lucide-react';
 import { generateVisionImage } from '../services/geminiService';
@@ -45,13 +44,13 @@ export const VisionBoard: React.FC = () => {
     <div className="w-full max-w-4xl mx-auto bg-[#FDFBF7] rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white flex flex-col md:flex-row h-auto md:h-[700px]">
         
         {/* Controls */}
-        <div className="w-full md:w-1/3 bg-brand-navy p-8 text-white flex flex-col relative overflow-hidden">
+        <div className="w-full md:w-1/3 bg-brand-navy p-8 text-white flex flex-col relative overflow-hidden shrink-0">
             <div className="absolute top-0 right-0 w-64 h-64 bg-brand-teal/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
             
             <div className="mb-8 relative z-10">
                 <div className="flex items-center gap-3 mb-2 text-brand-teal">
                     <Sparkles size={24} />
-                    <span className="font-bold uppercase tracking-widest text-xs">Nano Banana Pro</span>
+                    <span className="font-bold uppercase tracking-widest text-xs">AI Visualization</span>
                 </div>
                 <h3 className="font-display font-bold text-3xl">Vision Board</h3>
                 <p className="text-brand-lavender/60 text-sm mt-2">Visualize your recovery goals. See the future you are building.</p>
@@ -94,8 +93,8 @@ export const VisionBoard: React.FC = () => {
             </button>
         </div>
 
-        {/* Canvas */}
-        <div className="flex-1 bg-[#151515] relative flex items-center justify-center p-8 overflow-hidden">
+        {/* Canvas - Enforced Height on Mobile */}
+        <div className="flex-1 bg-[#151515] relative flex items-center justify-center p-8 overflow-hidden min-h-[400px] md:min-h-0">
             <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
             
             {image ? (

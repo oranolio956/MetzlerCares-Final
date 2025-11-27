@@ -1,25 +1,9 @@
-
 import React, { useState, useEffect, useMemo, memo } from 'react';
 import { ArrowRight, ShieldCheck, TrendingUp, Printer, Bus, Laptop, Home, Target, Zap, Pill, Shirt, Briefcase, Sparkles, FileText, Building, Utensils, Receipt, CheckCircle2 } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { PaymentModal } from './PaymentModal';
 import { useStore } from '../context/StoreContext';
 import { useSound } from '../hooks/useSound';
-
-const MarketSparkline: React.FC<{ color: string; seed: number }> = memo(({ color, seed }) => {
-  const points = Array.from({ length: 10 }, (_, i) => {
-    const x = i * 10;
-    const y = 20 - (Math.sin(i + seed) * 10 + 10); 
-    return `${x},${y}`;
-  }).join(' ');
-
-  return (
-    <svg viewBox="0 0 90 20" className="w-full h-8 opacity-30" preserveAspectRatio="none">
-       <polyline points={points} fill="none" stroke="currentColor" strokeWidth="2" className={color} />
-       <polygon points={`0,20 ${points} 90,20`} className={color} fillOpacity="0.2" fill="currentColor" stroke="none" />
-    </svg>
-  );
-});
 
 const ImpactEqualizer: React.FC<{ value: number; color: string }> = memo(({ value, color }) => {
   return (
@@ -114,7 +98,7 @@ export const DonationFlow: React.FC = () => {
         <PaymentModal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} item={selectedImpact} quantity={multiplier} totalAmount={totalAmount} onSuccess={handlePaymentComplete} />
       )}
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 relative z-20">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 relative z-20 px-4 md:px-0">
          <div className="w-full">
             <div className="flex items-center gap-2 mb-2 md:mb-4">
                <div className="bg-brand-navy text-white p-1.5 rounded-md"><TrendingUp size={16} /></div>
@@ -122,7 +106,7 @@ export const DonationFlow: React.FC = () => {
             </div>
             <h3 className="text-3xl md:text-6xl font-display font-bold text-brand-navy leading-none">
                Choose where to <br/>
-               <span className="text-brand-teal opacity-100 relative inline-block">Invest<svg className="absolute -bottom-2 left-0 w-full h-3 text-brand-yellow/50" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span>.
+               <span className="text-brand-teal opacity-100 relative inline-block">Support<svg className="absolute -bottom-2 left-0 w-full h-3 text-brand-yellow/50" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span>.
             </h3>
          </div>
          <div className="flex flex-col items-start md:items-end gap-2 w-full md:w-auto">
@@ -137,7 +121,7 @@ export const DonationFlow: React.FC = () => {
         <div className="lg:col-span-8 flex flex-col gap-6">
             
             {/* Category Selector - Scrollable on mobile */}
-            <div className="bg-white p-1.5 rounded-2xl shadow-sm border border-brand-navy/5 flex overflow-x-auto no-scrollbar md:flex-wrap sm:flex-nowrap gap-1 relative snap-x">
+            <div className="mx-4 md:mx-0 bg-white p-1.5 rounded-2xl shadow-sm border border-brand-navy/5 flex overflow-x-auto no-scrollbar md:flex-wrap sm:flex-nowrap gap-1 relative snap-x touch-pan-x">
                {SECTORS.map((sector) => {
                   const Icon = sector.icon;
                   const isActive = activeSector === sector.id;
@@ -145,7 +129,7 @@ export const DonationFlow: React.FC = () => {
                      <button 
                         key={sector.id} 
                         onClick={() => { setActiveSector(sector.id); playClick(); }} 
-                        className={`flex-none md:flex-1 flex items-center justify-center gap-2 px-4 py-3 md:px-4 rounded-xl transition-all duration-300 font-bold text-xs md:text-sm relative z-10 whitespace-nowrap snap-center ${isActive ? 'text-brand-navy shadow-sm ring-1 ring-black/5' : 'text-brand-navy/50 hover:bg-brand-cream/50'}`}
+                        className={`flex-none md:flex-1 flex items-center justify-center gap-2 px-6 py-4 md:px-4 md:py-3 rounded-xl transition-all duration-300 font-bold text-sm relative z-10 whitespace-nowrap snap-center ${isActive ? 'text-brand-navy shadow-sm ring-1 ring-black/5' : 'text-brand-navy/50 hover:bg-brand-cream/50'}`}
                      >
                         {isActive && (
                            <div className="absolute inset-0 bg-brand-cream rounded-xl z-[-1] animate-in fade-in zoom-in-95 duration-200"></div>
@@ -157,13 +141,12 @@ export const DonationFlow: React.FC = () => {
                })}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" role="radiogroup">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 px-4 md:px-0" role="radiogroup">
               {filteredImpacts.map((level, idx) => {
                 const isSelected = selectedImpact.id === level.id;
                 const Icon = level.icon;
                 return (
                   <button key={level.id} onClick={() => { setSelectedImpact(level); setMultiplier(1); playClick(); }} onMouseEnter={playHover} className={`group relative flex flex-col items-start text-left p-6 rounded-[2rem] transition-all duration-300 border-2 outline-none focus-visible:ring-4 focus-visible:ring-brand-teal overflow-hidden min-h-[160px] ${isSelected ? 'bg-brand-navy border-brand-navy shadow-[0_20px_40px_-10px_rgba(26,42,58,0.3)] scale-[1.02] z-10' : 'bg-white border-brand-navy/5 hover:border-brand-navy/20 hover:shadow-lg scale-100 opacity-80 hover:opacity-100'}`}>
-                    <div className="absolute bottom-0 left-0 w-full h-12 opacity-20 pointer-events-none"><MarketSparkline color={isSelected ? "text-brand-teal" : level.textColor} seed={level.sparkSeed} /></div>
                     <div className="w-full flex justify-between items-start mb-6 relative z-10">
                        <div className={`p-3 rounded-2xl transition-colors duration-300 ${isSelected ? 'bg-white/10 text-white' : 'bg-brand-navy/5 text-brand-navy'}`}><Icon size={24} /></div>
                     </div>
@@ -177,7 +160,7 @@ export const DonationFlow: React.FC = () => {
               })}
             </div>
 
-            <div className="bg-white border-2 border-brand-navy/5 rounded-[2.5rem] p-6 md:p-12 shadow-xl relative overflow-hidden flex-grow flex flex-col justify-center min-h-[350px]">
+            <div className="bg-white border-2 border-brand-navy/5 rounded-[2.5rem] p-6 md:p-12 shadow-xl relative overflow-hidden flex-grow flex flex-col justify-center min-h-[350px] mx-4 md:mx-0">
                <div className={`absolute -right-20 -bottom-20 opacity-[0.03] pointer-events-none transition-all duration-1000 hidden md:block ${idleMascot ? 'translate-y-[-20px] rotate-6 opacity-10' : 'rotate-12'}`}>
                   <Mascot variant={selectedImpact.variant} expression={idleMascot ? 'wink' : 'happy'} className="w-96 h-96" />
                </div>
@@ -253,13 +236,12 @@ export const DonationFlow: React.FC = () => {
         </div>
 
         {/* Live Invoice Preview */}
-        <div className="lg:col-span-4 flex flex-col h-full mt-8 lg:mt-0">
+        <div className="lg:col-span-4 flex flex-col h-full mt-8 lg:mt-0 px-4 md:px-0">
             <div className="lg:sticky lg:top-32">
                <div className="relative bg-white shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group rounded-[1.5rem] overflow-hidden">
                   
                   {/* Invoice Header */}
                   <div className="bg-brand-navy p-6 flex justify-between items-center relative overflow-hidden">
-                      <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNlNWU3ZWIiLz4KPC9zdmc+')]"></div>
                       <div>
                          <span className="text-[10px] font-bold uppercase tracking-widest text-brand-teal flex items-center gap-1"><Receipt size={12} /> Live Invoice</span>
                          <h4 className="font-display font-bold text-xl text-white mt-1">Pending Transaction</h4>
@@ -307,7 +289,7 @@ export const DonationFlow: React.FC = () => {
                         <div className="border-t-2 border-brand-navy border-dashed pt-4">
                            <div className="flex justify-between items-end">
                               <span className="font-bold text-xl text-brand-navy">Total Due</span>
-                              <span className="font-display font-bold text-4xl text-brand-navy">${totalAmount.toFixed(2)}</span>
+                              <span className="font-display font-bold text-[clamp(2rem,4vw,2.5rem)] text-brand-navy leading-none">${totalAmount.toFixed(2)}</span>
                            </div>
                         </div>
 

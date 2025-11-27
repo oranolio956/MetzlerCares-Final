@@ -69,7 +69,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
            "@context": "https://schema.org",
            "@type": "NGO",
            "name": "SecondWind Colorado Recovery",
-           "alternateName": "SecondWind Protocol",
+           "alternateName": "SecondWind Fund",
            "areaServed": {
              "@type": "State",
              "name": "Colorado"
@@ -86,12 +86,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
       >
         {/* Abstract Background Elements - Fixed z-index 0 */}
         <div className="absolute inset-0 pointer-events-none z-0">
-            {/* Moving Grid */}
-            <div className="absolute inset-0 opacity-[0.03] animate-slide-left" style={{ 
-                backgroundImage: 'linear-gradient(90deg, #1A2A3A 1px, transparent 1px), linear-gradient(#1A2A3A 1px, transparent 1px)', 
-                backgroundSize: '80px 80px',
-                width: '200%' 
-            }}></div>
             
             {/* Parallax blobs */}
             <div 
@@ -133,7 +127,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                    
                    {/* Subtext */}
                    <p className="mt-8 text-lg md:text-xl lg:text-2xl text-brand-navy/60 font-medium max-w-xl animate-slide-up opacity-0 leading-relaxed" style={{ animationDelay: '0.4s' }}>
-                      The protocol for direct-action aid. We replace bureaucracy with instant, verified funding for sober living rent and rehab access in Denver & Boulder.
+                      The platform for direct-action aid. We replace bureaucracy with instant, verified funding for sober living rent and rehab access in Denver & Boulder.
                    </p>
 
                    {/* Mobile Only HUD - Kept under text for immediate action */}
@@ -149,7 +143,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                            onClick={() => onNavigate('donate')}
                            className="flex-1 bg-brand-teal text-white py-4 rounded-xl font-bold active:scale-95 transition-transform"
                         >
-                           Invest
+                           Donate
                         </button>
                       </div>
                    </div>
@@ -245,7 +239,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                  </div>
                  <div className="flex flex-col min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40">Live Capital Deployed in CO</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40">Funds Distributed in CO</span>
                       <div className="w-1.5 h-1.5 rounded-full bg-brand-teal animate-pulse"></div>
                     </div>
                     <div className="flex items-baseline gap-3">
@@ -274,7 +268,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                  >
                     <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                     <HeartHandshake size={18} className="fill-current w-5 h-5 relative z-10" />
-                    <span className="relative z-10">Invest Now</span>
+                    <span className="relative z-10">Donate Now</span>
                     <ArrowUpRight size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform w-[18px] relative z-10" />
                  </button>
               </div>

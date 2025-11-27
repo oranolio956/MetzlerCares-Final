@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { MapPin } from 'lucide-react';
 
@@ -55,7 +54,7 @@ export const HyperLocalMap: React.FC = () => {
              ))}
           </div>
           <div className="mt-8 pt-8 border-t border-white/5 text-center opacity-50">
-             SECONDWIND_PROTOCOL_V1.2 // CO_BHA_COMPLIANT // 501(C)(3)_VERIFIED
+             SECONDWIND COLORADO // 501(C)(3) NON-PROFIT
           </div>
        </div>
     </div>
