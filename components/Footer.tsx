@@ -15,7 +15,7 @@ export const Footer: React.FC<{ onNavigate: (route: string) => void }> = ({ onNa
   const { userType } = useStore();
 
   return (
-    <footer className="bg-brand-navy text-white pt-20 pb-10 rounded-t-[3rem] relative overflow-hidden mt-0">
+    <footer className="bg-brand-navy text-white pt-20 pb-10 relative overflow-hidden mt-0">
       {/* Background Texture */}
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(#2D9C8E 1px, transparent 1px), linear-gradient(90deg, #2D9C8E 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
       
