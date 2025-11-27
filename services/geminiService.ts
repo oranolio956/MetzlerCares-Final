@@ -159,18 +159,18 @@ export const sendMessageToGemini = async (message: string, session: any): Promis
                 tools = [{ googleSearch: {} }];
             }
             
-            const model = ai.models.getGenerativeModel({ 
+            const response = await ai.models.generateContent({
                 model: modelName,
-                systemInstruction: instruction,
-                tools: tools.length > 0 ? tools : undefined
+                contents: [{ role: 'user', parts: [{ text: message }] }],
+                config: {
+                    systemInstruction: instruction,
+                    tools: tools.length > 0 ? tools : undefined
+                }
             });
             
-            const result = await model.generateContent({
-                contents: [{ role: 'user', parts: [{ text: message }] }]
-            });
-            
-            const responseText = result.response.text();
-            const groundingChunks = result.response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+            // Access properties directly
+            const responseText = response.text ?? "";
+            const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
 
             return { text: responseText, sources: groundingChunks };
 

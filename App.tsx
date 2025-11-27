@@ -249,7 +249,7 @@ const App: React.FC = () => {
         <NotificationSystem />
         {/* MedicaidPromo is properly layered via z-index in CSS, mobile menu is z-[100], promo is z-[80] */}
         <MedicaidPromo />
-        <GlobalChat />
+        <GlobalChat activeSection={activeSection} />
 
         {/* MOBILE MENU */}
         <div className={`fixed inset-0 z-[100] bg-brand-navy/95 backdrop-blur-xl text-white transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col ${isMobileMenuOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'}`}>
