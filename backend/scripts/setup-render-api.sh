@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Render API Setup Script
+API_KEY="rnd_E6GGs6PzdUy5aLU4wfWpKTyJh0uE"
+API_BASE="https://api.render.com/v1"
+
+echo "=== Render Backend Setup ==="
+echo ""
+
+# Generate secrets
+echo "Generating secrets..."
+JWT_SECRET=$(openssl rand -hex 32)
+JWT_REFRESH_SECRET=$(openssl rand -hex 32)
+ENCRYPTION_SALT=$(openssl rand -hex 32)
+
+echo "JWT_SECRET=$JWT_SECRET"
+echo "JWT_REFRESH_SECRET=$JWT_REFRESH_SECRET"
+echo "ENCRYPTION_SALT=$ENCRYPTION_SALT"
+echo ""
+
+# Create PostgreSQL Database
+echo "Creating PostgreSQL database..."
+DB_RESPONSE=$(curl -s -X POST "$API_BASE/databases" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "secondwind-db",
+    "databaseName": "secondwind",
+    "user": "secondwind_user",
+    "plan": "starter",
+    "region": "oregon",
+    "postgresMajorVersion": 15
+  }')
+
+echo "Database creation response:"
+echo "$DB_RESPONSE" | jq '.' 2>/dev/null || echo "$DB_RESPONSE"
+echo ""
+
+# Create Redis
+echo "Creating Redis instance..."
+REDIS_RESPONSE=$(curl -s -X POST "$API_BASE/redis" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "secondwind-redis",
+    "plan": "starter",
+    "region": "oregon",
+    "maxmemoryPolicy": "allkeys-lru"
+  }')
+
+echo "Redis creation response:"
+echo "$REDIS_RESPONSE" | jq '.' 2>/dev/null || echo "$REDIS_RESPONSE"
+echo ""
+
+echo "=== Setup Complete ==="
+echo ""
+echo "Next steps:"
+echo "1. Note the database connection string from the response above"
+echo "2. Note the Redis connection string from the response above"
+echo "3. Create web service via Render dashboard or render.yaml"
+echo "4. Set environment variables in Render dashboard"
