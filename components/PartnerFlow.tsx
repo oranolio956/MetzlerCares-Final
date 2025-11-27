@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Building2, ShieldCheck, CheckCircle2, ArrowRight, AlertCircle, Lock, FileText, BadgeCheck, Stethoscope, Receipt, CheckSquare } from 'lucide-react';
+import { Building2, ShieldCheck, CheckCircle2, ArrowRight, AlertCircle, Lock, FileText, BadgeCheck, Stethoscope, Receipt, CheckSquare, Stamp } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { useSound } from '../hooks/useSound';
 import { Mascot } from './Mascot';
@@ -342,42 +342,50 @@ export const PartnerFlow: React.FC = () => {
                 <h3 className="font-display font-bold text-3xl text-brand-navy">Network Dues</h3>
             </div>
 
-            {/* INVOICE UI */}
-            <div className="bg-white border-2 border-brand-navy/10 p-8 shadow-xl relative overflow-hidden mb-8 group hover:border-brand-navy/30 transition-colors">
-                {/* Dotted top */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-brand-navy/5" style={{backgroundImage: 'linear-gradient(to right, #1A2A3A 50%, transparent 50%)', backgroundSize: '10px 100%'}}></div>
+            {/* UPGRADED INVOICE UI */}
+            <div className="bg-white shadow-xl relative overflow-hidden mb-8 group transition-all transform hover:-translate-y-1">
+                {/* Paper texture */}
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
                 
-                <div className="flex justify-between items-start mb-8">
-                    <div>
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40 mb-1">Bill To</div>
-                        <h4 className="font-bold text-xl text-brand-navy">{formData.name || 'Your Facility'}</h4>
-                        <p className="text-sm text-brand-navy/50">{new Date().toLocaleDateString()}</p>
-                    </div>
-                    <Receipt className="text-brand-navy/10" size={32} />
-                </div>
+                {/* Receipt Zig-Zag Bottom */}
+                <div className="absolute bottom-0 left-0 w-full h-2 bg-brand-cream z-10" style={{ clipPath: 'polygon(0% 100%, 5% 0%, 10% 100%, 15% 0%, 20% 100%, 25% 0%, 30% 100%, 35% 0%, 40% 100%, 45% 0%, 50% 100%, 55% 0%, 60% 100%, 65% 0%, 70% 100%, 75% 0%, 80% 100%, 85% 0%, 90% 100%, 95% 0%, 100% 100%)' }}></div>
 
-                <div className="space-y-4 mb-8 border-y-2 border-brand-navy/5 py-6">
-                    <div className="flex justify-between items-center">
-                        <span className="text-brand-navy font-medium">Network Membership (Monthly)</span>
-                        <span className="font-mono font-bold text-brand-navy">$99.00</span>
+                <div className="p-8 pb-12 relative z-10 border-x-2 border-t-2 border-brand-navy/5">
+                    <div className="flex justify-between items-start mb-8 border-b-2 border-brand-navy/10 pb-6 border-dashed">
+                        <div>
+                            <div className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40 mb-1">Bill To</div>
+                            <h4 className="font-bold text-xl text-brand-navy">{formData.name || 'Your Facility'}</h4>
+                            <p className="text-sm text-brand-navy/50 font-mono mt-1">REF: {formData.ein || 'PENDING'}</p>
+                        </div>
+                        <div className="text-right">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40 mb-1 block">Date</span>
+                            <span className="font-mono text-sm font-bold text-brand-navy">{new Date().toLocaleDateString()}</span>
+                        </div>
                     </div>
-                    <div className="flex justify-between items-center text-sm text-brand-navy/60">
-                        <span className="pl-4 border-l-2 border-brand-teal">Platform Access</span>
-                        <span>Included</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm text-brand-navy/60">
-                        <span className="pl-4 border-l-2 border-brand-teal">Direct Rent Deposits</span>
-                        <span>Included</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm text-brand-navy/60">
-                        <span className="pl-4 border-l-2 border-brand-teal">Safe Harbor Badge</span>
-                        <span>Included</span>
-                    </div>
-                </div>
 
-                <div className="flex justify-between items-end">
-                    <span className="font-bold text-brand-navy text-lg">Total Due</span>
-                    <span className="font-display font-bold text-4xl text-brand-navy">$99.00</span>
+                    <div className="space-y-4 mb-8">
+                        <div className="flex justify-between items-center">
+                            <span className="text-brand-navy font-bold">Network Membership (Monthly)</span>
+                            <span className="font-mono font-bold text-brand-navy">$99.00</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm text-brand-navy/60 pl-4 border-l-2 border-brand-teal/30">
+                            <span>Platform Access</span>
+                            <span className="text-[10px] font-bold uppercase">Included</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm text-brand-navy/60 pl-4 border-l-2 border-brand-teal/30">
+                            <span>Direct Rent Deposits</span>
+                            <span className="text-[10px] font-bold uppercase">Included</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm text-brand-navy/60 pl-4 border-l-2 border-brand-teal/30">
+                            <span>Safe Harbor Badge</span>
+                            <span className="text-[10px] font-bold uppercase">Included</span>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-end border-t-2 border-brand-navy border-dashed pt-6">
+                        <span className="font-bold text-brand-navy text-lg">Total Due</span>
+                        <span className="font-display font-bold text-4xl text-brand-navy">$99.00</span>
+                    </div>
                 </div>
             </div>
             
@@ -397,7 +405,7 @@ export const PartnerFlow: React.FC = () => {
       case 5: // SUCCESS
         return (
           <div className="flex flex-col items-center text-center animate-slide-up py-12 max-w-lg mx-auto">
-            <div className="w-20 h-20 bg-brand-teal text-white flex items-center justify-center mb-8 shadow-[8px_8px_0px_0px_rgba(26,42,58,0.1)]">
+            <div className="w-20 h-20 bg-brand-teal text-white flex items-center justify-center mb-8 shadow-[8px_8px_0px_0px_rgba(26,42,58,0.1)] rounded-2xl rotate-3">
                <CheckCircle2 size={40} />
             </div>
             <h2 className="font-display font-bold text-4xl text-brand-navy mb-4">Application Docketed.</h2>
@@ -406,7 +414,7 @@ export const PartnerFlow: React.FC = () => {
                Our compliance officer will contact you within 48 hours for the site audit.
             </p>
             
-            <div className="w-full bg-brand-cream border-l-4 border-brand-navy p-6 text-left">
+            <div className="w-full bg-brand-cream border-l-4 border-brand-navy p-6 text-left shadow-inner">
                <h4 className="font-bold text-brand-navy flex items-center gap-2 mb-2"><FileText size={16} /> Prepare for Audit</h4>
                <ul className="text-sm text-brand-navy/70 space-y-2 list-disc list-inside">
                   <li>Have your Liability Insurance certificate ready.</li>
@@ -439,7 +447,7 @@ export const PartnerFlow: React.FC = () => {
 
       {isLoading ? (
          <div className="flex flex-col items-center justify-center py-20 animate-fadeIn">
-            <div className="w-12 h-12 border-4 border-brand-navy/10 border-t-brand-teal animate-spin mb-6"></div>
+            <div className="w-12 h-12 border-4 border-brand-navy/10 border-t-brand-teal animate-spin mb-6 rounded-full"></div>
             <h3 className="font-bold text-xl text-brand-navy">Processing Entity...</h3>
             <p className="text-brand-navy/40 text-sm mt-2">Verifying Ledger Entry</p>
          </div>

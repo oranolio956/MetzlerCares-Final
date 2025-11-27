@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { IntakeChat } from './components/IntakeChat';
 import { DonationFlow } from './components/DonationFlow';
 import { BeneficiaryDashboard } from './components/BeneficiaryDashboard';
@@ -99,6 +99,62 @@ const LegalOverlay = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
             </div>
         </div>
     );
+};
+
+// --- SLIDING NAV COMPONENT ---
+const DesktopNav = ({ activeSection, navigate, playClick }: { activeSection: string, navigate: (s: string) => void, playClick: () => void }) => {
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
+  const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Find active element and update pill position
+    const updatePosition = () => {
+        const activeEl = navRef.current?.querySelector(`[data-active="true"]`) as HTMLElement;
+        if (activeEl) {
+            setIndicatorStyle({
+                left: activeEl.offsetLeft,
+                width: activeEl.offsetWidth,
+                opacity: 1
+            });
+        }
+    };
+
+    updatePosition();
+    // Re-calculate on window resize
+    window.addEventListener('resize', updatePosition);
+    return () => window.removeEventListener('resize', updatePosition);
+  }, [activeSection]);
+
+  const navItems = [
+    { id: 'intro', label: 'Home' },
+    { id: 'philosophy', label: 'Our Model' },
+    { id: 'peer-coaching', label: 'Coaching' },
+    { id: 'donate', label: 'Donate' },
+    { id: 'partner', label: 'Network' },
+    { id: 'apply', label: 'Apply' },
+    { id: 'ledger', label: 'Ledger' }
+  ];
+
+  return (
+      <nav ref={navRef} className="hidden lg:flex items-center relative bg-white/80 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-sm absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+         {/* Sliding Pill */}
+         <div 
+            className="absolute bg-brand-navy rounded-full shadow-md transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) h-[calc(100%-12px)] top-1.5 pointer-events-none"
+            style={{ left: indicatorStyle.left, width: indicatorStyle.width, opacity: indicatorStyle.opacity }}
+         />
+         
+         {navItems.map(item => (
+            <button
+                key={item.id}
+                data-active={activeSection === item.id}
+                onClick={() => { navigate(item.id); playClick(); }}
+                className={`relative z-10 px-5 py-2 rounded-full text-sm font-bold transition-colors duration-300 capitalize ${activeSection === item.id ? 'text-white' : 'text-brand-navy/60 hover:text-brand-navy'}`}
+            >
+                {item.label}
+            </button>
+         ))}
+      </nav>
+  );
 };
 
 const App: React.FC = () => {
@@ -375,21 +431,8 @@ const App: React.FC = () => {
                      <span className={`font-display font-bold text-xl tracking-tight ${isCalmMode || scrolled ? 'text-white' : 'text-brand-navy md:text-brand-navy opacity-0 md:opacity-100'}`}>SecondWind</span>
                   </div>
                   
-                  <nav className="hidden lg:flex items-center gap-1 bg-white/80 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-sm absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                     {[
-                       { id: 'intro', label: 'Home' },
-                       { id: 'philosophy', label: 'Our Model' },
-                       { id: 'peer-coaching', label: 'Coaching' },
-                       { id: 'donate', label: 'Donate' },
-                       { id: 'partner', label: 'Network' },
-                       { id: 'apply', label: 'Apply' },
-                       { id: 'ledger', label: 'Ledger' }
-                     ].map((item) => (
-                        <button key={item.id} onClick={() => { navigate(item.id); playClick(); }} className={`px-5 py-2 rounded-full text-sm font-bold transition-all capitalize ${activeSection === item.id ? 'bg-brand-navy text-white shadow-md' : 'text-brand-navy/60 hover:text-brand-navy hover:bg-brand-navy/5'}`}>
-                          {item.label}
-                        </button>
-                     ))}
-                  </nav>
+                  {/* REPLACED: Static Nav with Animated DesktopNav */}
+                  <DesktopNav activeSection={activeSection} navigate={navigate} playClick={playClick} />
 
                   <div className="flex items-center gap-3">
                      <button onClick={toggleSound} className={`p-2.5 rounded-full transition-colors hidden sm:flex ${scrolled ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-brand-navy/40 hover:text-brand-navy hover:bg-brand-navy/5'}`} aria-label="Toggle sound">

@@ -188,43 +188,46 @@ export const TransparencyLedger: React.FC = () => {
                 <div className="col-span-2 text-right">Status</div>
             </div>
 
-            <div className="divide-y divide-brand-navy/5 max-h-[500px] overflow-y-auto custom-scrollbar">
+            <div className="md:divide-y md:divide-brand-navy/5 max-h-[500px] overflow-y-auto custom-scrollbar p-3 md:p-0">
                 {filteredLedger.length === 0 ? (
                     <div className="p-12 text-center text-brand-navy/40 font-medium">No transactions found for this filter.</div>
                 ) : (
                 filteredLedger.map((item, index) => (
                 <div 
                    key={item.id} 
-                   className={`grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 px-6 md:px-8 py-4 md:py-5 items-start md:items-center hover:bg-brand-cream/30 transition-colors group cursor-default ${activeTx === item.id ? 'bg-brand-teal/5 ring-1 ring-inset ring-brand-teal/20' : index % 2 === 0 ? 'bg-gray-50/30' : 'bg-white'}`} 
+                   className={`grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-4 md:px-8 py-4 md:py-5 items-start md:items-center hover:bg-brand-cream/30 transition-all group cursor-default mb-3 md:mb-0 rounded-2xl md:rounded-none border border-brand-navy/5 md:border-0 shadow-sm md:shadow-none ${activeTx === item.id ? 'bg-brand-teal/5 ring-1 ring-inset ring-brand-teal/20' : 'bg-white md:bg-transparent'}`} 
                    onMouseEnter={() => setActiveTx(item.id)} 
                    onMouseLeave={() => setActiveTx(null)}
                 >
                     
-                    <div className="col-span-2 flex justify-between md:block w-full">
-                        <div className="md:hidden text-[10px] font-bold text-brand-navy/30 uppercase tracking-widest mb-1">Time</div>
-                        <div>
+                    {/* Mobile Header Row */}
+                    <div className="col-span-2 flex justify-between md:block w-full border-b border-brand-navy/5 pb-2 md:pb-0 md:border-0 mb-2 md:mb-0">
+                        <div className="md:hidden text-[10px] font-bold text-brand-navy/30 uppercase tracking-widest flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-brand-teal"></span>
+                            {item.timestamp.split(',')[0]}
+                        </div>
+                        <div className="md:hidden text-[10px] font-bold text-brand-navy/30 uppercase tracking-widest">
+                            {item.timestamp.split(',')[1]}
+                        </div>
+                        {/* Desktop View */}
+                        <div className="hidden md:block">
                            <span className="font-mono font-bold text-brand-navy text-xs md:text-sm block">{item.timestamp.split(',')[1]}</span>
                            <span className="text-[10px] text-brand-navy/40">{item.timestamp.split(',')[0]}</span>
                         </div>
-                        <div className="md:hidden text-right flex flex-col items-end">
-                            <span className="font-mono font-bold text-brand-navy text-lg">${item.amount.toFixed(2)}</span>
-                            {item.status === 'CLEARED' ? <span className="text-[10px] font-bold text-brand-teal flex items-center gap-1"><Check size={10} /> Cleared</span> : <span className="text-[10px] font-bold text-brand-yellow">Pending</span>}
-                        </div>
                     </div>
 
-                    <div className="col-span-3 mt-2 md:mt-0 w-full">
-                         <div className="md:hidden text-[10px] font-bold text-brand-navy/30 uppercase tracking-widest mb-1">Vendor</div>
-                         <div className="flex items-center gap-2 md:gap-3">
+                    <div className="col-span-3 md:mt-0 w-full flex items-center justify-between md:justify-start">
+                         <div className="flex items-center gap-3">
                             <div className="hidden md:flex w-8 h-8 rounded-full bg-brand-navy/5 items-center justify-center text-brand-navy/40 group-hover:bg-brand-navy group-hover:text-white transition-colors shrink-0"><ArrowDownLeft size={14} /></div>
                             <div className="text-left">
-                               <span className="block font-bold text-brand-navy text-sm">{item.vendor}</span>
+                               <span className="block font-bold text-brand-navy text-sm md:text-sm text-base">{item.vendor}</span>
                                <span className="font-mono text-[10px] text-brand-navy/30 hidden md:block">{item.id}</span>
                             </div>
                         </div>
+                        <div className="md:hidden font-mono text-[10px] text-brand-navy/30">{item.id}</div>
                     </div>
 
                     <div className="col-span-3 flex justify-between md:justify-start items-center mt-2 md:mt-0 w-full">
-                        <div className="md:hidden text-[10px] font-bold text-brand-navy/30 uppercase tracking-widest">Category</div>
                         <button 
                             onClick={(e) => { e.stopPropagation(); toggleFilter(item.category); }}
                             className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border hover:scale-105 transition-transform ${item.category === 'RENT' ? 'bg-brand-coral/5 border-brand-coral/20 text-brand-coral' : item.category === 'TECH' ? 'bg-brand-teal/5 border-brand-teal/20 text-brand-teal' : 'bg-brand-lavender/10 border-brand-lavender/20 text-brand-navy'}`}
@@ -235,8 +238,10 @@ export const TransparencyLedger: React.FC = () => {
 
                     <div className="col-span-2 text-right hidden md:block"><span className="font-mono font-bold text-brand-navy text-sm tracking-tight">${item.amount.toFixed(2)}</span></div>
 
-                    <div className="col-span-2 text-right hidden md:flex justify-between md:justify-end items-center mt-2 md:mt-0 w-full border-t border-brand-navy/5 pt-3 md:border-0 md:pt-0">
-                        <div className="md:hidden text-[10px] font-bold text-brand-navy/30 uppercase tracking-widest">Status</div>
+                    <div className="col-span-2 text-right flex justify-between md:justify-end items-center mt-3 md:mt-0 w-full border-t border-brand-navy/5 pt-3 md:border-0 md:pt-0">
+                        <div className="md:hidden">
+                            <span className="font-mono font-bold text-brand-navy text-lg tracking-tight">${item.amount.toFixed(2)}</span>
+                        </div>
                         {item.status === 'CLEARED' ? <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-brand-teal bg-brand-teal/5 px-2 py-1 rounded-md"><Check className="w-3 h-3" /> Cleared</div> : <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-brand-yellow bg-brand-yellow/10 px-2 py-1 rounded-md"><div className="w-1.5 h-1.5 rounded-full bg-brand-yellow animate-ping"></div> Pending</div>}
                     </div>
                 </div>
