@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "npm run generate:social-card && vite build",
+    "preview": "vite preview",
+    "generate:social-card": "node scripts/generate-social-card.cjs"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
@@ -20,6 +21,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.18",
     "postcss": "^8.4.35",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.2.2",
     "vite": "^5.1.4"

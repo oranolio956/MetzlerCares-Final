@@ -1,0 +1,118 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Brand Gradients -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A2A3A"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    
+    <linearGradient id="tealGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2D9C8E"/>
+      <stop offset="1" stop-color="#20756B"/>
+    </linearGradient>
+
+    <linearGradient id="coralGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF8A75"/>
+      <stop offset="1" stop-color="#E06C57"/>
+    </linearGradient>
+
+    <!-- Grid Pattern -->
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+
+    <!-- Drop Shadows -->
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Abstract Kinetic Flow (Background Shape) -->
+  <path d="M -100 630 C 200 630 400 300 800 300 C 1200 300 1300 630 1400 630 L 1400 700 L -100 700 Z" fill="#2D9C8E" opacity="0.1"/>
+  
+  <!-- Massive Background Logo Mark (Watermark) -->
+  <g transform="translate(850, 100) scale(3)" opacity="0.05">
+     <path d="M15 55C15 85 40 95 75 95V75C55 75 40 70 40 55H15Z" fill="#FDFBF7" />
+     <path d="M85 45C85 15 60 5 25 5V25C45 25 60 30 60 45H85Z" fill="#FDFBF7" />
+  </g>
+
+  <!-- CONTENT CONTAINER -->
+  <g transform="translate(100, 100)">
+    
+    <!-- Header / Logo Lockup -->
+    <g>
+       <!-- Logo Icon -->
+       <g transform="scale(0.8)">
+         <path d="M15 55C15 85 40 95 75 95V75C55 75 40 70 40 55H15Z" fill="#2D9C8E" />
+         <path d="M85 45C85 15 60 5 25 5V25C45 25 60 30 60 45H85Z" fill="#2D9C8E" opacity="0.8" />
+         <circle cx="50" cy="50" r="12" fill="#FF8A75" />
+       </g>
+       
+       <!-- Brand Name -->
+       <text x="90" y="55" font-family="sans-serif" font-weight="800" font-size="32" letter-spacing="2" fill="#FDFBF7">SECONDWIND</text>
+       <text x="350" y="55" font-family="sans-serif" font-weight="400" font-size="24" letter-spacing="1" fill="#2D9C8E" opacity="0.8">PROTOCOL</text>
+    </g>
+
+    <!-- Main Headline -->
+    <g transform="translate(0, 180)">
+      <text x="0" y="0" font-family="sans-serif" font-weight="800" font-size="96" fill="#FDFBF7" letter-spacing="-3" style="text-transform: capitalize;">
+        Invest in
+      </text>
+      <text x="0" y="110" font-family="sans-serif" font-weight="800" font-size="96" fill="#FDFBF7" letter-spacing="-3" style="text-transform: capitalize;">
+        Human <tspan fill="url(#tealGrad)">Potential.</tspan>
+      </text>
+    </g>
+
+    <!-- Subhead / Value Prop -->
+    <text x="5" y="420" font-family="monospace" font-weight="500" font-size="28" fill="#A7ACD9" letter-spacing="0">
+      Direct-to-Vendor Recovery Funding in Colorado.
+    </text>
+
+    <!-- Badges / Footer -->
+    <g transform="translate(0, 480)">
+       <!-- Pill 1 -->
+       <g filter="url(#shadow)">
+          <rect width="260" height="54" rx="27" fill="#2D9C8E"/>
+          <text x="130" y="34" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="18" fill="#1A2A3A" letter-spacing="1">ZERO RED TAPE</text>
+       </g>
+       
+       <!-- Pill 2 -->
+       <g transform="translate(290, 0)" filter="url(#shadow)">
+          <rect width="280" height="54" rx="27" fill="#1A2A3A" stroke="#2D9C8E" stroke-width="2"/>
+          <text x="140" y="34" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="18" fill="#2D9C8E" letter-spacing="1">VERIFIED 501(c)(3)</text>
+       </g>
+    </g>
+
+  </g>
+
+  <!-- Visual Element: The Card / Ledger Receipt (Right Side) -->
+  <g transform="translate(780, 180) rotate(-5)" filter="url(#shadow)">
+     <!-- Card Body -->
+     <rect width="320" height="400" rx="20" fill="#FDFBF7"/>
+     
+     <!-- Card Header -->
+     <rect width="320" height="80" rx="20" fill="#1A2A3A" clip-path="inset(0 0 320 0)"/>
+     <circle cx="40" cy="40" r="16" fill="#2D9C8E"/>
+     <rect x="70" y="28" width="120" height="10" rx="5" fill="white" opacity="0.2"/>
+     <rect x="70" y="46" width="80" height="6" rx="3" fill="white" opacity="0.1"/>
+
+     <!-- Card Content Lines -->
+     <g transform="translate(30, 110)">
+        <rect width="260" height="40" rx="8" fill="#F3F4F6"/>
+        <rect width="180" height="40" rx="8" y="50" fill="#F3F4F6"/>
+        
+        <text x="0" y="160" font-family="sans-serif" font-weight="bold" font-size="60" fill="#1A2A3A">$250</text>
+        <text x="0" y="190" font-family="monospace" font-size="16" fill="#2D9C8E" font-weight="bold">RENT ASSISTANCE</text>
+
+        <!-- Checkbox -->
+        <circle cx="240" cy="240" r="20" fill="#2D9C8E"/>
+        <path d="M232 240 L238 246 L248 234" stroke="white" stroke-width="4" fill="none"/>
+        <text x="0" y="245" font-family="sans-serif" font-size="16" fill="#1A2A3A" opacity="0.6">Status: Funded</text>
+     </g>
+  </g>
+
+</svg>
