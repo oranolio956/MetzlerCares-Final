@@ -28,6 +28,7 @@ import { GlobalChat } from './components/GlobalChat';
 import { PeerCoachingTeaser } from './components/PeerCoachingTeaser';
 import { FAQSection } from './components/FAQSection';
 import { LocationPage } from './components/LocationPage';
+import { ServicePage } from './components/ServicePage';
 import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2, Sparkles, Image, Shield } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
@@ -371,6 +372,10 @@ const App: React.FC = () => {
     // Handle path-based routes (for SEO)
     if (typeof activeSection === 'string' && activeSection.startsWith('/locations/')) {
       return <LocationPage />;
+    }
+
+    if (typeof activeSection === 'string' && activeSection.startsWith('/services/')) {
+      return <ServicePage />;
     }
     
     // AUTH GUARD: Redirect unauthenticated users from protected routes
