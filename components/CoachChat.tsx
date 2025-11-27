@@ -6,6 +6,7 @@ import { Message } from '../types';
 import { useTypewriter } from '../hooks/useTypewriter';
 import { useSound } from '../hooks/useSound';
 import { Mascot } from './Mascot';
+import { useStore } from '../context/StoreContext';
 
 const MessageItem: React.FC<{ message: Message }> = ({ message }) => {
   const displayText = useTypewriter(message.text, 10, message.role === 'model');
@@ -44,6 +45,7 @@ export const CoachChat: React.FC = () => {
   const chatRef = useRef<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { playClick, playSuccess } = useSound();
+  const { authToken, addNotification } = useStore();
 
   useEffect(() => {
     // Initialize Pro Chat
@@ -70,13 +72,20 @@ export const CoachChat: React.FC = () => {
     const text = inputText;
     setInputText('');
     
-    setMessages(prev => [...prev, { id: Date.now().toString(), role: 'user', text }]);
+    const userMessage = { id: Date.now().toString(), role: 'user', text } as Message;
+    const newHistory = [...messages, userMessage];
+    setMessages(newHistory);
     setIsTyping(true);
 
     try {
-        const response = await sendMessageToGemini(text, chatRef.current);
+        if (!authToken) {
+          throw new Error('Please log in before chatting.');
+        }
+
+        const response = await sendMessageToGemini(text, chatRef.current, newHistory, authToken);
         setMessages(prev => [...prev, { id: Date.now().toString(), role: 'model', text: response.text }]);
     } catch (e) {
+        addNotification('error', e instanceof Error ? e.message : 'Unable to reach backend.');
         setMessages(prev => [...prev, { id: Date.now().toString(), role: 'model', text: "I'm having trouble connecting to the Pro network. Please try again." }]);
     } finally {
         setIsTyping(false);

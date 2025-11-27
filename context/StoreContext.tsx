@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Donation, Notification, RequestItem, BeneficiaryProfile, Message } from '../types';
+import { loginToBackend } from '../services/geminiService';
 
 type UserType = 'donor' | 'beneficiary' | null;
 
 interface IntakeSessionState {
   messages: Message[];
-  mockState: string;
+  sessionId?: string;
+  sessionType?: 'INTAKE' | 'COACH' | 'GLOBAL';
   hasStarted: boolean;
   hasConsent: boolean;
 }
@@ -37,7 +39,7 @@ interface StoreContextType {
   // Auth State (Simulated Backend)
   userType: UserType;
   isAuthenticated: boolean;
-  login: (type: UserType) => void;
+  login: (type: UserType) => Promise<void>;
   logout: () => void;
   clearAllData: () => void;
   // Chat Persistence
@@ -60,10 +62,13 @@ const DEFAULT_BENEFICIARY: BeneficiaryProfile = {
 
 const DEFAULT_INTAKE_SESSION: IntakeSessionState = {
   messages: [],
-  mockState: 'GREETING',
   hasStarted: false,
   hasConsent: false
 };
+
+const AUTH_STORAGE_KEY = 'secondwind_auth_token';
+const BACKEND_EMAIL = import.meta.env.VITE_BACKEND_EMAIL;
+const BACKEND_PASSWORD = import.meta.env.VITE_BACKEND_PASSWORD;
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
@@ -80,7 +85,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [intakeSession, setIntakeSession] = useState<IntakeSessionState>(DEFAULT_INTAKE_SESSION);
   
   // Simulated Secure Session
-  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(AUTH_STORAGE_KEY);
+  });
 
   const toggleCalmMode = () => {
     setIsCalmMode(prev => {
@@ -154,18 +162,31 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
-  // Simulated Backend Auth Flow
-  const login = (type: UserType) => {
-    // In production, this would exchange credentials for a real JWT
-    const mockToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.simulated_token.${Date.now()}`;
-    setAuthToken(mockToken);
-    setUserType(type);
-    triggerConfetti();
-    addNotification('success', `Welcome back, ${type === 'donor' ? 'Partner' : 'Friend'}.`);
+  // Backend Auth Flow
+  const login = async (type: UserType) => {
+    if (!BACKEND_EMAIL || !BACKEND_PASSWORD) {
+      addNotification('error', 'Backend credentials are not configured. Set VITE_BACKEND_EMAIL and VITE_BACKEND_PASSWORD.');
+      return;
+    }
+
+    try {
+      const { token } = await loginToBackend(BACKEND_EMAIL, BACKEND_PASSWORD);
+      setAuthToken(token);
+      localStorage.setItem(AUTH_STORAGE_KEY, token);
+      setUserType(type);
+      triggerConfetti();
+      addNotification('success', `Welcome back, ${type === 'donor' ? 'Partner' : 'Friend'}.`);
+    } catch (error: any) {
+      console.error('Login failed', error);
+      addNotification('error', error?.message || 'Unable to log in. Please verify backend credentials.');
+    }
   };
 
   const logout = () => {
     setAuthToken(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
     setUserType(null);
     addNotification('info', 'You have been logged out.');
   };

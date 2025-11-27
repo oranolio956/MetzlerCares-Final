@@ -1,9 +1,14 @@
 #!/bin/bash
+set -euo pipefail
 
 # Create all Render services using API
-API_KEY="rnd_E6GGs6PzdUy5aLU4wfWpKTyJh0uE"
-OWNER_ID="tea-d419fdili9vc739hocog"
+API_KEY=${RENDER_API_KEY:?"RENDER_API_KEY is required"}
+OWNER_ID=${RENDER_OWNER_ID:?"RENDER_OWNER_ID is required"}
 API_BASE="https://api.render.com/v1"
+
+if ! command -v jq &> /dev/null; then
+  echo "⚠️  jq not found. Install jq for formatted JSON output."
+fi
 
 echo "=== Creating Render Services ==="
 echo ""
@@ -50,7 +55,7 @@ WEB_RESPONSE=$(curl -s -X POST "$API_BASE/services" \
   }")
 
 echo "Web service response:"
-echo "$WEB_RESPONSE" | python3 -m json.tool 2>/dev/null || echo "$WEB_RESPONSE"
+echo "$WEB_RESPONSE" | jq '.' 2>/dev/null || echo "$WEB_RESPONSE"
 echo ""
 
 echo "=== Service Creation Complete ==="

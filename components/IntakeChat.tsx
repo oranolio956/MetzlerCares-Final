@@ -50,7 +50,9 @@ export const IntakeChat: React.FC = () => {
       resetIntakeSession,
       setCrisisMode, 
       setShowLegalDocs,
-      isCalmMode
+      isCalmMode,
+      authToken,
+      addNotification
   } = useStore();
 
   const [mode, setMode] = useState<'text' | 'voice'>('text');
@@ -67,17 +69,14 @@ export const IntakeChat: React.FC = () => {
   const { playClick, playSuccess } = useSound();
   const { connect, disconnect, isSpeaking, volume, connected } = useGeminiLive();
 
-  // Restore session object on mount if we have mockState
   useEffect(() => {
-      if (intakeSession.hasStarted && !sessionRef.current) {
-          // Re-hydrate a lightweight session object
-          sessionRef.current = {
-              sessionId: `restored_${Date.now()}`,
-              type: 'INTAKE',
-              mockState: intakeSession.mockState
-          };
-      }
-  }, []);
+    if (!sessionRef.current && intakeSession.sessionId) {
+      sessionRef.current = {
+        sessionId: intakeSession.sessionId,
+        type: intakeSession.sessionType || 'INTAKE'
+      };
+    }
+  }, [intakeSession.sessionId, intakeSession.sessionType]);
 
   const toggleVoiceMode = () => {
      playClick();
@@ -146,15 +145,21 @@ export const IntakeChat: React.FC = () => {
 
   const startSession = () => {
       playSuccess();
-      updateIntakeSession({ hasStarted: true });
       sessionRef.current = startIntakeSession();
+      updateIntakeSession({ hasStarted: true, sessionId: sessionRef.current.sessionId, sessionType: 'INTAKE' });
       setIsAiTyping(true);
-      
+
       // Simulate network delay for realism
       setTimeout(async () => {
-          const response = await sendMessageToGemini("Hello, I am ready to start.", sessionRef.current);
-          updateIntakeSession({ 
-              messages: [{ id: 'init', role: 'model', text: response.text }] 
+          if (!authToken) {
+            addNotification('error', 'Please log in to start a session.');
+            setIsAiTyping(false);
+            return;
+          }
+
+          const response = await sendMessageToGemini("Hello, I am ready to start.", sessionRef.current, [], authToken);
+          updateIntakeSession({
+              messages: [{ id: 'init', role: 'model', text: response.text }]
           });
           setIsAiTyping(false);
       }, 800);
@@ -180,20 +185,24 @@ export const IntakeChat: React.FC = () => {
     if (inputRef.current) inputRef.current.focus();
 
     try {
-      const response = await sendMessageToGemini(text, sessionRef.current, intakeSession.messages);
+      if (!authToken) {
+        throw new Error('Please log in before chatting.');
+      }
+
+      const response = await sendMessageToGemini(text, sessionRef.current, newHistory, authToken);
       
       // Proactive Crisis Check
       if (response.text.toLowerCase().includes("988") || response.text.toLowerCase().includes("suicide")) {
          setCrisisMode(true);
       }
       
-      updateIntakeSession({ 
+      updateIntakeSession({
           messages: [...newHistory, { id: (Date.now() + 1).toString(), role: 'model', text: response.text }],
-          mockState: sessionRef.current?.mockState
       });
 
     } catch (e) {
-      updateIntakeSession({ 
+      addNotification('error', e instanceof Error ? e.message : 'Unable to reach backend.');
+      updateIntakeSession({
           messages: [...newHistory, { id: 'err', role: 'model', text: "Connection interrupted. Please check your internet."}]
       });
     } finally {

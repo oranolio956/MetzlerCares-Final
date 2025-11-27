@@ -15,6 +15,21 @@ View your app in AI Studio: https://ai.studio/apps/drive/15RVMjoduKyt3-EPkFtsu8U
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. Set `VITE_BACKEND_URL`, `VITE_BACKEND_EMAIL`, and `VITE_BACKEND_PASSWORD` in [.env.local](.env.local) to point the UI at
+   your backend and authenticate requests. (Optional) Set `VITE_GEMINI_API_KEY` only if you want to enable the experimental
+   voice mode that still talks directly to Gemini.
 3. Run the app:
    `npm run dev`
+
+## Backend API (server-side Gemini proxy)
+
+The backend keeps API keys off the client and adds validation, rate limiting, and OpenAPI docs.
+
+```
+cd backend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+See [backend/README.md](backend/README.md) for endpoints and deployment notes.
