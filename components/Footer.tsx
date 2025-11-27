@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { HeartHandshake, MapPin, Mail, Phone, ArrowRight, Github, Twitter, Linkedin, Instagram } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
@@ -12,7 +11,7 @@ const BrandLogo = ({ className = "w-8 h-8" }: { className?: string }) => (
 );
 
 export const Footer: React.FC<{ onNavigate: (route: string) => void }> = ({ onNavigate }) => {
-  const { userType } = useStore();
+  const { userType, setShowLegalDocs } = useStore();
 
   return (
     <footer className="bg-brand-navy text-white pt-20 pb-10 relative overflow-hidden mt-0">
@@ -86,8 +85,8 @@ export const Footer: React.FC<{ onNavigate: (route: string) => void }> = ({ onNa
               © 2024 SecondWind Protocol. All Rights Reserved.
            </p>
            <div className="flex gap-6 text-xs text-brand-lavender/40 font-bold uppercase tracking-widest">
-              <a href="#" className="hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms</a>
+              <button onClick={() => setShowLegalDocs(true)} className="hover:text-white transition-colors">Privacy</button>
+              <button onClick={() => setShowLegalDocs(true)} className="hover:text-white transition-colors">Terms</button>
               <a href="#" className="hover:text-white transition-colors">Sitemap</a>
            </div>
         </div>

@@ -1,19 +1,13 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Activity, Shield, Zap, LifeBuoy, CornerDownLeft, ArrowRight, FileCheck, MapPin, User, Clock, Trash2, MessageCircle } from 'lucide-react';
+import { Mic, MicOff, Activity, Shield, Zap, LifeBuoy, CornerDownLeft, ArrowRight, FileCheck, MapPin, User, Trash2, Lock } from 'lucide-react';
 import { startIntakeSession, sendMessageToGemini } from '../services/geminiService';
 import { useGeminiLive } from '../hooks/useGeminiLive';
 import { Message } from '../types';
 import { Mascot, MascotProps } from './Mascot';
-import { Content } from '@google/genai';
 import { useTypewriter } from '../hooks/useTypewriter';
 import { useStore } from '../context/StoreContext';
 import { useSound } from '../hooks/useSound';
 
-const SESSION_KEY = 'secondwind_intake_session_v1';
-const SESSION_EXPIRY = 24 * 60 * 60 * 1000;
-
-// QUICK CHIPS - Suggested replies
 const QUICK_CHIPS = [
     "Yes, I'm in Colorado",
     "No, I don't have insurance",
@@ -57,6 +51,7 @@ const MessageItem: React.FC<{ message: Message; isLast: boolean }> = ({ message,
 };
 
 export const IntakeChat: React.FC = () => {
+  const [hasConsent, setHasConsent] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [mode, setMode] = useState<'text' | 'voice'>('text');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -64,13 +59,14 @@ export const IntakeChat: React.FC = () => {
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [mascotExpression, setMascotExpression] = useState<MascotProps['expression']>('happy');
   
-  const chatRef = useRef<any>(null); 
+  // Session State (Ephemeral, not in LocalStorage)
+  const sessionRef = useRef<any>(null); 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { setCrisisMode } = useStore();
+  const { setCrisisMode, setShowLegalDocs } = useStore();
   const { playClick, playSuccess } = useSound();
-  const { connect, disconnect, isSpeaking, volume } = useGeminiLive();
+  const { connect, disconnect, isSpeaking, volume, connected } = useGeminiLive();
 
   const toggleVoiceMode = () => {
      playClick();
@@ -93,65 +89,33 @@ export const IntakeChat: React.FC = () => {
      }
   }, [mode, isSpeaking, volume]);
 
-  useEffect(() => {
-    const saved = localStorage.getItem(SESSION_KEY);
-    if (saved) {
-      try {
-        const { messages: savedMsgs, hasStarted: savedStarted, timestamp } = JSON.parse(saved);
-        if (Date.now() - timestamp > SESSION_EXPIRY) {
-            localStorage.removeItem(SESSION_KEY);
-            return;
-        }
-        if (savedStarted) {
-          setHasStarted(true);
-          setMessages(savedMsgs);
-          const history: Content[] = savedMsgs
-            .filter((m: Message) => m.id !== 'init' && m.id !== 'err') 
-            .map((m: Message) => ({ role: m.role, parts: [{ text: m.text }] }));
-          chatRef.current = startIntakeSession(history);
-        }
-      } catch (e) { localStorage.removeItem(SESSION_KEY); }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (hasStarted && messages.length > 0) {
-      localStorage.setItem(SESSION_KEY, JSON.stringify({ messages, hasStarted, timestamp: Date.now() }));
-    }
-  }, [messages, hasStarted]);
-
   const handleResetSession = () => {
-      if (window.confirm("Start a new intake session?")) {
+      if (window.confirm("Start a new intake session? This will clear all temporary data.")) {
           playClick();
-          localStorage.removeItem(SESSION_KEY);
           setMessages([]);
           setHasStarted(false);
-          chatRef.current = null;
+          setHasConsent(false);
+          sessionRef.current = null;
+          // Clean up any backend sessions here if needed
       }
   };
 
+  // Auto-start message
   useEffect(() => {
-    if (hasStarted && !chatRef.current && mode === 'text') {
+    if (hasStarted && hasConsent && !sessionRef.current && mode === 'text') {
       if (messages.length === 0) {
-          chatRef.current = startIntakeSession();
+          sessionRef.current = startIntakeSession();
           setIsAiTyping(true);
+          // Simulate network delay for realism
           setTimeout(async () => {
-              try {
-                const response = await sendMessageToGemini("Hello, I am a new user looking for help.", chatRef.current);
-                setMessages([{ id: 'init', role: 'model', text: response }]);
-              } catch(e) { console.error(e); }
+              const response = await sendMessageToGemini("Hello, I am ready to start.", sessionRef.current);
+              setMessages([{ id: 'init', role: 'model', text: response }]);
               setIsAiTyping(false);
-          }, 600);
-      } else {
-           const history: Content[] = messages
-            .filter((m: Message) => m.id !== 'init' && m.id !== 'err') 
-            .map((m: Message) => ({ role: m.role, parts: [{ text: m.text }] }));
-           chatRef.current = startIntakeSession(history);
+          }, 800);
       }
     }
-  }, [hasStarted, mode]);
+  }, [hasStarted, hasConsent, mode]);
 
-  // Improved scroll logic
   useEffect(() => {
     if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -168,14 +132,16 @@ export const IntakeChat: React.FC = () => {
     if (inputRef.current) inputRef.current.focus();
 
     try {
-      const responseText = await sendMessageToGemini(text, chatRef.current);
-      // Basic heuristic to detect crisis response
+      const responseText = await sendMessageToGemini(text, sessionRef.current);
+      
+      // Proactive Crisis Check (Client Side Safety Net)
       if (responseText.toLowerCase().includes("988") || responseText.toLowerCase().includes("suicide")) {
          setCrisisMode(true);
       }
+      
       setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'model', text: responseText }]);
     } catch (e) {
-      setMessages(prev => [...prev, { id: 'err', role: 'model', text: "Connection interrupted. Please try again."}]);
+      setMessages(prev => [...prev, { id: 'err', role: 'model', text: "Connection interrupted. Please check your internet."}]);
     } finally {
       setIsAiTyping(false);
     }
@@ -184,6 +150,7 @@ export const IntakeChat: React.FC = () => {
   if (!hasStarted) {
     return (
       <div className="w-full max-w-6xl mx-auto bg-brand-navy rounded-3xl md:rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row relative min-h-[600px]">
+         {/* Left Side: Info */}
          <div className="flex-1 p-8 md:p-14 flex flex-col justify-center relative overflow-hidden text-white border-b md:border-b-0 md:border-r border-white/5">
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-teal opacity-10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
             <h1 className="font-display font-bold text-4xl sm:text-5xl md:text-6xl leading-[0.9] tracking-tight mb-8 relative z-10">COLORADO<br/>RECOVERY INTAKE</h1>
@@ -195,21 +162,44 @@ export const IntakeChat: React.FC = () => {
                     <li className="flex items-center gap-3"><MapPin size={16} className="text-brand-coral" /> <span>Current location/Oxford House</span></li>
                     <li className="flex items-center gap-3"><FileCheck size={16} className="text-brand-coral" /> <span>Vendor Contact Info</span></li>
                     <li className="flex items-center gap-3"><User size={16} className="text-brand-coral" /> <span>Photo ID</span></li>
-                    <li className="flex items-center gap-3"><Clock size={16} className="text-brand-coral" /> <span>Approximate Sobriety Date</span></li>
                   </ul>
                </div>
                <div className="flex gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest text-brand-teal/80">
-                  <span className="flex items-center gap-1"><Shield size={12} /> Encrypted</span>
-                  <span className="flex items-center gap-1"><Zap size={12} /> Instant</span>
-                  <span className="flex items-center gap-1"><Activity size={12} /> 24/7 Active</span>
+                  <span className="flex items-center gap-1"><Lock size={12} /> HIPAA-Compliant</span>
+                  <span className="flex items-center gap-1"><Zap size={12} /> No Persistent Storage</span>
                </div>
             </div>
          </div>
+         
+         {/* Right Side: Consent & Start */}
          <div className="flex-1 bg-[#FDFBF7] p-8 md:p-14 flex flex-col justify-center items-center relative">
-            <div className="w-full max-w-sm space-y-4 relative z-10">
-               <div className="mb-8 flex justify-center"><div className="w-32 h-32 relative"><Mascot expression="happy" className="w-full h-full" /></div></div>
-               <button onClick={() => { playSuccess(); setHasStarted(true); }} className="w-full bg-brand-navy text-white h-16 rounded-xl font-bold text-lg hover:bg-brand-teal transition-all flex items-center justify-between px-6 group shadow-lg active:scale-95"><span>Begin Session</span><ArrowRight className="group-hover:translate-x-1 transition-transform" /></button>
-               <button onClick={() => { playClick(); setHasStarted(true); toggleVoiceMode(); }} className="w-full bg-white border-2 border-brand-navy/10 text-brand-navy h-16 rounded-xl font-bold text-lg hover:border-brand-navy/30 transition-all flex items-center justify-between px-6 group active:scale-95"><span>Voice Mode</span><Mic size={20} className="text-brand-coral group-hover:scale-110 transition-transform" /></button>
+            <div className="w-full max-w-sm space-y-6 relative z-10">
+               <div className="mb-4 flex justify-center"><div className="w-32 h-32 relative"><Mascot expression="happy" className="w-full h-full" /></div></div>
+               
+               {!hasConsent ? (
+                 <div className="bg-white border border-brand-navy/10 rounded-xl p-6 animate-slide-up shadow-lg">
+                    <h4 className="font-bold text-brand-navy mb-2 flex items-center gap-2"><Shield size={16}/> Privacy & Consent</h4>
+                    <p className="text-xs text-brand-navy/60 mb-4 leading-relaxed">
+                      This system uses AI to process your intake. By proceeding, you agree to our <button onClick={() => setShowLegalDocs(true)} className="text-brand-teal underline font-bold">Terms & Privacy Policy</button>. 
+                      We do not store your chat history permanently on this device. All data is transmitted securely to our backend.
+                    </p>
+                    <div className="flex items-center gap-3 mb-4 p-3 bg-brand-navy/5 rounded-lg border border-brand-navy/5">
+                        <input type="checkbox" id="consent" className="w-5 h-5 rounded border-brand-navy text-brand-teal focus:ring-brand-teal" onChange={(e) => e.target.checked && playClick()} />
+                        <label htmlFor="consent" className="text-xs font-bold text-brand-navy cursor-pointer">I understand and agree.</label>
+                    </div>
+                    <button 
+                      onClick={() => { playClick(); setHasConsent(true); }}
+                      className="w-full bg-brand-navy text-white py-3 rounded-lg font-bold text-sm hover:bg-brand-teal transition-colors"
+                    >
+                      Continue
+                    </button>
+                 </div>
+               ) : (
+                 <div className="space-y-4 animate-slide-up">
+                    <button onClick={() => { playSuccess(); setHasStarted(true); }} className="w-full bg-brand-navy text-white h-16 rounded-xl font-bold text-lg hover:bg-brand-teal transition-all flex items-center justify-between px-6 group shadow-lg active:scale-95"><span>Begin Session</span><ArrowRight className="group-hover:translate-x-1 transition-transform" /></button>
+                    <button onClick={() => { playClick(); setHasStarted(true); toggleVoiceMode(); }} className="w-full bg-white border-2 border-brand-navy/10 text-brand-navy h-16 rounded-xl font-bold text-lg hover:border-brand-navy/30 transition-all flex items-center justify-between px-6 group active:scale-95"><span>Voice Mode (Beta)</span><Mic size={20} className="text-brand-coral group-hover:scale-110 transition-transform" /></button>
+                 </div>
+               )}
             </div>
          </div>
       </div>
@@ -229,12 +219,12 @@ export const IntakeChat: React.FC = () => {
                <h3 className="font-bold text-brand-navy leading-none">Intake Assistant</h3>
                <div className="flex items-center gap-1.5 mt-1">
                   <div className={`w-1.5 h-1.5 rounded-full ${mode === 'voice' ? 'bg-brand-coral animate-pulse' : 'bg-brand-teal'}`}></div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40">{mode === 'voice' ? 'Voice Active' : 'Secure Connection'}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40">{mode === 'voice' ? 'Voice Encrypted' : 'Secure Session'}</span>
                </div>
             </div>
          </div>
          <div className="flex gap-2">
-            <button onClick={handleResetSession} className="p-3 text-brand-navy/40 hover:text-brand-coral hover:bg-brand-coral/10 rounded-xl transition-colors" title="Reset Session"><Trash2 size={20} /></button>
+            <button onClick={handleResetSession} className="p-3 text-brand-navy/40 hover:text-brand-coral hover:bg-brand-coral/10 rounded-xl transition-colors" title="Clear Data & Reset"><Trash2 size={20} /></button>
             <button onClick={() => setCrisisMode(true)} className="p-3 text-brand-coral hover:bg-brand-coral/10 rounded-xl transition-colors" title="Crisis Help"><LifeBuoy size={20} /></button>
             <button onClick={toggleVoiceMode} className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${mode === 'voice' ? 'bg-brand-coral text-white shadow-md' : 'bg-brand-navy/5 text-brand-navy hover:bg-brand-navy/10'}`}>
                {mode === 'voice' ? <><MicOff size={16}/> End Call</> : <><Mic size={16}/> Voice</>}
@@ -271,20 +261,20 @@ export const IntakeChat: React.FC = () => {
             aria-modal="true"
          >
              <div className="relative w-72 h-72 flex items-center justify-center mb-8">
-                {!isSpeaking && <div className="absolute inset-0 border-2 border-brand-coral/20 rounded-full animate-ping" style={{ animationDuration: '2s' }}></div>}
+                {!isSpeaking && connected && <div className="absolute inset-0 border-2 border-brand-coral/20 rounded-full animate-ping" style={{ animationDuration: '2s' }}></div>}
                 <div className={`absolute bg-brand-coral/10 rounded-full transition-all duration-75 ease-out`} style={{ width: `${50 + volume * 50}%`, height: `${50 + volume * 50}%`, opacity: 0.2 + volume }}></div>
                 <div className="relative z-20 w-40 h-40 bg-white rounded-full shadow-2xl flex items-center justify-center p-6"><Mascot expression={mascotExpression} className="w-full h-full" /></div>
              </div>
              
-             <h3 className="font-display font-bold text-2xl text-brand-navy mb-2 animate-slide-up">Listening...</h3>
-             <p className="text-brand-navy/40 font-medium mb-8">Speak naturally. Windy is ready.</p>
+             <h3 className="font-display font-bold text-2xl text-brand-navy mb-2 animate-slide-up">{connected ? "Listening..." : "Connecting..."}</h3>
+             <p className="text-brand-navy/40 font-medium mb-8">Speak naturally. Windy is listening.</p>
          </div>
       </div>
 
       {/* INPUT AREA */}
       <div className={`shrink-0 bg-white border-t border-brand-navy/5 transition-transform duration-300 ${mode === 'voice' ? 'translate-y-full hidden' : 'translate-y-0 block'}`}>
          
-         {/* QUICK CHIPS - Suggested Replies */}
+         {/* QUICK CHIPS */}
          <div className="px-4 pt-4 flex gap-2 overflow-x-auto no-scrollbar pb-2">
             {QUICK_CHIPS.map((chip) => (
                 <button

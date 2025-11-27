@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality, FunctionDeclaration, Type } from "@google/genai";
 import { useStore } from '../context/StoreContext';
@@ -26,7 +25,7 @@ const submitApplicationTool: FunctionDeclaration = {
 export const useGeminiLive = () => {
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [volume, setVolume] = useState(0);
-    const { addNotification, submitIntakeRequest } = useStore();
+    const { addNotification, submitIntakeRequest, authToken } = useStore();
     const [connected, setConnected] = useState(false);
     
     // Audio Context Refs
@@ -42,6 +41,11 @@ export const useGeminiLive = () => {
 
     const connect = useCallback(async () => {
         try {
+            // Check for API Key or Backend Token
+            if (!process.env.API_KEY && !authToken) {
+                throw new Error("Missing authentication credentials. Please log in.");
+            }
+
             const client = new GoogleGenAI({ apiKey: process.env.API_KEY });
             
             // Setup Audio Contexts
@@ -54,18 +58,29 @@ export const useGeminiLive = () => {
             outputNode.connect(ctx.destination);
             outputNodeRef.current = outputNode;
 
-            // Input Stream
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: {
-                sampleRate: 16000,
-                channelCount: 1,
-                echoCancellation: true,
-                autoGainControl: true,
-                noiseSuppression: true
-            }});
+            // Input Stream with explicit error handling for permissions
+            let stream;
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ audio: {
+                    sampleRate: 16000,
+                    channelCount: 1,
+                    echoCancellation: true,
+                    autoGainControl: true,
+                    noiseSuppression: true
+                }});
+            } catch (err: any) {
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    throw new Error("Microphone access denied. Please allow permission in your browser settings.");
+                } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                     throw new Error("No microphone device found.");
+                } else {
+                     throw new Error("Could not access microphone.");
+                }
+            }
+            
             streamRef.current = stream;
 
-            // Input Processing for Volume Viz & PCM conversion
-            // We use a separate 16k context for input to ensure correct sample rate for the model
+            // Input Processing
             const inputCtx = new AudioCtx({ sampleRate: 16000 });
             const source = inputCtx.createMediaStreamSource(stream);
             const processor = inputCtx.createScriptProcessor(4096, 1, 1);
@@ -89,11 +104,11 @@ export const useGeminiLive = () => {
                         processor.onaudioprocess = (e) => {
                             const inputData = e.inputBuffer.getChannelData(0);
                             
-                            // Calculate Volume for UI
+                            // Calculate Volume for UI Visualization
                             let sum = 0;
                             for(let i=0; i<inputData.length; i++) sum += inputData[i] * inputData[i];
                             const rms = Math.sqrt(sum / inputData.length);
-                            setVolume(Math.min(rms * 5, 1)); // Amplify for visual
+                            setVolume(Math.min(rms * 5, 1)); 
                             
                             // Convert to PCM16
                             const pcmData = new Int16Array(inputData.length);
@@ -122,7 +137,6 @@ export const useGeminiLive = () => {
                         };
                     },
                     onmessage: async (msg: LiveServerMessage) => {
-                        // Handle Audio Output
                         const audioData = msg.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
                         if (audioData) {
                             setIsSpeaking(true);
@@ -149,7 +163,6 @@ export const useGeminiLive = () => {
                                 nextStartTimeRef.current = start + buffer.duration;
                                 
                                 source.onended = () => {
-                                    // Rough approximation of when speaking stops if no new chunks
                                     if (ctx.currentTime >= nextStartTimeRef.current - 0.1) {
                                         setIsSpeaking(false);
                                     }
@@ -157,17 +170,13 @@ export const useGeminiLive = () => {
                             }
                         }
 
-                        // Handle Turn Complete / Interrupt
-                        if (msg.serverContent?.turnComplete) {
-                            setIsSpeaking(false);
-                        }
+                        if (msg.serverContent?.turnComplete) setIsSpeaking(false);
                         
                         if (msg.serverContent?.interrupted) {
                              nextStartTimeRef.current = 0;
                              setIsSpeaking(false);
                         }
 
-                        // Handle Tool Calls
                         if (msg.toolCall) {
                              for (const fc of msg.toolCall.functionCalls) {
                                  if (fc.name === 'submit_application') {
@@ -177,7 +186,6 @@ export const useGeminiLive = () => {
                                          details: args.reasoning
                                      });
                                      
-                                     // Respond
                                      sessionPromise.then(s => s.sendToolResponse({
                                          functionResponses: {
                                              id: fc.id,
@@ -197,7 +205,7 @@ export const useGeminiLive = () => {
                     },
                     onerror: (e) => {
                         console.error("Session Error", e);
-                        addNotification('error', 'Voice connection lost');
+                        addNotification('error', 'Voice connection interrupted.');
                         setConnected(false);
                     }
                 },
@@ -213,11 +221,11 @@ export const useGeminiLive = () => {
             
             sessionRef.current = sessionPromise;
 
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            addNotification('error', 'Failed to initialize voice mode');
+            addNotification('error', error.message || 'Failed to initialize voice mode');
         }
-    }, [addNotification, submitIntakeRequest]);
+    }, [addNotification, submitIntakeRequest, authToken]);
 
     const disconnect = useCallback(() => {
         if (sessionRef.current) {

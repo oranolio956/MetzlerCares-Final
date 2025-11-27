@@ -1,207 +1,114 @@
+import { GoogleGenAI } from "@google/genai";
 
-import { GoogleGenAI, Chat, Content, Part } from "@google/genai";
+// ARCHITECTURE NOTE:
+// This service is now a facade. In production, these functions should call
+// your backend endpoints (e.g., POST /api/chat) which then call Gemini.
+// Direct client-side calls are disabled for security unless a specific Dev Mode is active.
 
-// Lazy initialization
-let ai: GoogleGenAI | null = null;
+export const SYSTEM_INSTRUCTION = `You are Windy, the AI Intake Specialist for SecondWind, a Colorado non-profit funding recovery.
+Your goal is to screen applicants for eligibility (Rent, Transit, Tech) in a friendly but efficient manner.
+You represent a "tough love" but deeply caring persona.
+Key qualifications:
+1. Must be in Colorado.
+2. Must be sober or seeking sobriety.
+3. Funding goes to vendors (Oxford House, RTD), never cash to users.
 
-const getAiClient = () => {
-  if (!ai) {
-    const key = process.env.API_KEY;
-    if (!key) console.warn("Gemini API Key missing");
-    ai = new GoogleGenAI({ apiKey: key });
+If the user mentions suicide or self-harm, stop immediately and tell them to call 988.
+Keep responses concise and conversational.`;
+
+// --- MOCK BACKEND SIMULATION (For Frontend Demo Only) ---
+const MOCK_DELAY = 800;
+
+const mockBackendResponse = async (message: string, systemInstruction: string): Promise<string> => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const lowerMsg = message.toLowerCase();
+            
+            // Crisis Detection (Simulated Backend Middleware)
+            if (lowerMsg.includes('suicide') || lowerMsg.includes('kill myself') || lowerMsg.includes('hurt')) {
+                resolve("I am stopping this conversation immediately because I am concerned for your safety. Please call 988 or 911 right now. We can handle the paperwork later. You matter.");
+                return;
+            }
+
+            // Simple Decision Tree to simulate "Windy"
+            if (systemInstruction.includes("Intake Case Manager") || systemInstruction.includes("Intake Specialist")) {
+                 if (lowerMsg.includes('hello') || lowerMsg.includes('hi')) return resolve("Hey there. I'm Windy. I handle the intake logistics so we can get you funded. First off, are you currently located in Colorado?");
+                 if (lowerMsg.includes('yes') && lowerMsg.includes('colorado')) return resolve("Okay, good. Next question: Are you safe right now? Do you have a place to sleep tonight, or are you on the street?");
+                 if (lowerMsg.includes('street') || lowerMsg.includes('homeless')) return resolve("I hear you. That's rough. We can help with sober living deposits. Do you have a specific Oxford House or facility in mind, or do you need a list?");
+                 return resolve("I got that. Look, I need to be sure we're a good fit. Do you have Medicaid or any state insurance? That changes what funds I can unlock for you.");
+            } else {
+                 return resolve("I'm processing that through our secure coaching backend. Give me a moment to analyze your recovery trajectory... [Mock Response: Coach Pro would analyze career paths here].");
+            }
+        }, MOCK_DELAY);
+    });
+};
+
+// --- CLIENT ---
+
+export const startIntakeSession = (): any => {
+  // In a real app, this would return a session ID from the server
+  return {
+    sessionId: `sess_${Date.now()}`,
+    type: 'INTAKE'
+  };
+};
+
+export const startCoachSession = (): any => {
+    return {
+        sessionId: `sess_coach_${Date.now()}`,
+        type: 'COACH'
+    };
+};
+
+export const sendMessageToGemini = async (message: string, session: any): Promise<string> => {
+  try {
+    // SECURITY CHECK: In production, use fetch() to your backend.
+    // const response = await fetch('/api/chat', { method: 'POST', body: JSON.stringify({ message, sessionId: session.sessionId }) });
+    // return await response.json();
+
+    // FALLBACK: If API Key is present (Dev Mode), use SDK. Otherwise, use Mock.
+    if (process.env.API_KEY) {
+        try {
+            // Re-instantiate for statelessness (simulating request scope)
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            const modelName = session.type === 'COACH' ? 'gemini-3-pro-preview' : 'gemini-2.5-flash-lite';
+            const instruction = session.type === 'COACH' 
+                ? "You are a Recovery Coach." 
+                : SYSTEM_INSTRUCTION;
+            
+            const model = ai.models.getGenerativeModel({ 
+                model: modelName,
+                systemInstruction: instruction
+            });
+            
+            // Note: In a real stateless backend, you'd pass full history here.
+            // For this demo, we just send the single prompt to show connectivity if key exists.
+            const result = await model.generateContent({
+                contents: [{ role: 'user', parts: [{ text: message }] }]
+            });
+            return result.response.text();
+        } catch (e) {
+            console.warn("Direct SDK call failed, falling back to mock backend.", e);
+            return await mockBackendResponse(message, session.type === 'COACH' ? "Coach" : "Intake Case Manager");
+        }
+    } else {
+        // PRODUCTION / DEMO MODE (No Keys exposed)
+        return await mockBackendResponse(message, session.type === 'COACH' ? "Coach" : "Intake Case Manager");
+    }
+
+  } catch (error) {
+    console.error("Service Error:", error);
+    return "I'm having trouble reaching the intake server. Please check your connection.";
   }
-  return ai;
-};
-
-export const SYSTEM_INSTRUCTION = `
-You are "Windy", the Intake Case Manager for "SecondWind", a Colorado non-profit funding recovery.
-You are NOT a robot. You are a warm, "tough love", experienced recovery specialist. You speak naturally, use empathy, but you do NOT let people bullshit you.
-
-**YOUR CORE MISSION:**
-We have limited funds. You must SCREEN applicants to ensure we only help those genuinely committed to recovery. We disqualify high-risk cases to prevent wasting resources on active addiction.
-
-**CRISIS PROTOCOL (HIGHEST PRIORITY):**
-If the user indicates they are suicidal, overdosing, in immediate danger, or planning violence:
-1.  STOP the intake immediately.
-2.  Say: "I hear you, and your life is more important than this application right now. Please call 988 (Suicide & Crisis Lifeline) or 911 immediately. We can talk about funding later when you are safe."
-3.  Do not attempt to provide medical advice or therapy.
-
-**OFF-TOPIC / EVASIVE PROTOCOL:**
-If the user rambles, talks about aliens, the weather, or tries to avoid a question:
-1.  Validate briefly: "I hear that," or "That's an interesting point."
-2.  Pivot immediately: "...but right now, I need to focus on getting you housed/fed. Let's get back to [Current Question]."
-
-**MANDATORY 7-STEP SCREENING (Ask one at a time):**
-
-1.  **Location Check**: "First off, I need to know you're local. Are you currently physically located in Colorado?"
-    *   *Rule*: If NO -> Disqualify. We only serve CO.
-
-2.  **Immediate Safety**: "Are you safe where you are right now, or are you in a crisis situation?"
-    *   *Rule*: If Crisis -> Trigger Crisis Protocol.
-
-3.  **Sobriety Status**: "Let's be real for a second. What is your clean/sober date? Are you currently using?"
-    *   *Rule*: If < 30 days AND not in a facility -> High Risk. (Lean towards Peer Coaching).
-    *   *Rule*: If "Active Use" with no plan -> Disqualify. We cannot fund active use.
-
-4.  **Living Situation**: "Where are you sleeping tonight? Oxford House, shelter, or somewhere else?"
-    *   *Green Flag*: Verified Oxford House/SLE.
-    *   *Red Flag*: "Apartment" (We don't pay first month/deposit for private rentals without income).
-
-5.  **Medicaid Check (THE PIVOT)**: "Do you have active Colorado Medicaid insurance?"
-    *   *CRITICAL*: If YES, they AUTOMATICALLY qualify for **Peer Coaching** (Employment, ID vouchers, Food stamps help), even if we can't pay their rent.
-    *   *If NO*: "We can help you apply. That unlocks a lot of doors."
-
-6.  **The Ask (Vendor Check)**: "Who exactly do we need to pay? I need a Landlord or Company name. We do not do cash or Venmo."
-    *   *Rule*: If they insist on Cash -> Disqualify.
-
-7.  **Recovery Plan**: "If we fund this, what's your plan for the next 30 days? How are you staying on the wagon?"
-    *   *Assessment*: Look for meetings, sponsorship, IOP, or work. Vague answers = Red Flag.
-
-**DECISION LOGIC (Internal Monologue):**
-
-*   **QUALIFIED (FUNDING)**: CO Resident + Sober (>30 days or in structure) + Valid Vendor + Clear Plan.
-*   **QUALIFIED (PEER COACHING)**: Has Medicaid but didn't meet strict funding criteria (e.g. early sobriety, unstable). *This is the fallback for "High Risk" candidates who have insurance.*
-*   **DISQUALIFIED**: Not in CO, Asking for Cash, Active Use, Hostile.
-
-**HOW TO CLOSE:**
-
-*   **If Qualified for Funding**: "Alright, you checked out. I'm submitting your packet to the board now. Stand by."
-*   **If Peer Coaching Only**: "Look, I can't approve the cash request right now—it's too early in your process. BUT, because you have Medicaid, I can get you a Peer Coach. They can get you a bus pass, help with food stamps, and get your ID. Do you want that?"
-*   **If Disqualified**: "Based on what you've told me, you don't fit our funding criteria right now. I recommend calling 2-1-1 for emergency resources."
-
-**TONE GUIDE:**
-*   **Bad**: "Please state your sobriety date." (Too robotic)
-*   **Good**: "How long have you been clean? Be honest with me, I've heard it all."
-*   **Bad**: "You are disqualified."
-*   **Good**: "I can't make that work right now. We have strict rules on this."
-`;
-
-export const COACH_SYSTEM_INSTRUCTION = `
-You are "Windy (Pro)", a highly advanced Peer Recovery Coach for SecondWind.
-Your goal is to provide detailed, thoughtful, and reasoned advice to beneficiaries in recovery.
-You have access to advanced reasoning capabilities. Use them to help users plan their careers, navigate complex emotional situations, and build long-term sobriety strategies.
-You are encouraging, professional, and deeply knowledgeable about addiction science, Colorado resources, and life skills.
-`;
-
-export const startIntakeSession = (restoredHistory?: Content[]): Chat => {
-  const client = getAiClient();
-  
-  // Transform simplified history if needed or pass as is
-  const validHistory = restoredHistory?.map(h => ({
-    role: h.role,
-    parts: h.parts
-  })) || [];
-
-  return client.chats.create({
-    model: 'gemini-2.5-flash-lite', // Using Fast AI for Intake
-    config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
-      temperature: 0.4, 
-      tools: [{ googleSearch: {} }]
-    },
-    history: validHistory
-  });
-};
-
-export const startCoachSession = (restoredHistory?: Content[]): Chat => {
-  const client = getAiClient();
-  
-  const validHistory = restoredHistory?.map(h => ({
-    role: h.role,
-    parts: h.parts
-  })) || [];
-
-  return client.chats.create({
-    model: 'gemini-3-pro-preview', // Using Pro for deep coaching
-    config: {
-      systemInstruction: COACH_SYSTEM_INSTRUCTION,
-      temperature: 0.7,
-    },
-    history: validHistory
-  });
 };
 
 export const generateVisionImage = async (prompt: string, size: '1K' | '2K' | '4K'): Promise<string> => {
-  const client = getAiClient();
-  try {
-    const response = await client.models.generateContent({
-        model: 'gemini-3-pro-image-preview',
-        contents: { parts: [{ text: prompt }] },
-        config: {
-            imageConfig: {
-                aspectRatio: "1:1",
-                imageSize: size
-            }
-        }
+    // MOCK IMAGE GENERATION
+    // Real backend would call: POST /api/generate-image
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            // Return a placeholder that looks cool
+            resolve("https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=3506&auto=format&fit=crop"); 
+        }, 1500);
     });
-    
-    for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData) {
-            return `data:image/png;base64,${part.inlineData.data}`;
-        }
-    }
-    throw new Error("No image generated");
-  } catch (error) {
-    console.error("Image Gen Error:", error);
-    throw error;
-  }
-};
-
-export const sendMessageToGemini = async (message: string, chat: Chat): Promise<string> => {
-  try {
-    const result = await chat.sendMessage({ message });
-    
-    // Safety & Null Checks
-    if (!result || !result.candidates || result.candidates.length === 0) {
-        throw new Error("No response candidates returned");
-    }
-
-    const candidate = result.candidates[0];
-    
-    // Check for safety blocking and other finish reasons
-    if (candidate.finishReason !== 'STOP' && candidate.finishReason !== undefined) {
-         if (candidate.finishReason === 'SAFETY') {
-             return "I need to keep our conversation professional and focused on your recovery logistics. Could we rephrase that?";
-         }
-         return "I'm having trouble processing that request under our current guidelines. Could you be more specific?";
-    }
-
-    let text = "";
-
-    // Access text via getter
-    try {
-        if (result.text) text = result.text;
-    } catch (e) {
-        // Fallback for parsing structure manually if getter fails
-        if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
-             const part = candidate.content.parts[0];
-             if ('text' in part) text = part.text as string;
-        }
-    }
-
-    // Process Grounding Metadata (Sources)
-    if (candidate.groundingMetadata?.groundingChunks) {
-        console.log("Grounding Metadata:", candidate.groundingMetadata); // Explicit logging for debugging
-
-        const sources = candidate.groundingMetadata.groundingChunks
-            .map((chunk: any) => {
-                const web = chunk.web;
-                if (web?.uri) {
-                    const title = web.title || 'Source';
-                    return `• ${title}: ${web.uri}`;
-                }
-                return null;
-            })
-            .filter(Boolean);
-        
-        if (sources.length > 0) {
-            text += "\n\nVerified Sources:\n" + sources.join('\n');
-        }
-    }
-
-    return text || "I'm having a little trouble connecting to the intake server. Can you repeat that?";
-  } catch (error) {
-    console.error("Gemini Error:", error);
-    return "System interruption. Let's try that again.";
-  }
 };

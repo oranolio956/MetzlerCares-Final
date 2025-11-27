@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { IntakeChat } from './components/IntakeChat';
 import { DonationFlow } from './components/DonationFlow';
@@ -25,7 +24,7 @@ import { MedicaidPromo } from './components/MedicaidPromo';
 import { RecoveryKnowledgeGraph } from './components/RecoveryKnowledgeGraph';
 import { CoachChat } from './components/CoachChat';
 import { VisionBoard } from './components/VisionBoard';
-import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2, Sparkles, Image } from 'lucide-react';
+import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2, Sparkles, Image, Shield } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SecondWind Logo">
@@ -35,7 +34,7 @@ const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
   </svg>
 );
 
-// Global Crisis Overlay Component - High Z-Index to block everything
+// Global Crisis Overlay Component
 const CrisisOverlay = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   if (!isOpen) return null;
   
@@ -59,14 +58,50 @@ const CrisisOverlay = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
           <a href="sms:741741" className="bg-brand-navy text-white font-bold py-5 rounded-2xl flex items-center justify-center gap-3 shadow-xl hover:scale-105 transition-transform">
             <MessageSquare size={24} /> Text HOME to 741741
           </a>
+          <a href="tel:1-844-493-8255" className="bg-white/10 text-white border border-white/20 font-bold py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-white/20 transition-transform">
+            <Building2 size={20} /> CO Crisis Services
+          </a>
         </div>
+        <p className="mt-8 text-white/60 text-sm font-bold uppercase tracking-widest">Available 24/7 • Confidential • Bilingual</p>
     </div>
   );
 };
 
+// Legal Docs Overlay
+const LegalOverlay = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+            <div className="absolute inset-0 bg-brand-navy/60 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl relative z-10 max-h-[80vh] flex flex-col overflow-hidden animate-slide-up">
+                <div className="p-6 border-b border-brand-navy/5 flex justify-between items-center bg-brand-cream shrink-0">
+                    <h3 className="font-bold text-xl text-brand-navy flex items-center gap-2"><Shield size={20} /> Legal & Compliance</h3>
+                    <button onClick={onClose}><X size={24} className="text-brand-navy/40 hover:text-brand-navy" /></button>
+                </div>
+                <div className="p-8 overflow-y-auto custom-scrollbar prose prose-sm text-brand-navy/80">
+                    <h4 className="font-bold text-lg text-brand-navy mb-2">1. Terms of Service</h4>
+                    <p className="mb-4">By using SecondWind, you acknowledge that we are a platform facilitating direct payments to verified recovery vendors. We do not provide medical advice. All donations are final and non-refundable tax-deductible contributions.</p>
+                    
+                    <h4 className="font-bold text-lg text-brand-navy mb-2">2. Privacy Policy</h4>
+                    <p className="mb-4">We prioritize data minimization. Chat logs in the Intake Assistant are ephemeral and not permanently stored. We do not sell user data to third parties. We comply with 42 CFR Part 2 regarding confidentiality of substance use disorder patient records.</p>
+                    
+                    <h4 className="font-bold text-lg text-brand-navy mb-2">3. HIPAA Compliance</h4>
+                    <p className="mb-4">While SecondWind acts as an administrative intermediary, we adhere to HIPAA standards for data encryption and handling of any health-related information provided during the intake process.</p>
+                    
+                    <h4 className="font-bold text-lg text-brand-navy mb-2">4. Crisis Disclaimer</h4>
+                    <p className="mb-4 font-bold text-brand-coral">If you are in immediate danger, call 911. SecondWind is an administrative tool for funding, not an emergency response service.</p>
+                </div>
+                <div className="p-6 border-t border-brand-navy/5 bg-white shrink-0">
+                    <button onClick={onClose} className="w-full bg-brand-navy text-white py-3 rounded-xl font-bold hover:bg-brand-teal transition-colors">Acknowledge & Close</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const App: React.FC = () => {
   const { route: activeSection, navigate } = useRouter();
-  const { isCalmMode, toggleCalmMode, isSoundEnabled, toggleSound, userType, login, logout, isCrisisMode, setCrisisMode } = useStore();
+  const { isCalmMode, toggleCalmMode, isSoundEnabled, toggleSound, userType, login, logout, isCrisisMode, setCrisisMode, showLegalDocs, setShowLegalDocs, isAuthenticated } = useStore();
   const { playClick } = useSound();
   const [scrolled, setScrolled] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -96,9 +131,9 @@ const App: React.FC = () => {
   }, [activeSection, isCalmMode]);
 
   useEffect(() => {
-    document.body.style.overflow = (isMobileMenuOpen || isCrisisMode) ? 'hidden' : '';
+    document.body.style.overflow = (isMobileMenuOpen || isCrisisMode || showLegalDocs) ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
-  }, [isMobileMenuOpen, isCrisisMode]);
+  }, [isMobileMenuOpen, isCrisisMode, showLegalDocs]);
 
   const handleLoginSuccess = (type: 'donor' | 'beneficiary') => {
     login(type);
@@ -107,6 +142,16 @@ const App: React.FC = () => {
   };
 
   const renderContent = () => {
+    // AUTH GUARD: Redirect unauthenticated users from protected routes
+    if ((activeSection === 'portal' || activeSection === 'coach' || activeSection === 'vision') && (!isAuthenticated || userType !== 'beneficiary')) {
+        setTimeout(() => setIsLoginOpen(true), 100);
+        return <HeroSection onNavigate={navigate} />; 
+    }
+    if (activeSection === 'donor-portal' && (!isAuthenticated || userType !== 'donor')) {
+        setTimeout(() => setIsLoginOpen(true), 100);
+        return <HeroSection onNavigate={navigate} />;
+    }
+
     const content = (() => {
       switch (activeSection) {
         case 'intro': return <HeroSection onNavigate={navigate} />;
@@ -146,11 +191,8 @@ const App: React.FC = () => {
               <PartnerFlow />
             </SectionWrapper>
         );
-        case 'portal': 
-          if (userType !== 'beneficiary') { setTimeout(() => navigate('intro'), 0); return null; }
-          return <SectionWrapper id="portal" title="My Dashboard"><BeneficiaryDashboard /></SectionWrapper>;
+        case 'portal': return <SectionWrapper id="portal" title="My Dashboard"><BeneficiaryDashboard /></SectionWrapper>;
         case 'coach':
-          if (userType !== 'beneficiary') { setTimeout(() => navigate('intro'), 0); return null; }
           return (
             <SectionWrapper id="coach" title="Recovery Coach (Pro)">
                 <div className="max-w-4xl mx-auto text-center mb-8">
@@ -161,15 +203,12 @@ const App: React.FC = () => {
             </SectionWrapper>
           );
         case 'vision':
-          if (userType !== 'beneficiary') { setTimeout(() => navigate('intro'), 0); return null; }
           return (
             <SectionWrapper id="vision" title="Vision Board">
                 <VisionBoard />
             </SectionWrapper>
           );
-        case 'donor-portal': 
-          if (userType !== 'donor') { setTimeout(() => navigate('intro'), 0); return null; }
-          return <SectionWrapper id="donor-portal" title="Impact Portfolio"><DonorDashboard /></SectionWrapper>;
+        case 'donor-portal': return <SectionWrapper id="donor-portal" title="Impact Portfolio"><DonorDashboard /></SectionWrapper>;
         case 'ledger': return (
             <SectionWrapper 
               id="ledger" 
@@ -203,6 +242,7 @@ const App: React.FC = () => {
         
         {/* GLOBAL OVERLAYS */}
         <CrisisOverlay isOpen={isCrisisMode} onClose={() => setCrisisMode(false)} />
+        <LegalOverlay isOpen={showLegalDocs} onClose={() => setShowLegalDocs(false)} />
         <LoginExperience isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} onLoginSuccess={handleLoginSuccess} />
         <NotificationSystem />
         {/* MedicaidPromo is properly layered via z-index in CSS, mobile menu is z-[100], promo is z-[80] */}
@@ -245,11 +285,15 @@ const App: React.FC = () => {
               )}
            </div>
            <div className="p-4 border-t border-white/10 shrink-0">
-              {userType ? (
+              {isAuthenticated ? (
                 <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="w-full bg-white/10 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2"><LogOut size={20} /> Sign Out</button>
               ) : (
                 <button onClick={() => { setIsLoginOpen(true); setIsMobileMenuOpen(false); }} className="w-full bg-brand-teal text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2"><LogIn size={20} /> Member Login</button>
               )}
+              <div className="mt-4 flex justify-center gap-4 text-xs text-white/40 font-bold uppercase tracking-widest">
+                  <button onClick={() => { setShowLegalDocs(true); setIsMobileMenuOpen(false); }}>Legal</button>
+                  <button onClick={() => { setShowLegalDocs(true); setIsMobileMenuOpen(false); }}>Privacy</button>
+              </div>
            </div>
         </div>
 
@@ -285,7 +329,7 @@ const App: React.FC = () => {
                      <button onClick={toggleCalmMode} className={`p-2.5 rounded-full transition-colors hidden sm:flex ${scrolled ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-brand-navy/40 hover:text-brand-navy hover:bg-brand-navy/5'}`} aria-label="Toggle calm mode">
                         {isCalmMode ? <EyeOff size={20} /> : <Eye size={20} />}
                      </button>
-                     {userType ? (
+                     {isAuthenticated ? (
                         <button onClick={() => navigate(userType === 'donor' ? 'donor-portal' : 'portal')} className="hidden sm:flex items-center gap-2 px-4 py-2 bg-brand-navy text-white rounded-full font-bold text-sm hover:bg-brand-teal transition-colors shadow-lg">
                            <UserCircle size={18} /> <span>Dashboard</span>
                         </button>

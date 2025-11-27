@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Donation, Notification, RequestItem, BeneficiaryProfile } from '../types';
 
@@ -12,6 +11,10 @@ interface StoreContextType {
   // Crisis Management
   isCrisisMode: boolean;
   setCrisisMode: (active: boolean) => void;
+  // Legal & Auth
+  showLegalDocs: boolean;
+  setShowLegalDocs: (show: boolean) => void;
+  authToken: string | null;
   // Data
   donations: Donation[];
   addDonation: (donation: Donation) => void;
@@ -24,10 +27,12 @@ interface StoreContextType {
   beneficiaryProfile: BeneficiaryProfile;
   submitIntakeRequest: (data: { type: string; details: string }) => void;
   verifyInsurance: (status: 'verified' | 'pending') => void;
-  // Auth State
+  // Auth State (Simulated Backend)
   userType: UserType;
+  isAuthenticated: boolean;
   login: (type: UserType) => void;
   logout: () => void;
+  clearAllData: () => void;
 }
 
 const DEFAULT_BENEFICIARY: BeneficiaryProfile = {
@@ -48,11 +53,15 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isCalmMode, setIsCalmMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [isCrisisMode, setCrisisMode] = useState(false);
+  const [showLegalDocs, setShowLegalDocs] = useState(false);
   const [donations, setDonations] = useState<Donation[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [confettiTrigger, setConfettiTrigger] = useState(0);
   const [beneficiaryProfile, setBeneficiaryProfile] = useState<BeneficiaryProfile>(DEFAULT_BENEFICIARY);
   const [userType, setUserType] = useState<UserType>(null);
+  
+  // Simulated Secure Session
+  const [authToken, setAuthToken] = useState<string | null>(null);
 
   const toggleCalmMode = () => {
     setIsCalmMode(prev => {
@@ -126,15 +135,27 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
+  // Simulated Backend Auth Flow
   const login = (type: UserType) => {
+    // In production, this would exchange credentials for a real JWT
+    const mockToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.simulated_token.${Date.now()}`;
+    setAuthToken(mockToken);
     setUserType(type);
     triggerConfetti();
     addNotification('success', `Welcome back, ${type === 'donor' ? 'Partner' : 'Friend'}.`);
   };
 
   const logout = () => {
+    setAuthToken(null);
     setUserType(null);
     addNotification('info', 'You have been logged out.');
+  };
+
+  const clearAllData = () => {
+      setBeneficiaryProfile(DEFAULT_BENEFICIARY);
+      setDonations([]);
+      logout();
+      window.location.reload(); // Hard reset
   };
 
   return (
@@ -145,6 +166,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       toggleSound,
       isCrisisMode,
       setCrisisMode,
+      showLegalDocs,
+      setShowLegalDocs,
+      authToken,
       donations,
       addDonation,
       notifications,
@@ -156,8 +180,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       submitIntakeRequest,
       verifyInsurance,
       userType,
+      isAuthenticated: !!authToken,
       login,
-      logout
+      logout,
+      clearAllData
     }}>
       {children}
     </StoreContext.Provider>
