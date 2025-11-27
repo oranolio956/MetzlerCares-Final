@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { HeartHandshake, ArrowRight, Wind, ChevronDown, Activity, Building2, Sparkles, ArrowUpRight, Crown, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { Mascot } from './Mascot';
@@ -64,18 +63,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
   return (
     <div className="w-full relative bg-[#FDFBF7]">
       <SEOHead 
-         title="SecondWind | Sober Living Funding & Rehab Assistance Colorado" 
+         title="Colorado Sober Living Funding & Rehab Assistance | SecondWind" 
          description="Direct-action recovery in Colorado. We pay sober living rent, provide transit for rehab, and fund technology for recovery in Denver and Boulder."
          schema={{
            "@context": "https://schema.org",
-           "@type": "WebPage",
+           "@type": "NGO",
            "name": "SecondWind Colorado Recovery",
-           "spatialCoverage": "Colorado",
-           "mainEntity": {
-              "@type": "Organization",
-              "name": "SecondWind Recovery",
-              "description": "Providing direct financial aid for sober living and addiction recovery in Colorado."
-           }
+           "alternateName": "SecondWind Protocol",
+           "areaServed": {
+             "@type": "State",
+             "name": "Colorado"
+           },
+           "mainEntityOfPage": "https://secondwind.org",
+           "description": "Providing direct financial aid for sober living and addiction recovery in Colorado."
          }}
       />
 
@@ -112,28 +112,27 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                
                {/* 
                   LEFT COLUMN: TYPOGRAPHY (7 Columns)
-                  Order 1 on Mobile, Order 1 on Desktop
                */}
                <div className="lg:col-span-7 flex flex-col justify-center items-start leading-[0.85] select-none order-1">
                    <h1 className="font-display font-bold text-[13vw] lg:text-[7.5vw] xl:text-[8vw] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.1s' }}>
                       INVEST IN
                    </h1>
                    <div className="flex items-center gap-4 w-full">
-                      <h1 className="font-display font-bold text-[13vw] lg:text-[7.5vw] xl:text-[8vw] text-brand-teal tracking-[-0.04em] animate-slide-up opacity-0 whitespace-nowrap" style={{ animationDelay: '0.2s' }}>
+                      <h2 className="font-display font-bold text-[13vw] lg:text-[7.5vw] xl:text-[8vw] text-brand-teal tracking-[-0.04em] animate-slide-up opacity-0 whitespace-nowrap" style={{ animationDelay: '0.2s' }}>
                          COLORADO
-                      </h1>
+                      </h2>
                       {/* Line Decorator */}
                       <div className="hidden xl:block h-[1vw] flex-grow bg-brand-navy/5 rounded-full mt-3 animate-slide-up opacity-0 origin-left overflow-hidden relative" style={{ animationDelay: '0.4s', transform: 'scaleX(1)' }}>
                          <div className="absolute inset-0 bg-brand-navy/10 animate-slide-left" style={{ width: '200%', background: 'linear-gradient(90deg, transparent, rgba(26,42,58,0.2), transparent)' }}></div>
                       </div>
                    </div>
-                   <h1 className="font-display font-bold text-[13vw] lg:text-[7.5vw] xl:text-[8vw] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.3s' }}>
+                   <h2 className="font-display font-bold text-[13vw] lg:text-[7.5vw] xl:text-[8vw] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.3s' }}>
                       RECOVERY<span className="text-brand-coral">.</span>
-                   </h1>
+                   </h2>
                    
                    {/* Subtext */}
                    <p className="mt-8 text-lg md:text-xl lg:text-2xl text-brand-navy/60 font-medium max-w-xl animate-slide-up opacity-0 leading-relaxed" style={{ animationDelay: '0.4s' }}>
-                      The protocol for direct-action aid. We replace bureaucracy with instant, verified funding for sober living rent and rehab access.
+                      The protocol for direct-action aid. We replace bureaucracy with instant, verified funding for sober living rent and rehab access in Denver & Boulder.
                    </p>
 
                    {/* Mobile Only HUD (Moved here for flow) */}
@@ -157,8 +156,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
 
                {/* 
                   RIGHT COLUMN: VISUAL COMPOSITION (5 Columns)
-                  Order 2 on Mobile, Order 2 on Desktop
-                  Vertically stacked Visuals
                */}
                <div className="lg:col-span-5 relative flex flex-col items-center lg:items-end justify-center order-2 mt-8 lg:mt-0">
                   
@@ -167,7 +164,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                       
                       {/* Mascot - Anchored */}
                       <div className="relative w-[60vw] h-[60vw] max-w-[300px] max-h-[300px] lg:w-[500px] lg:h-[500px] lg:max-w-none lg:max-h-none animate-float z-10 lg:-mr-12">
-                         <Mascot expression="excited" variant="tech" className="w-full h-full drop-shadow-2xl" />
+                         <Mascot expression="excited" variant="tech" className="w-full h-full drop-shadow-2xl" reactToScroll={true} />
                       </div>
 
                       {/* Cards Stack - Overlapping Mascot slightly */}
@@ -184,7 +181,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                           </div>
 
                           {/* PEER COACHING CARD (THE UNLOCK) */}
-                          {/* Designed to look like a Premium/Gold Credit Card or VIP Pass */}
                           <div 
                             onClick={() => onNavigate('peer-coaching')}
                             className="relative overflow-hidden p-[2px] rounded-2xl shadow-2xl cursor-pointer transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 group animate-slide-up opacity-0"
@@ -203,7 +199,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                                       <div className="bg-brand-yellow/20 text-brand-yellow p-1.5 rounded-lg">
                                         <Crown size={16} fill="currentColor" />
                                       </div>
-                                      <span className="text-[10px] font-bold uppercase tracking-widest text-brand-yellow">Benefit Unlocked</span>
+                                      <span className="text-xs font-bold uppercase tracking-widest text-brand-yellow">Benefit Unlocked</span>
                                    </div>
                                    <h4 className="font-bold text-white text-lg leading-tight">Peer Recovery Agent</h4>
                                    <div className="flex items-center gap-2 mt-1">

@@ -18,6 +18,7 @@ import { useStore } from './context/StoreContext';
 import { useSound } from './hooks/useSound';
 import { Confetti } from './components/Confetti';
 import { Footer } from './components/Footer';
+import { RecoveryDirectory } from './components/RecoveryDirectory';
 import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, Activity, Globe, LogIn, LogOut, Menu, X, Phone, MessageSquare, LifeBuoy } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
@@ -256,6 +257,9 @@ const App: React.FC = () => {
            {renderContent()}
         </main>
 
+        {/* SEO: Resource Directory (Footer-Adjacent) */}
+        <RecoveryDirectory />
+        
         <Footer onNavigate={navigate} />
         <NotificationSystem />
         <Confetti />

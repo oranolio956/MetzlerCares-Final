@@ -1,4 +1,3 @@
-
 import React, { memo, useId, useState, useEffect } from 'react';
 
 export interface MascotProps {
@@ -6,16 +5,19 @@ export interface MascotProps {
   variant?: 'default' | 'tech' | 'home' | 'commute';
   className?: string;
   lookAt?: { x: number; y: number };
+  reactToScroll?: boolean;
 }
 
 export const Mascot: React.FC<MascotProps> = memo(({ 
   expression = 'happy', 
   variant = 'default', 
   className = '',
-  lookAt
+  lookAt,
+  reactToScroll = false
 }) => {
   const uid = useId().replace(/:/g, ''); // Generate unique ID for SVG defs
   const [isBlinking, setIsBlinking] = useState(false);
+  const [scrollExpression, setScrollExpression] = useState<MascotProps['expression'] | null>(null);
   
   // Eye tracking logic
   // We use CSS variables for global mouse, or props for fixed lookAt
@@ -34,7 +36,7 @@ export const Mascot: React.FC<MascotProps> = memo(({
 
     const triggerBlink = () => {
       // Don't blink if in a special expression state that overrides eyes
-      if (['happy', 'excited', 'thinking', 'default'].includes(expression)) {
+      if (['happy', 'excited', 'thinking', 'default'].includes(activeExpression)) {
         setIsBlinking(true);
         setTimeout(() => setIsBlinking(false), 180); // Slightly slower blink for cuteness
       }
@@ -48,9 +50,55 @@ export const Mascot: React.FC<MascotProps> = memo(({
     timeoutId = setTimeout(triggerBlink, 2000);
 
     return () => clearTimeout(timeoutId);
-  }, [expression]);
+  }, [expression, scrollExpression]);
 
-  const showBlink = isBlinking && !['wink', 'confused', 'celebration'].includes(expression);
+  // Scroll Reaction Logic
+  useEffect(() => {
+    if (!reactToScroll) return;
+
+    let lastScrollY = window.scrollY;
+    let timeoutId: ReturnType<typeof setTimeout>;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          const diff = currentScrollY - lastScrollY;
+          
+          if (Math.abs(diff) > 5) {
+            if (diff > 0) {
+              // Scrolling Down - "Wink" / Nod
+              setScrollExpression('wink');
+            } else {
+              // Scrolling Up - Return to neutral (null uses prop expression)
+              setScrollExpression(null);
+            }
+            
+            // Debounce reset
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+              setScrollExpression(null);
+            }, 800);
+          }
+          
+          lastScrollY = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeoutId);
+    };
+  }, [reactToScroll]);
+
+  // Determine active expression (Scroll overrides prop if active)
+  const activeExpression = scrollExpression || expression;
+  const showBlink = isBlinking && !['wink', 'confused', 'celebration'].includes(activeExpression);
 
   return (
     <svg 
@@ -59,7 +107,7 @@ export const Mascot: React.FC<MascotProps> = memo(({
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label={`Windy the Cloud Spirit looking ${expression}`}
+      aria-label={`Windy the Cloud Spirit looking ${activeExpression}`}
       style={{ overflow: 'visible' }}
     >
       <style>{`
@@ -159,7 +207,7 @@ export const Mascot: React.FC<MascotProps> = memo(({
         <g transform="translate(0, 10)">
            
            {/* Cheeks - Fade in/out based on expression */}
-           <g className="transition-opacity duration-500" style={{ opacity: expression === 'excited' || expression === 'happy' ? 1 : 0.5 }}>
+           <g className="transition-opacity duration-500" style={{ opacity: activeExpression === 'excited' || activeExpression === 'happy' ? 1 : 0.5 }}>
              <circle cx="110" cy="220" r="25" fill={`url(#blushGrad-${uid})`} />
              <circle cx="290" cy="220" r="25" fill={`url(#blushGrad-${uid})`} />
            </g>
@@ -168,9 +216,9 @@ export const Mascot: React.FC<MascotProps> = memo(({
            <g transform="translate(0, 0)">
               {/* Left Eye */}
               <g transform="translate(140, 180)">
-                 {expression === 'wink' || expression === 'confused' ? (
+                 {activeExpression === 'wink' || activeExpression === 'confused' ? (
                      <path d="M-20 0 Q0 -10 20 0" stroke="#1A2A3A" strokeWidth="6" strokeLinecap="round" fill="none" className="mascot-transition" />
-                 ) : expression === 'celebration' ? (
+                 ) : activeExpression === 'celebration' ? (
                      <path d="M-20 0 Q0 -15 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" className="mascot-transition" />
                  ) : showBlink ? (
                      <path d="M-20 0 Q0 8 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" />
@@ -187,11 +235,11 @@ export const Mascot: React.FC<MascotProps> = memo(({
 
               {/* Right Eye */}
               <g transform="translate(260, 180)">
-                 {expression === 'confused' ? (
+                 {activeExpression === 'confused' ? (
                      <g className="animate-spin-slow" style={{ transformOrigin: '0 0' }}>
                         <path d="M-15 -15 L15 15 M-15 15 L15 -15" stroke="#1A2A3A" strokeWidth="6" strokeLinecap="round" />
                      </g>
-                 ) : expression === 'celebration' ? (
+                 ) : activeExpression === 'celebration' ? (
                      <path d="M-20 0 Q0 -15 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" className="mascot-transition" />
                  ) : showBlink ? (
                      <path d="M-20 0 Q0 8 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" />
@@ -199,7 +247,7 @@ export const Mascot: React.FC<MascotProps> = memo(({
                    <g>
                      <ellipse cx="0" cy="0" rx="28" ry="32" fill="white" stroke="#E5E7EB" strokeWidth="2" 
                        className="mascot-transition"
-                       style={{ ry: expression === 'thinking' ? 22 : 32 }}
+                       style={{ ry: activeExpression === 'thinking' ? 22 : 32 }}
                      />
                      <g style={pupilStyle}>
                        <circle cx="0" cy="0" r="14" fill="#1A2A3A" />
@@ -210,10 +258,10 @@ export const Mascot: React.FC<MascotProps> = memo(({
               </g>
 
               {/* Eyebrows (Expression) */}
-              <g className="mascot-transition" style={{ opacity: expression === 'thinking' ? 1 : 0, transform: expression === 'thinking' ? 'translateY(0)' : 'translateY(-10px)' }}>
+              <g className="mascot-transition" style={{ opacity: activeExpression === 'thinking' ? 1 : 0, transform: activeExpression === 'thinking' ? 'translateY(0)' : 'translateY(-10px)' }}>
                  <path d="M240 140 Q260 130 280 140" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" />
               </g>
-              <g className="mascot-transition" style={{ opacity: expression === 'excited' ? 1 : 0, transform: expression === 'excited' ? 'translateY(0)' : 'translateY(10px)' }}>
+              <g className="mascot-transition" style={{ opacity: activeExpression === 'excited' ? 1 : 0, transform: activeExpression === 'excited' ? 'translateY(0)' : 'translateY(10px)' }}>
                    <path d="M120 130 Q140 110 160 130" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" />
                    <path d="M240 130 Q260 110 280 130" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" />
               </g>
@@ -221,11 +269,12 @@ export const Mascot: React.FC<MascotProps> = memo(({
 
            {/* Mouth */}
            <g transform="translate(200, 240)">
-              {expression === 'happy' && <path d="M-20 0 Q0 15 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" className="mascot-transition" />}
-              {expression === 'excited' && <path d="M-20 0 Q0 20 20 0 Z" fill="#1A2A3A" className="mascot-transition" />}
-              {expression === 'thinking' && <circle cx="15" cy="5" r="5" fill="#1A2A3A" className="mascot-transition" />}
-              {expression === 'confused' && <path d="M-15 5 Q0 0 15 5" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" className="mascot-transition" />}
-              {expression === 'celebration' && <path d="M-25 0 Q0 25 25 0 Z" fill="#1A2A3A" className="mascot-transition" />}
+              {activeExpression === 'happy' && <path d="M-20 0 Q0 15 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" className="mascot-transition" />}
+              {activeExpression === 'excited' && <path d="M-20 0 Q0 20 20 0 Z" fill="#1A2A3A" className="mascot-transition" />}
+              {activeExpression === 'thinking' && <circle cx="15" cy="5" r="5" fill="#1A2A3A" className="mascot-transition" />}
+              {activeExpression === 'confused' && <path d="M-15 5 Q0 0 15 5" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" className="mascot-transition" />}
+              {activeExpression === 'celebration' && <path d="M-25 0 Q0 25 25 0 Z" fill="#1A2A3A" className="mascot-transition" />}
+              {activeExpression === 'wink' && <path d="M-20 0 Q0 10 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" className="mascot-transition" />}
            </g>
 
         </g>
@@ -235,21 +284,21 @@ export const Mascot: React.FC<MascotProps> = memo(({
         <g className="mascot-transition">
            {/* Left Arm */}
            <ellipse 
-              cx={expression === 'thinking' ? 160 : expression === 'celebration' ? 80 : 100} 
-              cy={expression === 'thinking' ? 280 : expression === 'celebration' ? 180 : 250} 
+              cx={activeExpression === 'thinking' ? 160 : activeExpression === 'celebration' ? 80 : 100} 
+              cy={activeExpression === 'thinking' ? 280 : activeExpression === 'celebration' ? 180 : 250} 
               rx="20" ry="35" 
               fill="#2D9C8E" 
               className="mascot-transition"
-              transform={expression === 'thinking' ? "rotate(45 160 280)" : expression === 'celebration' ? "rotate(45 80 180)" : "rotate(-20 100 250)"}
+              transform={activeExpression === 'thinking' ? "rotate(45 160 280)" : activeExpression === 'celebration' ? "rotate(45 80 180)" : "rotate(-20 100 250)"}
            />
            {/* Right Arm */}
            <ellipse 
-              cx={expression === 'celebration' ? 320 : 300} 
-              cy={expression === 'celebration' ? 180 : 250} 
+              cx={activeExpression === 'celebration' ? 320 : 300} 
+              cy={activeExpression === 'celebration' ? 180 : 250} 
               rx="20" ry="35" 
               fill="#2D9C8E" 
               className="mascot-transition"
-              transform={expression === 'celebration' ? "rotate(-45 320 180)" : "rotate(20 300 250)"}
+              transform={activeExpression === 'celebration' ? "rotate(-45 320 180)" : "rotate(20 300 250)"}
            />
         </g>
 
