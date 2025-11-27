@@ -1,16 +1,17 @@
-
 import React, { useEffect } from 'react';
 
 interface SEOHeadProps {
   title: string;
   description?: string;
   schema?: Record<string, any>;
+  path?: string; // Optional path for canonical tags
 }
 
 export const SEOHead: React.FC<SEOHeadProps> = ({ 
   title, 
   description = "A direct-action recovery resource platform. Invest in human potential.",
-  schema 
+  schema,
+  path
 }) => {
   useEffect(() => {
     // 1. Update Title
@@ -34,7 +35,22 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     const ogDesc = document.querySelector('meta[property="og:description"]');
     if (ogDesc) ogDesc.setAttribute('content', description);
 
-    // 4. Inject JSON-LD Schema (Silent SEO Feature)
+    // 4. Update Canonical URL
+    const canonical = document.querySelector('link[rel="canonical"]');
+    const url = path 
+      ? `https://secondwind.org/${path.replace(/^\/+/, '')}` 
+      : window.location.href.split('#')[0]; // Fallback to clean root
+      
+    if (canonical) {
+      canonical.setAttribute('href', url);
+    } else {
+      const link = document.createElement('link');
+      link.rel = 'canonical';
+      link.href = url;
+      document.head.appendChild(link);
+    }
+
+    // 5. Inject JSON-LD Schema (Silent SEO Feature)
     // Now supports multiple concurrent schemas (e.g. Breadcrumbs + Product)
     if (schema) {
       const script = document.createElement('script');
@@ -50,7 +66,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
         if (el) el.remove();
       };
     }
-  }, [title, description, schema]);
+  }, [title, description, schema, path]);
 
   return null;
 };

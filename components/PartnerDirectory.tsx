@@ -96,7 +96,7 @@ const PARTNERS: Partner[] = [
       rules: ["Equal Expense Sharing", "Officer Elections", "Disruptive Behavior Eviction"],
       programRequirements: {
         curfew: "Determined by house vote. Typically 11 PM for new members.",
-        guests: "No overnight guests without majority house vote.",
+        guests: "No overnight guests. No opposite gender in bedrooms.",
         meetings: "MANDATORY weekly House Business Meeting (usually Sunday).",
         work: "Must pay equal share of rent. No specific work hours mandated."
       },
@@ -427,9 +427,32 @@ export const PartnerDirectory: React.FC = () => {
     return matchesText && matchesType && matchesStatus && matchesCarr;
   });
 
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Verified Colorado Sober Living Homes",
+    "description": "List of Oxford Houses and CARR-certified recovery residences in Denver and Boulder that accept direct funding.",
+    "itemListElement": filteredPartners.map((p, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "LocalBusiness",
+        "name": p.name,
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": p.location.split(',')[0],
+            "addressRegion": "CO"
+        },
+        "description": p.details.description
+      }
+    }))
+  };
+
   return (
     <>
       <section id="partner-directory" className="w-full bg-[#FDFBF7] py-16 border-t border-brand-navy/5" aria-label="Verified Sober Living Network">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
+        
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           
           <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-6">

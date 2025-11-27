@@ -109,6 +109,37 @@ const App: React.FC = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // KNOWLEDGE GRAPH INJECTION
+  useEffect(() => {
+    const orgSchema = {
+      "@context": "https://schema.org",
+      "@type": "NGO",
+      "name": "SecondWind Colorado",
+      "url": "https://secondwind.org",
+      "logo": "https://secondwind.org/logo.png",
+      "sameAs": [
+        "https://www.facebook.com/secondwind",
+        "https://twitter.com/SecondWindCO",
+        "https://www.instagram.com/secondwind"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+1-720-555-0123",
+        "contactType": "customer service",
+        "areaServed": ["US-CO"],
+        "availableLanguage": ["en", "es"]
+      },
+      "areaServed": "Colorado"
+    };
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(orgSchema);
+    document.head.appendChild(script);
+
+    return () => { document.head.removeChild(script); };
+  }, []);
+
   useEffect(() => {
     const handlePointerMove = (x: number, y: number) => {
         const normX = (x / window.innerWidth) * 2 - 1;
