@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Donation, Notification, RequestItem, BeneficiaryProfile, Message } from '../types';
+import { Donation, Notification, RequestItem, BeneficiaryProfile, Message, Testimonial, ReviewSubmission } from '../types';
+import { TESTIMONIALS } from '../services/reviewContent';
 
 type UserType = 'donor' | 'beneficiary' | null;
 
@@ -44,6 +45,9 @@ interface StoreContextType {
   intakeSession: IntakeSessionState;
   updateIntakeSession: (updates: Partial<IntakeSessionState>) => void;
   resetIntakeSession: () => void;
+  // Reviews
+  reviews: Testimonial[];
+  addReview: (submission: ReviewSubmission) => void;
 }
 
 const DEFAULT_BENEFICIARY: BeneficiaryProfile = {
@@ -78,6 +82,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [beneficiaryProfile, setBeneficiaryProfile] = useState<BeneficiaryProfile>(DEFAULT_BENEFICIARY);
   const [userType, setUserType] = useState<UserType>(null);
   const [intakeSession, setIntakeSession] = useState<IntakeSessionState>(DEFAULT_INTAKE_SESSION);
+  const [reviews, setReviews] = useState<Testimonial[]>(TESTIMONIALS);
   
   // Simulated Secure Session
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -186,6 +191,23 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setIntakeSession(DEFAULT_INTAKE_SESSION);
   };
 
+  const addReview = (submission: ReviewSubmission) => {
+    const newReview: Testimonial = {
+      id: `review-${Date.now()}`,
+      name: submission.name || 'Anonymous',
+      role: submission.role,
+      citySlug: submission.citySlug,
+      rating: submission.rating,
+      summary: submission.quote.substring(0, 80) + (submission.quote.length > 80 ? '...' : ''),
+      quote: submission.quote,
+      service: submission.service,
+      date: new Date().toISOString().split('T')[0]
+    };
+
+    setReviews(prev => [newReview, ...prev]);
+    addNotification('success', 'Review received. Thanks for sharing your story.');
+  };
+
   return (
     <StoreContext.Provider value={{
       isCalmMode,
@@ -214,7 +236,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       clearAllData,
       intakeSession,
       updateIntakeSession,
-      resetIntakeSession
+      resetIntakeSession,
+      reviews,
+      addReview
     }}>
       {children}
     </StoreContext.Provider>

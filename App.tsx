@@ -28,6 +28,9 @@ import { GlobalChat } from './components/GlobalChat';
 import { PeerCoachingTeaser } from './components/PeerCoachingTeaser';
 import { FAQSection } from './components/FAQSection';
 import { LocationPage } from './components/LocationPage';
+import { ReviewIntake } from './components/ReviewIntake';
+import { ServicePage } from './components/ServicePage';
+import { BlogPage } from './components/BlogPage';
 import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2, Sparkles, Image, Shield } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
@@ -161,11 +164,15 @@ const DesktopNav = ({ activeSection, navigate, playClick }: { activeSection: str
 
 const App: React.FC = () => {
   const { route: activeSection, navigate } = useRouter();
-  const { isCalmMode, toggleCalmMode, isSoundEnabled, toggleSound, userType, login, logout, isCrisisMode, setCrisisMode, showLegalDocs, setShowLegalDocs, isAuthenticated } = useStore();
+  const { isCalmMode, toggleCalmMode, isSoundEnabled, toggleSound, userType, login, logout, isCrisisMode, setCrisisMode, showLegalDocs, setShowLegalDocs, isAuthenticated, reviews } = useStore();
   const { playClick } = useSound();
   const [scrolled, setScrolled] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const reviewAverage = reviews.length
+    ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
+    : '4.8';
+  const reviewCount = reviews.length || 127;
 
   // ENHANCED KNOWLEDGE GRAPH INJECTION (Top 1% SEO)
   useEffect(() => {
@@ -302,8 +309,8 @@ const App: React.FC = () => {
         },
         {
           "@type": "AggregateRating",
-          "ratingValue": "4.8",
-          "reviewCount": "127",
+          "ratingValue": reviewAverage,
+          "reviewCount": reviewCount,
           "bestRating": "5",
           "worstRating": "1"
         }
@@ -316,7 +323,7 @@ const App: React.FC = () => {
     document.head.appendChild(script);
 
     return () => { document.head.removeChild(script); };
-  }, []);
+  }, [reviewAverage, reviewCount]);
 
   useEffect(() => {
     const handlePointerMove = (x: number, y: number) => {
@@ -372,6 +379,12 @@ const App: React.FC = () => {
     if (typeof activeSection === 'string' && activeSection.startsWith('/locations/')) {
       return <LocationPage />;
     }
+    if (typeof activeSection === 'string' && activeSection.startsWith('/services/')) {
+      return <ServicePage />;
+    }
+    if (typeof activeSection === 'string' && activeSection.startsWith('/blog/')) {
+      return <BlogPage />;
+    }
     
     // AUTH GUARD: Redirect unauthenticated users from protected routes
     if ((activeSection === 'portal' || activeSection === 'coach' || activeSection === 'vision') && (!isAuthenticated || userType !== 'beneficiary')) {
@@ -389,6 +402,7 @@ const App: React.FC = () => {
             <>
               <HeroSection onNavigate={navigate} />
               <PeerCoachingTeaser onNavigate={navigate} />
+              <ReviewIntake onNavigate={navigate} />
             </>
         );
         case 'philosophy': return <PhilosophySection onNavigate={navigate} />;
