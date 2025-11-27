@@ -74,7 +74,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
              "@type": "State",
              "name": "Colorado"
            },
-           "mainEntityOfPage": "https://secondwind.org",
+           "mainEntityOfPage": "https://metzlercares.com",
            "description": "Providing direct financial aid for sober living and addiction recovery in Colorado."
          }}
       />

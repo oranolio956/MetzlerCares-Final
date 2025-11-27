@@ -40,7 +40,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     // 4. Update Canonical URL
     const canonical = document.querySelector('link[rel="canonical"]');
     const url = path 
-      ? `https://secondwind.org/${path.replace(/^\/+/, '')}` 
+      ? `https://metzlercares.com/${path.replace(/^\/+/, '')}` 
       : window.location.href.split('#')[0]; // Fallback to clean root
       
     if (canonical) {

@@ -30,13 +30,13 @@ export const SectionWrapper: React.FC<SectionWrapperProps> = ({
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://secondwind.org"
+        "item": "https://metzlercares.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": title.split('|')[0].trim(), // Clean title for breadcrumb
-        "item": `https://secondwind.org#${id}`
+        "item": `https://metzlercares.com#${id}`
       }
     ]
   };

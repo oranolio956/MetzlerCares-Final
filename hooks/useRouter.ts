@@ -8,6 +8,15 @@ export const useRouter = () => {
     if (path.startsWith('/locations/')) {
       return path; // e.g., '/locations/denver-sober-living'
     }
+    if (path === '/guides') {
+      return '/guides';
+    }
+    if (path.startsWith('/guides/')) {
+      return path; // e.g., '/guides/sober-living-application-checklist'
+    }
+    if (path === '/services') {
+      return '/services';
+    }
     if (path.startsWith('/services/')) {
       return path; // e.g., '/services/sober-living-rent-assistance'
     }
@@ -35,7 +44,14 @@ export const useRouter = () => {
 
   const navigate = (newRoute: string) => {
     // If it's a path-based route, use pushState
-    if (newRoute.startsWith('/locations/') || newRoute.startsWith('/services/') || newRoute.startsWith('/facilities/')) {
+    if (
+      newRoute === '/services' ||
+      newRoute === '/guides' ||
+      newRoute.startsWith('/locations/') ||
+      newRoute.startsWith('/services/') ||
+      newRoute.startsWith('/guides/') ||
+      newRoute.startsWith('/facilities/')
+    ) {
       window.history.pushState({}, '', newRoute);
       setRoute(newRoute);
     } else {

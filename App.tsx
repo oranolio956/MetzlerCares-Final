@@ -29,7 +29,10 @@ import { PeerCoachingTeaser } from './components/PeerCoachingTeaser';
 import { FAQSection } from './components/FAQSection';
 import { LocationPage } from './components/LocationPage';
 import { ServicePage } from './components/ServicePage';
-import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2, Sparkles, Image, Shield } from 'lucide-react';
+import { ServicesIndex } from './components/ServicesIndex';
+import { GuidesIndex } from './components/GuidesIndex';
+import { GuidePage } from './components/GuidePage';
+import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2, Sparkles, Image, Shield, ClipboardList } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SecondWind Logo">
@@ -130,6 +133,8 @@ const DesktopNav = ({ activeSection, navigate, playClick }: { activeSection: str
 
   const navItems = [
     { id: 'intro', label: 'Home' },
+    { id: '/services', label: 'Services' },
+    { id: '/guides', label: 'Guides' },
     { id: 'philosophy', label: 'Our Model' },
     { id: 'peer-coaching', label: 'Coaching' },
     { id: 'donate', label: 'Donate' },
@@ -175,11 +180,11 @@ const App: React.FC = () => {
       "@graph": [
         {
           "@type": "NGO",
-          "@id": "https://secondwind.org#organization",
+          "@id": "https://metzlercares.com#organization",
           "name": "SecondWind Colorado",
           "alternateName": "SecondWind Fund",
-          "url": "https://secondwind.org",
-          "logo": "https://secondwind.org/social-card.svg",
+          "url": "https://metzlercares.com",
+          "logo": "https://metzlercares.com/social-card.svg",
           "description": "A 501(c)(3) non-profit providing direct financial assistance for sober living rent, rehab transportation, and recovery technology in Colorado. We pay verified vendors directly—no cash, just results.",
           "foundingDate": "2023",
           "nonprofitStatus": "NonprofitType",
@@ -246,9 +251,9 @@ const App: React.FC = () => {
         },
         {
           "@type": "LocalBusiness",
-          "@id": "https://secondwind.org#localbusiness",
+          "@id": "https://metzlercares.com#localbusiness",
           "name": "SecondWind Colorado Recovery Fund",
-          "image": "https://secondwind.org/social-card.svg",
+          "image": "https://metzlercares.com/social-card.svg",
           "priceRange": "Free",
           "paymentAccepted": "Donation",
           "currenciesAccepted": "USD",
@@ -280,10 +285,10 @@ const App: React.FC = () => {
         {
           "@type": "WebSite",
           "name": "SecondWind Recovery Platform",
-          "url": "https://secondwind.org",
+          "url": "https://metzlercares.com",
           "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://secondwind.org/?facility={search_term_string}#partner",
+            "target": "https://metzlercares.com/?facility={search_term_string}#partner",
             "query-input": "required name=search_term_string"
           }
         },
@@ -292,7 +297,7 @@ const App: React.FC = () => {
           "name": "Sober Living Funding Colorado",
           "description": "Direct rent assistance for verified sober living homes and recovery residences in Colorado. We pay landlords directly—no cash to applicants.",
           "provider": {
-            "@id": "https://secondwind.org#organization"
+            "@id": "https://metzlercares.com#organization"
           },
           "areaServed": {
             "@type": "State",
@@ -374,8 +379,20 @@ const App: React.FC = () => {
       return <LocationPage />;
     }
 
+    if (activeSection === '/services') {
+      return <ServicesIndex />;
+    }
+
+    if (activeSection === '/guides') {
+      return <GuidesIndex />;
+    }
+
     if (typeof activeSection === 'string' && activeSection.startsWith('/services/')) {
       return <ServicePage />;
+    }
+
+    if (typeof activeSection === 'string' && activeSection.startsWith('/guides/')) {
+      return <GuidePage />;
     }
     
     // AUTH GUARD: Redirect unauthenticated users from protected routes
@@ -503,8 +520,10 @@ const App: React.FC = () => {
               </button>
            </div>
            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
-              {[
+              {[ 
                 { id: 'intro', icon: Activity, label: 'Home' },
+                { id: '/services', icon: ClipboardList, label: 'Services' },
+                { id: '/guides', icon: Globe, label: 'Guides' },
                 { id: 'apply', icon: HeartHandshake, label: 'Get Help' },
                 { id: 'peer-coaching', icon: UserCircle, label: 'Coaching' },
                 { id: 'donate', icon: Activity, label: 'Donate' },
