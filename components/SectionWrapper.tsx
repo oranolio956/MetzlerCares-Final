@@ -32,7 +32,7 @@ export const SectionWrapper: React.FC<SectionWrapperProps> = ({
         id={id}
         aria-label={title}
         className={`
-          w-full max-w-[1600px] mx-auto px-4 md:px-8 py-12 md:py-24 
+          w-full max-w-[1600px] mx-auto px-4 md:px-8 pt-28 pb-12 md:py-24 
           min-h-[80vh] flex flex-col justify-center relative
           ${className}
         `}

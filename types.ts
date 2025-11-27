@@ -34,6 +34,7 @@ export interface BeneficiaryProfile {
   name: string;
   daysSober: number;
   nextMilestone: number;
+  insuranceStatus: 'verified' | 'pending' | 'none'; // New field for Medicaid
   requests: RequestItem[];
 }
 

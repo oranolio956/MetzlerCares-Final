@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect, useMemo, memo } from 'react';
-import { ArrowRight, ShieldCheck, TrendingUp, Lock, Printer, CreditCard, Bus, Laptop, Home, Target, Activity, Zap, Apple, Pill, FileBadge, Smartphone, Shirt, Briefcase, Smile, Package, Building, Utensils, Sparkles, FileText, HardHat } from 'lucide-react';
+import { ArrowRight, ShieldCheck, TrendingUp, Printer, Bus, Laptop, Home, Target, Zap, Pill, Shirt, Briefcase, Sparkles, FileText, Building, Utensils, Receipt, CheckCircle2 } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { PaymentModal } from './PaymentModal';
 import { useStore } from '../context/StoreContext';
@@ -35,22 +36,22 @@ const ImpactEqualizer: React.FC<{ value: number; color: string }> = memo(({ valu
 });
 
 const SECTORS = [
-  { id: 'essentials', label: 'Essentials', icon: Utensils, desc: 'Survival Basics' },
-  { id: 'stability', label: 'Stability', icon: Building, desc: 'Foundation' },
-  { id: 'access', label: 'Access', icon: Laptop, desc: 'Opportunity' },
-  { id: 'flex', label: 'Flex', icon: Sparkles, desc: 'Rapid Response' }
+  { id: 'essentials', label: 'Basic Needs', icon: Utensils, desc: 'Survival Basics' },
+  { id: 'stability', label: 'Housing & Safety', icon: Building, desc: 'Foundation' },
+  { id: 'access', label: 'Jobs & Tech', icon: Laptop, desc: 'Opportunity' },
+  { id: 'flex', label: 'Rapid Response', icon: Sparkles, desc: 'Rapid Response' }
 ];
 
 const IMPACT_LEVELS = [
-  { id: 'food', category: 'essentials', label: "Nutrition", sub: "Food Security", desc: "1 Week Grocery Credit", story: "Recovery requires physical repair.", vendorName: "Kroger / Local Co-op", baseAmount: 75, roi: "Health", roiLabel: "Physical Repair", variant: 'home' as const, color: 'bg-brand-coral', textColor: 'text-brand-coral', icon: Utensils, accent: 'text-brand-coral', sparkSeed: 14 },
-  { id: 'meds', category: 'essentials', label: "Wellness", sub: "Medical Access", desc: "Rx Co-Pay Assistance", story: "Stabilizing chronic health.", vendorName: "CVS / Walgreens", baseAmount: 40, roi: "Preventative", roiLabel: "ER Diversion", variant: 'home' as const, color: 'bg-brand-coral', textColor: 'text-brand-coral', icon: Pill, accent: 'text-brand-coral', sparkSeed: 19 },
-  { id: 'clothing', category: 'essentials', label: "Attire", sub: "Dignity Kit", desc: "Work/Interview Outfit", story: "Looking the part is half the battle.", vendorName: "Retail Partners", baseAmount: 100, roi: "Confidence", roiLabel: "Interview Success", variant: 'home' as const, color: 'bg-brand-coral', textColor: 'text-brand-coral', icon: Shirt, accent: 'text-brand-coral', sparkSeed: 55 },
-  { id: 'housing', category: 'stability', label: "Emergency Bed", sub: "Sober Living Entry", desc: "1 Week Safe Housing", story: "Recovery cannot happen on the street.", vendorName: "Oxford House / SafeHaven", baseAmount: 250, roi: "∞", roiLabel: "Relapse Prevention", variant: 'home' as const, color: 'bg-brand-teal', textColor: 'text-brand-teal', icon: Home, accent: 'text-brand-teal', sparkSeed: 99 },
-  { id: 'operations', category: 'stability', label: "Ops Fund", sub: "Platform Sustainability", desc: "Powering SecondWind", story: "Keeps our servers running.", vendorName: "SecondWind Ops", baseAmount: 50, roi: "Scale", roiLabel: "Platform Uptime", variant: 'tech' as const, color: 'bg-brand-teal', textColor: 'text-brand-teal', icon: Briefcase, accent: 'text-brand-teal', sparkSeed: 88 },
-  { id: 'laptop', category: 'access', label: "Tech", sub: "Digital Access", desc: "Refurbished Laptop", story: "Remote work is impossible without hardware.", vendorName: "TechReuse Corp", baseAmount: 300, roi: "100%", roiLabel: "Career Unlock", variant: 'tech' as const, color: 'bg-brand-lavender', textColor: 'text-brand-lavender', icon: Laptop, accent: 'text-brand-lavender', sparkSeed: 45 },
-  { id: 'bus', category: 'access', label: "Mobility", sub: "Transit Infrastructure", desc: "Monthly Bus Pass", story: "Transit is the lifeline to employment.", vendorName: "City Metro Auth", baseAmount: 60, roi: "10x", roiLabel: "Job Access", variant: 'commute' as const, color: 'bg-brand-lavender', textColor: 'text-brand-lavender', icon: Bus, accent: 'text-brand-lavender', sparkSeed: 12 },
-  { id: 'docs', category: 'access', label: "Identity", sub: "Legal Status", desc: "ID Replacement Fees", story: "You don't exist on paper without an ID.", vendorName: "DMV / Vital Records", baseAmount: 50, roi: "Binary", roiLabel: "Employment Prerequisite", variant: 'commute' as const, color: 'bg-brand-lavender', textColor: 'text-brand-lavender', icon: FileText, accent: 'text-brand-lavender', sparkSeed: 22 },
-  { id: 'custom', category: 'flex', label: "Rapid Response", sub: "Gap Funding", desc: "Unlisted Critical Needs", story: "For the specific barriers.", vendorName: "Verified Vendor (Various)", baseAmount: 25, roi: "Agility", roiLabel: "Problem Solving", variant: 'tech' as const, color: 'bg-brand-yellow', textColor: 'text-brand-yellow', icon: Sparkles, accent: 'text-brand-yellow', sparkSeed: 77 }
+  { id: 'food', category: 'essentials', label: "Food Assistance", sub: "Good Eats", desc: "Fills a Denver fridge for a week", transparencyDesc: "Funds credited directly to local co-op account.", story: "Good food fuels recovery.", vendorName: "Kroger / Denver Food Co-op", baseAmount: 75, roi: "Health", roiLabel: "Physical Repair", variant: 'home' as const, color: 'bg-brand-coral', textColor: 'text-brand-coral', icon: Utensils, accent: 'text-brand-coral', sparkSeed: 14 },
+  { id: 'meds', category: 'essentials', label: "Meds Assistance", sub: "Pharmacy Co-Pay", desc: "Covers one prescription", transparencyDesc: "Paid directly to pharmacy for specific Rx.", story: "Stabilizing health is the first step.", vendorName: "CVS / Walgreens CO", baseAmount: 40, roi: "Preventative", roiLabel: "ER Diversion", variant: 'home' as const, color: 'bg-brand-coral', textColor: 'text-brand-coral', icon: Pill, accent: 'text-brand-coral', sparkSeed: 19 },
+  { id: 'clothing', category: 'essentials', label: "Interview Gear", sub: "Professional", desc: "One professional outfit", transparencyDesc: "Voucher for interview attire only.", story: "Looking the part is half the battle.", vendorName: "Retail Partners Denver", baseAmount: 100, roi: "Confidence", roiLabel: "Interview Success", variant: 'home' as const, color: 'bg-brand-coral', textColor: 'text-brand-coral', icon: Shirt, accent: 'text-brand-coral', sparkSeed: 55 },
+  { id: 'housing', category: 'stability', label: "Safe Housing", sub: "Sober Living", desc: "Pays 1 week of rent", transparencyDesc: "Paid to Oxford House CO landlord account.", story: "Recovery cannot happen on the street.", vendorName: "Oxford House / SafeHaven", baseAmount: 250, roi: "∞", roiLabel: "Relapse Prevention", variant: 'home' as const, color: 'bg-brand-teal', textColor: 'text-brand-teal', icon: Home, accent: 'text-brand-teal', sparkSeed: 99 },
+  { id: 'operations', category: 'stability', label: "Core Ops", sub: "Lights On", desc: "Powering SecondWind", transparencyDesc: "Server costs & minimal overhead.", story: "Keeps our servers running.", vendorName: "SecondWind Ops", baseAmount: 50, roi: "Scale", roiLabel: "Platform Uptime", variant: 'tech' as const, color: 'bg-brand-teal', textColor: 'text-brand-teal', icon: Briefcase, accent: 'text-brand-teal', sparkSeed: 88 },
+  { id: 'laptop', category: 'access', label: "Tech Access", sub: "Laptop Fund", desc: "Refurbished Laptop", transparencyDesc: "Hardware purchased from cert. refurbisher.", story: "Remote work is impossible without hardware.", vendorName: "TechReuse Corp", baseAmount: 300, roi: "100%", roiLabel: "Career Unlock", variant: 'tech' as const, color: 'bg-brand-lavender', textColor: 'text-brand-lavender', icon: Laptop, accent: 'text-brand-lavender', sparkSeed: 45 },
+  { id: 'bus', category: 'access', label: "Bus Passes", sub: "Mobility", desc: "Monthly Bus Pass", transparencyDesc: "Direct purchase from Denver Metro.", story: "Transit is the lifeline to employment.", vendorName: "RTD Denver", baseAmount: 60, roi: "10x", roiLabel: "Job Access", variant: 'commute' as const, color: 'bg-brand-lavender', textColor: 'text-brand-lavender', icon: Bus, accent: 'text-brand-lavender', sparkSeed: 12 },
+  { id: 'docs', category: 'access', label: "ID Restoration", sub: "Documents", desc: "State ID Fees", transparencyDesc: "State fees for license/birth cert.", story: "You don't exist on paper without an ID.", vendorName: "Colorado DMV", baseAmount: 50, roi: "Binary", roiLabel: "Employment Prerequisite", variant: 'commute' as const, color: 'bg-brand-lavender', textColor: 'text-brand-lavender', icon: FileText, accent: 'text-brand-lavender', sparkSeed: 22 },
+  { id: 'custom', category: 'flex', label: "Gap Fund", sub: "Emergency", desc: "Unlisted Critical Needs", transparencyDesc: "Discretionary fund for verified emergencies.", story: "For the specific barriers.", vendorName: "Verified Vendor (Various)", baseAmount: 25, roi: "Agility", roiLabel: "Problem Solving", variant: 'tech' as const, color: 'bg-brand-yellow', textColor: 'text-brand-yellow', icon: Sparkles, accent: 'text-brand-yellow', sparkSeed: 77 }
 ];
 
 export const DonationFlow: React.FC = () => {
@@ -94,7 +95,7 @@ export const DonationFlow: React.FC = () => {
   const handlePaymentComplete = () => {
     playSuccess(); triggerConfetti();
     addDonation({ id: txId, amount: selectedImpact.baseAmount * multiplier, itemLabel: `${multiplier}x ${selectedImpact.label}`, impactType: selectedImpact.variant, timestamp: new Date() });
-    addNotification('success', 'Investment Deployed. Check your portfolio.');
+    addNotification('success', 'Support Deployed. Check your portfolio.');
   };
 
   const handleQuickDonate = () => {
@@ -117,11 +118,11 @@ export const DonationFlow: React.FC = () => {
          <div className="w-full">
             <div className="flex items-center gap-2 mb-2 md:mb-4">
                <div className="bg-brand-navy text-white p-1.5 rounded-md"><TrendingUp size={16} /></div>
-               <span className="text-xs font-bold uppercase tracking-[0.2em] text-brand-navy/60">Impact Allocation</span>
+               <span className="text-xs font-bold uppercase tracking-[0.2em] text-brand-navy/60">Colorado Recovery Fund</span>
             </div>
-            <h3 className="text-4xl md:text-6xl font-display font-bold text-brand-navy leading-none">
-               Select Resource <br/>
-               <span className="text-brand-teal opacity-100 relative inline-block">Class<svg className="absolute -bottom-2 left-0 w-full h-3 text-brand-yellow/50" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span>.
+            <h3 className="text-3xl md:text-6xl font-display font-bold text-brand-navy leading-none">
+               Choose where to <br/>
+               <span className="text-brand-teal opacity-100 relative inline-block">Invest<svg className="absolute -bottom-2 left-0 w-full h-3 text-brand-yellow/50" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span>.
             </h3>
          </div>
          <div className="flex flex-col items-start md:items-end gap-2 w-full md:w-auto">
@@ -134,12 +135,23 @@ export const DonationFlow: React.FC = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 relative">
         <div className="lg:col-span-8 flex flex-col gap-6">
-            <div className="flex flex-wrap gap-2 md:gap-4 p-2 bg-brand-navy/5 rounded-2xl overflow-x-auto no-scrollbar scroll-smooth snap-x touch-pan-x">
+            
+            {/* Category Selector - Scrollable on mobile */}
+            <div className="bg-white p-1.5 rounded-2xl shadow-sm border border-brand-navy/5 flex overflow-x-auto no-scrollbar md:flex-wrap sm:flex-nowrap gap-1 relative snap-x">
                {SECTORS.map((sector) => {
                   const Icon = sector.icon;
+                  const isActive = activeSector === sector.id;
                   return (
-                     <button key={sector.id} onClick={() => { setActiveSector(sector.id); playClick(); }} className={`snap-center flex items-center gap-2 px-5 py-3 rounded-xl transition-all font-bold text-sm whitespace-nowrap min-h-[44px] ${activeSector === sector.id ? 'bg-brand-navy text-white shadow-lg' : 'bg-white text-brand-navy/50 hover:text-brand-navy hover:bg-white/80'}`}>
-                        <Icon size={18} /> {sector.label}
+                     <button 
+                        key={sector.id} 
+                        onClick={() => { setActiveSector(sector.id); playClick(); }} 
+                        className={`flex-none md:flex-1 flex items-center justify-center gap-2 px-4 py-3 md:px-4 rounded-xl transition-all duration-300 font-bold text-xs md:text-sm relative z-10 whitespace-nowrap snap-center ${isActive ? 'text-brand-navy shadow-sm ring-1 ring-black/5' : 'text-brand-navy/50 hover:bg-brand-cream/50'}`}
+                     >
+                        {isActive && (
+                           <div className="absolute inset-0 bg-brand-cream rounded-xl z-[-1] animate-in fade-in zoom-in-95 duration-200"></div>
+                        )}
+                        <Icon size={16} className={isActive ? "text-brand-teal" : ""} /> 
+                        {sector.label}
                      </button>
                   )
                })}
@@ -157,7 +169,7 @@ export const DonationFlow: React.FC = () => {
                     </div>
                     <div className="mt-auto relative z-10 w-full">
                       <span className={`text-[10px] font-bold uppercase tracking-widest mb-2 block ${isSelected ? 'text-brand-lavender' : 'text-brand-navy/40'}`}>{level.sub}</span>
-                      <h4 className={`text-2xl font-display font-bold mb-1 leading-none ${isSelected ? 'text-white' : 'text-brand-navy'}`}>{level.label}</h4>
+                      <h4 className={`text-xl font-display font-bold mb-1 leading-tight ${isSelected ? 'text-white' : 'text-brand-navy'}`}>{level.label}</h4>
                       <div className={`text-sm font-medium flex justify-between items-center ${isSelected ? 'text-white/60' : 'text-brand-navy/40'}`}><span>${level.baseAmount} / unit</span></div>
                     </div>
                   </button>
@@ -175,10 +187,10 @@ export const DonationFlow: React.FC = () => {
                      <div className="flex-1 w-full">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 md:gap-0">
                            <div>
-                              <label className="text-xs font-bold uppercase tracking-widest text-brand-navy/40 block mb-2">Impact Volume</label>
+                              <label className="text-xs font-bold uppercase tracking-widest text-brand-navy/40 block mb-2">Lives to Impact in Colorado</label>
                               <div className="flex items-baseline gap-2">
-                                 <span className="text-6xl font-display font-bold text-brand-navy tabular-nums tracking-tighter">{multiplier}</span>
-                                 <span className="text-xl font-medium text-brand-navy/40">{multiplier === 1 ? 'unit' : 'units'}</span>
+                                 <span className="text-5xl md:text-6xl font-display font-bold text-brand-navy tabular-nums tracking-tighter">{multiplier}</span>
+                                 <span className="text-xl font-medium text-brand-navy/40">{multiplier === 1 ? 'person' : 'people'}</span>
                               </div>
                            </div>
                            <div className="text-left md:text-right w-full md:w-auto p-4 md:p-0 bg-brand-cream md:bg-transparent rounded-xl md:rounded-none">
@@ -188,7 +200,7 @@ export const DonationFlow: React.FC = () => {
                         </div>
 
                         {/* Enhanced Touch Slider */}
-                        <div className="relative h-24 flex items-center group touch-none select-none my-4">
+                        <div className="relative h-24 flex items-center group select-none my-4">
                            <div className={`absolute bottom-8 left-0 right-0 h-full ${selectedImpact.accent}`}><ImpactEqualizer value={multiplier} color={selectedImpact.color} /></div>
                            <div className="absolute w-full flex justify-between px-2 pointer-events-none opacity-20 top-1/2 -translate-y-1/2">
                               {[...Array(10)].map((_, i) => (<div key={i} className="w-[1px] h-4 bg-brand-navy"></div>))}
@@ -203,7 +215,8 @@ export const DonationFlow: React.FC = () => {
                               step="1" 
                               value={multiplier} 
                               onChange={(e) => handleSliderChange(parseInt(e.target.value))} 
-                              className="w-full absolute z-20 opacity-0 cursor-pointer h-24 top-1/2 -translate-y-1/2 touch-pan-y focus:outline-none" 
+                              className="w-full absolute z-20 opacity-0 cursor-pointer h-24 top-1/2 -translate-y-1/2 focus:outline-none touch-none" 
+                              style={{ touchAction: 'none' }}
                               aria-label="Adjust donation multiplier"
                            />
                            <div className="absolute h-14 w-14 top-1/2 -translate-y-1/2 bg-white border-4 border-brand-navy rounded-xl shadow-[0_8px_16px_rgba(0,0,0,0.2)] z-10 transition-all duration-150 pointer-events-none flex items-center justify-center transform group-active:scale-95 group-active:shadow-[0_2px_8px_rgba(0,0,0,0.2)]" style={{ left: `calc(${((multiplier - 1) / 9) * 100}% - ${multiplier === 10 ? 56 : multiplier === 1 ? 0 : 28}px)` }}>
@@ -211,11 +224,26 @@ export const DonationFlow: React.FC = () => {
                            </div>
                         </div>
 
-                        <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-brand-cream rounded-xl border border-brand-navy/5">
-                           <div className={`p-2 rounded-lg text-white shadow-sm shrink-0 ${selectedImpact.color}`}><Target size={20} /></div>
-                           <div>
-                              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40">Projected Outcome</span>
-                              <p className="text-brand-navy font-bold leading-tight">{multiplier} x {selectedImpact.desc}</p>
+                        {/* Impact Cards */}
+                        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                           <div className="flex flex-col sm:flex-row items-center gap-4 p-6 bg-white rounded-xl border-l-4 border-brand-teal shadow-md w-full">
+                              <div className="p-3 bg-brand-teal/10 rounded-full text-brand-teal shrink-0">
+                                <Building size={24} />
+                              </div>
+                              <div className="text-center sm:text-left">
+                                 <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40 block mb-1">Direct-to-Vendor</span>
+                                 <p className="text-brand-navy font-bold leading-tight text-sm md:text-base">{selectedImpact.transparencyDesc}</p>
+                              </div>
+                           </div>
+                           
+                           <div className="flex flex-col sm:flex-row items-center gap-4 p-6 bg-brand-cream rounded-xl border border-brand-navy/5 w-full">
+                              <div className={`p-3 rounded-full text-white shadow-sm shrink-0 ${selectedImpact.color}`}>
+                                <Target size={24} />
+                              </div>
+                              <div className="text-center sm:text-left">
+                                 <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40 block mb-1">Direct Outcome</span>
+                                 <p className="text-brand-navy font-bold leading-tight text-sm md:text-base">{multiplier} x {selectedImpact.desc}</p>
+                              </div>
                            </div>
                         </div>
                      </div>
@@ -224,26 +252,86 @@ export const DonationFlow: React.FC = () => {
             </div>
         </div>
 
+        {/* Live Invoice Preview */}
         <div className="lg:col-span-4 flex flex-col h-full mt-8 lg:mt-0">
             <div className="lg:sticky lg:top-32">
-               <div className="relative bg-white shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
-                  <div className="absolute -top-3 left-0 w-full h-4 bg-white" style={{ clipPath: 'polygon(0% 100%, 5% 0%, 10% 100%, 15% 0%, 20% 100%, 25% 0%, 30% 100%, 35% 0%, 40% 100%, 45% 0%, 50% 100%, 55% 0%, 60% 100%, 65% 0%, 70% 100%, 75% 0%, 80% 100%, 85% 0%, 90% 100%, 95% 0%, 100% 100%)' }}></div>
-                  <div className="p-8 pb-12">
-                     <div className="text-center border-b-2 border-dashed border-brand-navy/10 pb-6 mb-6">
-                        <div className="flex items-center justify-center gap-2 mb-2 text-brand-navy/30"><Printer size={16} /><span className="text-[10px] font-bold uppercase tracking-widest">Pre-Authorization</span></div>
-                        <h4 className="font-display font-bold text-2xl text-brand-navy">ESTIMATE</h4>
-                     </div>
-                     <div className="space-y-4 mb-6 font-mono text-sm">
-                        <div className="flex justify-between items-start"><span className="text-brand-navy font-bold">{multiplier}x {selectedImpact.label}</span><span className="text-brand-navy font-bold">${totalAmount.toFixed(2)}</span></div>
-                        <div className="flex justify-between items-center text-brand-teal bg-brand-teal/5 px-2 py-1 -mx-2 rounded"><span className="font-bold">Overhead Fee</span><span className="font-bold">$0.00</span></div>
-                     </div>
-                     <div className="border-t-2 border-brand-navy border-dashed pt-4 mb-8">
-                        <div className="flex justify-between items-end"><span className="font-bold text-xl text-brand-navy">TOTAL</span><span className="font-display font-bold text-4xl text-brand-navy">${totalAmount.toFixed(2)}</span></div>
-                     </div>
-                     <button onClick={() => { playClick(); setIsPaymentModalOpen(true); }} className="w-full bg-brand-navy text-white font-bold text-xl py-5 rounded-2xl shadow-[8px_8px_0px_0px_rgba(45,156,142,1)] hover:shadow-[4px_4px_0px_0px_rgba(45,156,142,1)] hover:translate-x-1 hover:translate-y-1 transition-all flex items-center justify-center gap-3 active:shadow-none active:translate-x-2 active:translate-y-2 border-2 border-brand-navy min-h-[60px]">Deploy Capital <ArrowRight strokeWidth={3} size={20} /></button>
-                     <button onClick={handleQuickDonate} className="w-full mt-4 bg-brand-yellow/10 text-brand-navy font-bold text-sm py-4 rounded-xl border border-brand-yellow/20 hover:bg-brand-yellow/20 transition-all flex items-center justify-center gap-2 group min-h-[50px]"><Zap size={16} className="text-brand-yellow group-hover:fill-brand-yellow transition-colors" /> Flash Fund $25</button>
+               <div className="relative bg-white shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group rounded-[1.5rem] overflow-hidden">
+                  
+                  {/* Invoice Header */}
+                  <div className="bg-brand-navy p-6 flex justify-between items-center relative overflow-hidden">
+                      <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNlNWU3ZWIiLz4KPC9zdmc+')]"></div>
+                      <div>
+                         <span className="text-[10px] font-bold uppercase tracking-widest text-brand-teal flex items-center gap-1"><Receipt size={12} /> Live Invoice</span>
+                         <h4 className="font-display font-bold text-xl text-white mt-1">Pending Transaction</h4>
+                      </div>
+                      <div className="text-right">
+                         <span className="text-[10px] font-mono text-white/40 block">#{Math.floor(Math.random() * 10000)}</span>
+                         <span className="text-[10px] font-bold text-brand-yellow uppercase tracking-wider animate-pulse">Draft</span>
+                      </div>
                   </div>
-                  <div className="absolute -bottom-3 left-0 w-full h-4 bg-white" style={{ clipPath: 'polygon(0% 0%, 5% 100%, 10% 0%, 15% 100%, 20% 0%, 25% 100%, 30% 0%, 35% 100%, 40% 0%, 45% 100%, 50% 0%, 55% 100%, 60% 0%, 65% 100%, 70% 0%, 75% 100%, 80% 0%, 85% 100%, 90% 0%, 95% 100%, 100% 0%)' }}></div>
+
+                  {/* Receipt Body */}
+                  <div className="p-8 bg-white relative">
+                     {/* Perforation Effect */}
+                     <div className="absolute top-0 left-0 w-full h-2 bg-brand-navy" style={{ clipPath: 'polygon(0% 0%, 5% 100%, 10% 0%, 15% 100%, 20% 0%, 25% 100%, 30% 0%, 35% 100%, 40% 0%, 45% 100%, 50% 0%, 55% 100%, 60% 0%, 65% 100%, 70% 0%, 75% 100%, 80% 0%, 85% 100%, 90% 0%, 95% 100%, 100% 0%)' }}></div>
+
+                     <div className="space-y-6">
+                        
+                        <div className="flex justify-between items-start border-b border-dashed border-brand-navy/10 pb-4">
+                           <div>
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40 block mb-1">Payable To</span>
+                              <span className="font-bold text-brand-navy text-lg leading-tight block">{selectedImpact.vendorName}</span>
+                              <span className="text-xs text-brand-teal flex items-center gap-1 mt-1 font-bold"><CheckCircle2 size={12} /> Verified Vendor</span>
+                           </div>
+                           <div className="text-right">
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/40 block mb-1">Date</span>
+                              <span className="font-mono text-brand-navy text-sm font-bold">{new Date().toLocaleDateString()}</span>
+                           </div>
+                        </div>
+
+                        <div className="space-y-2">
+                           <div className="flex justify-between items-center text-sm">
+                              <span className="text-brand-navy/60 font-medium">{multiplier}x {selectedImpact.label}</span>
+                              <span className="font-mono font-bold text-brand-navy">${totalAmount.toFixed(2)}</span>
+                           </div>
+                           <div className="flex justify-between items-center text-sm">
+                              <span className="text-brand-navy/60 font-medium">Platform Fee (0%)</span>
+                              <span className="font-mono font-bold text-brand-navy">$0.00</span>
+                           </div>
+                           <div className="flex justify-between items-center text-sm">
+                              <span className="text-brand-navy/60 font-medium">Processing</span>
+                              <span className="font-mono font-bold text-brand-navy">$0.00</span>
+                           </div>
+                        </div>
+
+                        <div className="border-t-2 border-brand-navy border-dashed pt-4">
+                           <div className="flex justify-between items-end">
+                              <span className="font-bold text-xl text-brand-navy">Total Due</span>
+                              <span className="font-display font-bold text-4xl text-brand-navy">${totalAmount.toFixed(2)}</span>
+                           </div>
+                        </div>
+
+                     </div>
+                     
+                     {/* Buttons */}
+                     <div className="mt-8 space-y-3">
+                        <button onClick={() => { playClick(); setIsPaymentModalOpen(true); }} className="w-full bg-brand-navy text-white font-bold text-lg py-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(45,156,142,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-3 border-2 border-brand-navy min-h-[60px] group">
+                           Authorize Payment <ArrowRight strokeWidth={3} size={20} className="group-hover:translate-x-1 transition-transform" />
+                        </button>
+                        <button onClick={handleQuickDonate} className="w-full bg-transparent text-brand-navy/60 font-bold text-xs py-3 rounded-xl hover:bg-brand-cream transition-colors flex items-center justify-center gap-2">
+                           <Zap size={14} className="text-brand-yellow fill-brand-yellow" /> Quick Flash Fund ($25)
+                        </button>
+                     </div>
+
+                     <div className="mt-6 text-center">
+                        <span className="text-[10px] text-brand-navy/30 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                           <ShieldCheck size={12} /> 100% Secure Checkout
+                        </span>
+                     </div>
+                     
+                     {/* Bottom ZigZag */}
+                     <div className="absolute bottom-0 left-0 w-full h-2 bg-white" style={{ clipPath: 'polygon(0% 100%, 5% 0%, 10% 100%, 15% 0%, 20% 100%, 25% 0%, 30% 100%, 35% 0%, 40% 100%, 45% 0%, 50% 100%, 55% 0%, 60% 100%, 65% 0%, 70% 100%, 75% 0%, 80% 100%, 85% 0%, 90% 100%, 95% 0%, 100% 100%)' }}></div>
+                  </div>
                </div>
             </div>
         </div>

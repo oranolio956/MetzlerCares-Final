@@ -1,0 +1,103 @@
+
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A2A3A"/>
+      <stop offset="1" stop-color="#15202B"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FDFBF7"/>
+      <stop offset="1" stop-color="#E2E8F0"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="20" stdDeviation="20" flood-opacity="0.4" flood-color="#000"/>
+    </filter>
+    <style>
+      /* Fallback font stack that mimics the app's style */
+      text { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Decorative Elements (Abstract Flow) -->
+  <path d="M-100 630 C 200 630 300 400 600 400 C 900 400 1000 630 1300 630 L 1300 700 L -100 700 Z" fill="#2D9C8E" opacity="0.1"/>
+  <circle cx="1100" cy="100" r="400" fill="#FF8A75" opacity="0.05"/>
+  <circle cx="100" cy="500" r="300" fill="#2D9C8E" opacity="0.05"/>
+
+  <!-- Grid Pattern (Ledger Theme) -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-opacity="0.03" stroke-width="1"/>
+  </pattern>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  
+  <!-- LOGO MARK (Top Left) - UPDATED TO VITAL SPARK -->
+  <g transform="translate(80, 80)">
+      <!-- Navy Base -->
+      <path d="M15 55C15 85 40 95 75 95V75C55 75 40 70 40 55H15Z" fill="#2D9C8E" transform="scale(0.8) translate(0,0)"/>
+      <!-- Teal Ascent -->
+      <path d="M85 45C85 15 60 5 25 5V25C45 25 60 30 60 45H85Z" fill="#2D9C8E" opacity="0.6" transform="scale(0.8) translate(0,0)"/>
+      <!-- Spark -->
+      <circle cx="40" cy="40" r="10" fill="#FF8A75"/>
+      
+      <text x="90" y="55" font-size="32" font-weight="800" fill="#FDFBF7" letter-spacing="1">SECONDWIND</text>
+  </g>
+  
+  <!-- MAIN TYPOGRAPHY -->
+  <g transform="translate(80, 300)">
+    <text x="0" y="0" font-size="90" font-weight="900" fill="url(#textGrad)" letter-spacing="-2" style="text-shadow: 0 4px 10px rgba(0,0,0,0.3)">
+      Invest in
+    </text>
+    <text x="0" y="110" font-size="90" font-weight="900" fill="url(#textGrad)" letter-spacing="-2" style="text-shadow: 0 4px 10px rgba(0,0,0,0.3)">
+      Human <tspan fill="#2D9C8E">Potential.</tspan>
+    </text>
+  </g>
+  
+  <!-- BADGE -->
+  <g transform="translate(80, 480)">
+    <rect width="400" height="64" rx="32" fill="#FF8A75" filter="url(#shadow)"/>
+    <text x="200" y="42" font-size="20" font-weight="bold" fill="#1A2A3A" text-anchor="middle" letter-spacing="2">ZERO RED TAPE</text>
+  </g>
+  
+  <!-- WINDY MASCOT (Right Side) -->
+  <g transform="translate(800, 140)" filter="url(#shadow)">
+     <!-- Head Body Shape -->
+     <path d="M200 60 C120 60 60 120 60 200 C60 280 120 340 200 340 C280 340 340 280 340 200 C340 140 300 80 250 70 C250 70 280 20 200 40 Z" fill="#FDFBF7"/>
+     
+     <!-- Lower Body / Tail -->
+     <path d="M200 340 C150 340 140 280 140 250 C140 250 120 280 80 260 C60 250 160 380 200 380 C240 380 340 250 320 260 C280 280 260 250 260 250 C260 280 250 340 200 340 Z" fill="#2D9C8E"/>
+     
+     <!-- Cheeks -->
+     <circle cx="120" cy="220" r="20" fill="#FF8A75" opacity="0.6"/>
+     <circle cx="280" cy="220" r="20" fill="#FF8A75" opacity="0.6"/>
+     
+     <!-- Eyes (Winking Expression) -->
+     <!-- Left Eye (Wink) -->
+     <path d="M120 170 Q150 150 180 170" stroke="#1A2A3A" stroke-width="8" stroke-linecap="round" fill="none"/>
+     
+     <!-- Right Eye (Open) -->
+     <ellipse cx="260" cy="180" rx="25" ry="30" fill="#FDFBF7" stroke="#E2E8F0" stroke-width="2"/>
+     <g transform="translate(260, 180)">
+       <circle cx="0" cy="0" r="14" fill="#1A2A3A" />
+       <circle cx="5" cy="-5" r="5" fill="white" />
+     </g>
+
+     <!-- Mouth (Smile) -->
+     <path d="M180 240 Q200 260 220 240 Z" fill="#1A2A3A"/>
+     
+     <!-- Arms (Celebrating) -->
+     <ellipse cx="80" cy="250" rx="15" ry="30" fill="#2D9C8E" transform="rotate(-30 80 250)"/>
+     <ellipse cx="320" cy="180" rx="15" ry="30" fill="#2D9C8E" transform="rotate(30 320 180)"/>
+     
+     <!-- Accessory: Tech Glasses (Subtle) -->
+     <path d="M220 180 L300 180" stroke="#2D9C8E" stroke-width="4" stroke-opacity="0.5"/>
+  </g>
+
+  <!-- Verified Icon Floating -->
+  <g transform="translate(1050, 100)">
+    <circle cx="0" cy="0" r="40" fill="#1A2A3A" stroke="#2D9C8E" stroke-width="4"/>
+    <path d="M-15 0 L-5 10 L15 -10" stroke="#2D9C8E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  
+</svg>

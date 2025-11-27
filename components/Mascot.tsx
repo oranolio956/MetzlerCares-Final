@@ -1,10 +1,11 @@
-import React, { memo } from 'react';
 
-interface MascotProps {
+import React, { memo, useId, useState, useEffect } from 'react';
+
+export interface MascotProps {
   expression?: 'happy' | 'thinking' | 'excited' | 'wink' | 'celebration' | 'confused';
   variant?: 'default' | 'tech' | 'home' | 'commute';
   className?: string;
-  lookAt?: { x: number; y: number }; // Optional state-based override
+  lookAt?: { x: number; y: number };
 }
 
 export const Mascot: React.FC<MascotProps> = memo(({ 
@@ -13,64 +14,108 @@ export const Mascot: React.FC<MascotProps> = memo(({
   className = '',
   lookAt
 }) => {
+  const uid = useId().replace(/:/g, ''); // Generate unique ID for SVG defs
+  const [isBlinking, setIsBlinking] = useState(false);
+  
   // Eye tracking logic
-  const pupilStyle = lookAt ? {
-    transform: `translate(${lookAt.x * 4}px, ${lookAt.y * 4}px)`
-  } : {
-    transform: `translate(calc(var(--mouse-x, 0) * 4px), calc(var(--mouse-y, 0) * 4px))`
+  // We use CSS variables for global mouse, or props for fixed lookAt
+  // Multiplier adjusted for subtle, realistic range
+  const pupilX = lookAt ? lookAt.x * 8 : 'var(--mouse-x, 0) * 8';
+  const pupilY = lookAt ? lookAt.y * 8 : 'var(--mouse-y, 0) * 8';
+  
+  const pupilStyle = {
+    transform: `translate(calc(${pupilX}px), calc(${pupilY}px))`,
+    transition: 'transform 0.2s cubic-bezier(0.25, 1, 0.5, 1)' // Smooth dampening
   };
 
-  const getAriaLabel = () => {
-    switch (expression) {
-        case 'happy': return 'Windy the Energy Wisp smiling warmly';
-        case 'thinking': return 'Windy processing information';
-        case 'excited': return 'Windy glowing with excitement';
-        case 'wink': return 'Windy winking playfully';
-        case 'celebration': return 'Windy celebrating with sparks';
-        case 'confused': return 'Windy looking puzzled';
-        default: return 'Windy the Energy Wisp';
-    }
-  };
+  // Organic Blinking Logic
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
 
-  // Dynamic body shapes based on variant/context
-  const getBodyPath = () => {
-    switch (variant) {
-      case 'tech': 
-        // Hexagonal/Blocky "Digital" Form
-        return "M100 180 L40 140 L40 60 L100 20 L160 60 L160 140 Z"; 
-      case 'home':
-        // Shelter/House-like Form
-        return "M100 20 L170 80 C170 80 170 180 100 180 C30 180 30 80 30 80 Z";
-      case 'commute':
-        // Aerodynamic/Wind-blown Form
-        return "M100 180 C40 180 20 100 20 100 C20 100 60 20 120 30 C180 40 180 120 160 150 C140 180 100 180 100 180 Z";
-      default:
-        // The Standard "Teardrop/Wisp" Form
-        return "M100 180 C50 180 20 130 20 90 C20 40 60 10 100 10 C140 10 180 40 180 90 C180 130 150 180 100 180 Z";
-    }
-  };
+    const triggerBlink = () => {
+      // Don't blink if in a special expression state that overrides eyes
+      if (['happy', 'excited', 'thinking', 'default'].includes(expression)) {
+        setIsBlinking(true);
+        setTimeout(() => setIsBlinking(false), 180); // Slightly slower blink for cuteness
+      }
+      
+      // Schedule next blink randomly between 3s and 8s (less frantic)
+      const nextBlink = Math.random() * 5000 + 3000;
+      timeoutId = setTimeout(triggerBlink, nextBlink);
+    };
+
+    // Initial blink delay
+    timeoutId = setTimeout(triggerBlink, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [expression]);
+
+  const showBlink = isBlinking && !['wink', 'confused', 'celebration'].includes(expression);
 
   return (
     <svg 
-      viewBox="0 0 200 200" 
+      viewBox="0 0 400 400" 
       className={`w-full h-full ${className}`} 
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
-      style={{ overflow: 'visible' }}
       role="img"
-      aria-label={getAriaLabel()}
+      aria-label={`Windy the Cloud Spirit looking ${expression}`}
+      style={{ overflow: 'visible' }}
     >
+      <style>{`
+        @keyframes breathe {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.02); }
+        }
+        @keyframes shimmer {
+          0%, 100% { stop-color: #FDFBF7; }
+          50% { stop-color: #E6F4F1; }
+        }
+        .mascot-breathe {
+          animation: breathe 4s ease-in-out infinite;
+          transform-origin: center center;
+        }
+        .mascot-transition {
+          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+      `}</style>
+
       <defs>
-        <linearGradient id="windBodyGrad" x1="20" y1="20" x2="180" y2="180" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#2D9C8E" />
-          <stop offset="100%" stopColor="#1A2A3A" />
-        </linearGradient>
-        <radialGradient id="glowGrad" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(100 100) rotate(90) scale(90)">
-          <stop stopColor="#2D9C8E" stopOpacity="0.2"/>
-          <stop offset="1" stopColor="#2D9C8E" stopOpacity="0"/>
+        {/* Main Body Gradient - Gives the 3D Sphere look */}
+        <radialGradient id={`bodyGrad-${uid}`} cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160 160) rotate(90) scale(220)">
+          <stop className="animate-pulse" style={{ animationDuration: '4s' }} stopColor="#FDFBF7" />
+          <stop offset="0.4" stopColor="#E6F4F1" />
+          <stop offset="1" stopColor="#2D9C8E" />
         </radialGradient>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+
+        {/* Shadow Gradient */}
+        <radialGradient id={`shadowGrad-${uid}`} cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(200 380) rotate(90) scale(80 200)">
+          <stop stopColor="#1A2A3A" stopOpacity="0.3"/>
+          <stop offset="1" stopColor="#1A2A3A" stopOpacity="0"/>
+        </radialGradient>
+
+        {/* Blush Gradient */}
+        <radialGradient id={`blushGrad-${uid}`}>
+          <stop stopColor="#FF8A75" stopOpacity="0.6"/>
+          <stop offset="1" stopColor="#FF8A75" stopOpacity="0"/>
+        </radialGradient>
+
+        {/* Goggle Lens Gradient */}
+        <linearGradient id={`lensGrad-${uid}`} x1="0" y1="0" x2="0" y2="1">
+           <stop stopColor="#2D9C8E" stopOpacity="0.6" />
+           <stop offset="1" stopColor="#1A2A3A" stopOpacity="0.8" />
+        </linearGradient>
+        
+        {/* Hologram Gradient */}
+        <linearGradient id={`holoGrad-${uid}`} x1="0" y1="0" x2="1" y2="1">
+           <stop stopColor="#A7ACD9" stopOpacity="0.8" />
+           <stop offset="0.5" stopColor="#FFFFFF" stopOpacity="0.9" />
+           <stop offset="1" stopColor="#A7ACD9" stopOpacity="0.8" />
+        </linearGradient>
+
+        {/* Filters for Softness */}
+        <filter id={`softGlow-${uid}`}>
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
           <feMerge>
             <feMergeNode in="coloredBlur"/>
             <feMergeNode in="SourceGraphic"/>
@@ -78,98 +123,179 @@ export const Mascot: React.FC<MascotProps> = memo(({
         </filter>
       </defs>
 
-      {/* Outer Glow for "Energy" Feel */}
-      <circle cx="100" cy="100" r="80" fill="url(#glowGrad)" className="animate-pulse" style={{ animationDuration: '3s' }} />
+      {/* Drop Shadow - Scales inversely to float to ground it */}
+      <ellipse cx="200" cy="360" rx="80" ry="15" fill={`url(#shadowGrad-${uid})`} className="animate-pulse" style={{ animationDuration: '6s' }} />
 
-      <g style={{ 
-        transformOrigin: '100px 100px',
-        animation: expression === 'celebration' ? 'bounce 0.5s infinite alternate' : 'float 6s ease-in-out infinite',
-      }}>
-          
-          {/* THE BODY - Morphs based on context */}
-          <path 
-            d={getBodyPath()}
-            className="transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)]" 
-            fill="url(#windBodyGrad)"
-            stroke={variant === 'tech' ? '#A7ACD9' : 'none'}
-            strokeWidth="2"
-            filter="url(#glow)"
-            style={{ 
-              transformOrigin: 'center'
-            }}
-          />
+      {/* Main Character Group */}
+      <g className="animate-float" style={{ transformOrigin: '200px 200px' }}>
+        
+        {/* === BODY & HEAD (Breathing) === */}
+        <g className="mascot-breathe">
+            {/* The "Tail" / Lower Body */}
+            <path 
+            d="M200 340 C150 340 140 280 140 250 C140 250 120 280 80 260 C60 250 160 380 200 380 C240 380 340 250 320 260 C280 280 260 250 260 250 C260 280 250 340 200 340 Z" 
+            fill="#2D9C8E" 
+            />
 
-          {/* THE COWLICK (Brand Signature) - The "Windy" Hair */}
-          <path 
-            d="M100 10 C100 10 110 -20 140 -10 C140 -10 120 -5 120 20"
-            fill="#2D9C8E"
-            className="transition-all duration-500"
-            style={{
-               transform: variant === 'commute' ? 'rotate(-20deg) translate(-10px, 10px)' : 'none'
-            }}
-          />
-
-          {/* FACE CONTAINER */}
-          <g transform="translate(0, 10)">
+            {/* The Head - Soft spherical shape with a cowlick */}
+            <path 
+            d="M200 60 
+                C120 60 60 120 60 200 
+                C60 280 120 340 200 340 
+                C280 340 340 280 340 200 
+                C340 140 300 80 250 70
+                C250 70 280 20 200 40 
+                C180 45 200 60 200 60 Z"
+            fill={`url(#bodyGrad-${uid})`}
+            filter={`url(#softGlow-${uid})`}
+            />
             
-            {/* Left Eye */}
-            <g transform="translate(65, 80)">
-               <ellipse cx="0" cy="0" rx="14" ry="18" fill="white" className="transition-all duration-300" 
-                  style={{ ry: expression === 'wink' ? 2 : 18 }} 
-               />
-               {expression !== 'wink' && (
-                 <circle cx="0" cy="0" r="6" fill="#1A2A3A" style={pupilStyle} />
-               )}
-            </g>
+            {/* Highlight on Head (Glossy/Wet look) */}
+            <ellipse cx="140" cy="120" rx="40" ry="25" fill="white" fillOpacity="0.4" transform="rotate(-30 140 120)" />
+        </g>
 
-            {/* Right Eye */}
-            <g transform="translate(135, 80)">
-               <ellipse cx="0" cy="0" rx="14" ry="18" fill="white" className="transition-all duration-300" 
-                  style={{ ry: expression === 'thinking' ? 12 : 18 }}
-               />
-               <circle cx="0" cy="0" r="6" fill="#1A2A3A" style={pupilStyle} />
-            </g>
 
-            {/* Expressions (Eyebrows / Mouth hints) */}
-            {expression === 'happy' && (
-               <path d="M90 110 Q100 115 110 110" stroke="#1A2A3A" strokeWidth="3" strokeLinecap="round" opacity="0.5" fill="none" />
-            )}
-            {expression === 'confused' && (
-               <path d="M125 55 L145 60" stroke="white" strokeWidth="4" strokeLinecap="round" />
-            )}
-            {expression === 'excited' && (
-               <>
-                 <path d="M55 55 Q65 45 75 55" stroke="white" strokeWidth="3" strokeLinecap="round" />
-                 <path d="M125 55 Q135 45 145 55" stroke="white" strokeWidth="3" strokeLinecap="round" />
-               </>
-            )}
-          </g>
+        {/* === FACE === */}
+        <g transform="translate(0, 10)">
+           
+           {/* Cheeks - Fade in/out based on expression */}
+           <g className="transition-opacity duration-500" style={{ opacity: expression === 'excited' || expression === 'happy' ? 1 : 0.5 }}>
+             <circle cx="110" cy="220" r="25" fill={`url(#blushGrad-${uid})`} />
+             <circle cx="290" cy="220" r="25" fill={`url(#blushGrad-${uid})`} />
+           </g>
 
-          {/* VARIANT ORBITALS - Floating Props */}
-          {variant === 'tech' && (
-            <g className="animate-spin-slow" style={{ transformOrigin: '100px 100px' }}>
-               <rect x="20" y="90" width="20" height="20" rx="4" fill="#A7ACD9" opacity="0.8" />
-               <rect x="160" y="50" width="15" height="15" rx="3" fill="#A7ACD9" opacity="0.6" />
-            </g>
-          )}
-          {variant === 'home' && (
-            <path d="M160 120 L170 110 L180 120" stroke="#FF8A75" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="animate-bounce" />
-          )}
-          {variant === 'commute' && (
-            <g className="animate-slide-left" style={{ opacity: 0.5 }}>
-               <path d="M10 100 H-40" stroke="white" strokeWidth="2" strokeDasharray="5,5" />
-               <path d="M10 120 H-20" stroke="white" strokeWidth="2" strokeDasharray="5,5" />
-            </g>
-          )}
+           {/* Eyes Container */}
+           <g transform="translate(0, 0)">
+              {/* Left Eye */}
+              <g transform="translate(140, 180)">
+                 {expression === 'wink' || expression === 'confused' ? (
+                     <path d="M-20 0 Q0 -10 20 0" stroke="#1A2A3A" strokeWidth="6" strokeLinecap="round" fill="none" className="mascot-transition" />
+                 ) : expression === 'celebration' ? (
+                     <path d="M-20 0 Q0 -15 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" className="mascot-transition" />
+                 ) : showBlink ? (
+                     <path d="M-20 0 Q0 8 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" />
+                 ) : (
+                   <g>
+                     <ellipse cx="0" cy="0" rx="28" ry="32" fill="white" stroke="#E5E7EB" strokeWidth="2" className="mascot-transition" />
+                     <g style={pupilStyle}>
+                       <circle cx="0" cy="0" r="14" fill="#1A2A3A" />
+                       <circle cx="4" cy="-4" r="5" fill="white" />
+                     </g>
+                   </g>
+                 )}
+              </g>
 
-          {/* Celebration Particles */}
-          {expression === 'celebration' && (
-             <g>
-               <circle cx="40" cy="40" r="5" fill="#F4D35E" className="animate-ping" />
-               <circle cx="160" cy="30" r="4" fill="#FF8A75" className="animate-ping" style={{ animationDelay: '0.2s' }} />
-               <circle cx="170" cy="140" r="3" fill="#A7ACD9" className="animate-ping" style={{ animationDelay: '0.4s' }} />
-             </g>
-          )}
+              {/* Right Eye */}
+              <g transform="translate(260, 180)">
+                 {expression === 'confused' ? (
+                     <g className="animate-spin-slow" style={{ transformOrigin: '0 0' }}>
+                        <path d="M-15 -15 L15 15 M-15 15 L15 -15" stroke="#1A2A3A" strokeWidth="6" strokeLinecap="round" />
+                     </g>
+                 ) : expression === 'celebration' ? (
+                     <path d="M-20 0 Q0 -15 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" className="mascot-transition" />
+                 ) : showBlink ? (
+                     <path d="M-20 0 Q0 8 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" />
+                 ) : (
+                   <g>
+                     <ellipse cx="0" cy="0" rx="28" ry="32" fill="white" stroke="#E5E7EB" strokeWidth="2" 
+                       className="mascot-transition"
+                       style={{ ry: expression === 'thinking' ? 22 : 32 }}
+                     />
+                     <g style={pupilStyle}>
+                       <circle cx="0" cy="0" r="14" fill="#1A2A3A" />
+                       <circle cx="4" cy="-4" r="5" fill="white" />
+                     </g>
+                   </g>
+                 )}
+              </g>
+
+              {/* Eyebrows (Expression) */}
+              <g className="mascot-transition" style={{ opacity: expression === 'thinking' ? 1 : 0, transform: expression === 'thinking' ? 'translateY(0)' : 'translateY(-10px)' }}>
+                 <path d="M240 140 Q260 130 280 140" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" />
+              </g>
+              <g className="mascot-transition" style={{ opacity: expression === 'excited' ? 1 : 0, transform: expression === 'excited' ? 'translateY(0)' : 'translateY(10px)' }}>
+                   <path d="M120 130 Q140 110 160 130" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" />
+                   <path d="M240 130 Q260 110 280 130" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" />
+              </g>
+           </g>
+
+           {/* Mouth */}
+           <g transform="translate(200, 240)">
+              {expression === 'happy' && <path d="M-20 0 Q0 15 20 0" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" className="mascot-transition" />}
+              {expression === 'excited' && <path d="M-20 0 Q0 20 20 0 Z" fill="#1A2A3A" className="mascot-transition" />}
+              {expression === 'thinking' && <circle cx="15" cy="5" r="5" fill="#1A2A3A" className="mascot-transition" />}
+              {expression === 'confused' && <path d="M-15 5 Q0 0 15 5" stroke="#1A2A3A" strokeWidth="4" strokeLinecap="round" fill="none" className="mascot-transition" />}
+              {expression === 'celebration' && <path d="M-25 0 Q0 25 25 0 Z" fill="#1A2A3A" className="mascot-transition" />}
+           </g>
+
+        </g>
+
+        {/* === ARMS === */}
+        {/* Little nubby arms that move based on expression with smoother transitions */}
+        <g className="mascot-transition">
+           {/* Left Arm */}
+           <ellipse 
+              cx={expression === 'thinking' ? 160 : expression === 'celebration' ? 80 : 100} 
+              cy={expression === 'thinking' ? 280 : expression === 'celebration' ? 180 : 250} 
+              rx="20" ry="35" 
+              fill="#2D9C8E" 
+              className="mascot-transition"
+              transform={expression === 'thinking' ? "rotate(45 160 280)" : expression === 'celebration' ? "rotate(45 80 180)" : "rotate(-20 100 250)"}
+           />
+           {/* Right Arm */}
+           <ellipse 
+              cx={expression === 'celebration' ? 320 : 300} 
+              cy={expression === 'celebration' ? 180 : 250} 
+              rx="20" ry="35" 
+              fill="#2D9C8E" 
+              className="mascot-transition"
+              transform={expression === 'celebration' ? "rotate(-45 320 180)" : "rotate(20 300 250)"}
+           />
+        </g>
+
+
+        {/* === ACCESSORIES (Variants) === */}
+
+        {/* COMMUTE VARIANT: Goggles & Scarf */}
+        {variant === 'commute' && (
+           <g className="animate-slide-up">
+              {/* Scarf */}
+              <path d="M120 300 Q200 340 280 300 L290 330 Q200 380 110 330 Z" fill="#FF8A75" />
+              <path d="M270 310 L320 360 L350 350 L290 300 Z" fill="#FF8A75" /> {/* Scarf Tail */}
+              
+              {/* Goggles */}
+              <g transform="translate(0, -10)">
+                <path d="M100 150 H300 V180 H100 Z" fill="#1A2A3A" opacity="0.2" /> {/* Strap */}
+                <circle cx="140" cy="180" r="35" fill={`url(#lensGrad-${uid})`} stroke="#A7ACD9" strokeWidth="4" />
+                <circle cx="260" cy="180" r="35" fill={`url(#lensGrad-${uid})`} stroke="#A7ACD9" strokeWidth="4" />
+                <path d="M175 180 L225 180" stroke="#1A2A3A" strokeWidth="8" /> {/* Bridge */}
+                {/* Lens Shine */}
+                <path d="M125 170 L145 155" stroke="white" strokeWidth="3" opacity="0.5" />
+                <path d="M245 170 L265 155" stroke="white" strokeWidth="3" opacity="0.5" />
+              </g>
+           </g>
+        )}
+
+        {/* TECH VARIANT: AR Visor */}
+        {variant === 'tech' && (
+           <g className="animate-pulse" style={{ animationDuration: '4s' }}>
+              <path d="M110 160 Q200 140 290 160 L280 210 Q200 230 120 210 Z" fill={`url(#holoGrad-${uid})`} stroke="#A7ACD9" strokeWidth="2" opacity="0.8" />
+              <path d="M100 170 L90 190" stroke="#1A2A3A" strokeWidth="4" /> {/* Ear piece L */}
+              <path d="M300 170 L310 190" stroke="#1A2A3A" strokeWidth="4" /> {/* Ear piece R */}
+              {/* Digital lines on visor */}
+              <path d="M150 180 H250" stroke="white" strokeWidth="1" opacity="0.5" strokeDasharray="4 4" />
+              <circle cx="270" cy="170" r="2" fill="#2D9C8E" className="animate-ping" />
+           </g>
+        )}
+
+        {/* HOME VARIANT: Holding a Key */}
+        {variant === 'home' && (
+           <g transform="translate(280, 240) rotate(-10)">
+              <circle cx="0" cy="0" r="15" stroke="#F4D35E" strokeWidth="6" fill="none" />
+              <path d="M15 0 L50 0 L50 10 M35 0 L35 10" stroke="#F4D35E" strokeWidth="6" strokeLinecap="round" />
+              <circle cx="0" cy="0" r="15" stroke="white" strokeWidth="2" fill="none" opacity="0.5" />
+           </g>
+        )}
 
       </g>
     </svg>

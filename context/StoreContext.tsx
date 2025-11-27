@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Donation, Notification, RequestItem, BeneficiaryProfile } from '../types';
 
+type UserType = 'donor' | 'beneficiary' | null;
+
 interface StoreContextType {
   isCalmMode: boolean;
   toggleCalmMode: () => void;
@@ -14,15 +16,21 @@ interface StoreContextType {
   removeNotification: (id: string) => void;
   confettiTrigger: number;
   triggerConfetti: () => void;
-  // New Beneficiary State
+  // Beneficiary State
   beneficiaryProfile: BeneficiaryProfile;
   submitIntakeRequest: (data: { type: string; details: string }) => void;
+  verifyInsurance: (status: 'verified' | 'pending') => void;
+  // Auth State
+  userType: UserType;
+  login: (type: UserType) => void;
+  logout: () => void;
 }
 
 const DEFAULT_BENEFICIARY: BeneficiaryProfile = {
   name: "Alex",
   daysSober: 42,
   nextMilestone: 60,
+  insuranceStatus: 'pending', // Default to pending to show the UI flow
   requests: [
     { id: '1', type: 'Rent Assistance (October)', date: '2 days ago', status: 'reviewing' },
     { id: '2', type: 'Bus Pass (Monthly)', date: 'Sep 28, 2024', status: 'funded' },
@@ -39,6 +47,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [confettiTrigger, setConfettiTrigger] = useState(0);
   const [beneficiaryProfile, setBeneficiaryProfile] = useState<BeneficiaryProfile>(DEFAULT_BENEFICIARY);
+  const [userType, setUserType] = useState<UserType>(null);
 
   const toggleCalmMode = () => {
     setIsCalmMode(prev => {
@@ -90,11 +99,19 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     triggerConfetti();
   };
 
+  const verifyInsurance = (status: 'verified' | 'pending') => {
+    setBeneficiaryProfile(prev => ({ ...prev, insuranceStatus: status }));
+    if (status === 'verified') {
+        addNotification('success', 'Medicaid Verified. Peer Coaching Unlocked.');
+        triggerConfetti();
+    } else {
+        addNotification('info', 'Insurance verification pending.');
+    }
+  };
+
   const addNotification = (type: 'success' | 'info' | 'error', message: string) => {
     const id = Date.now().toString() + Math.random().toString();
     setNotifications(prev => [...prev, { id, type, message }]);
-    
-    // Auto remove
     setTimeout(() => {
       removeNotification(id);
     }, 5000);
@@ -102,6 +119,17 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const removeNotification = (id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  const login = (type: UserType) => {
+    setUserType(type);
+    triggerConfetti();
+    addNotification('success', `Welcome back, ${type === 'donor' ? 'Partner' : 'Friend'}.`);
+  };
+
+  const logout = () => {
+    setUserType(null);
+    addNotification('info', 'You have been logged out.');
   };
 
   return (
@@ -118,7 +146,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       confettiTrigger,
       triggerConfetti,
       beneficiaryProfile,
-      submitIntakeRequest
+      submitIntakeRequest,
+      verifyInsurance,
+      userType,
+      login,
+      logout
     }}>
       {children}
     </StoreContext.Provider>
