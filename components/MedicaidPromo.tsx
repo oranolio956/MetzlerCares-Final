@@ -18,7 +18,7 @@ export const MedicaidPromo: React.FC = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-24 left-4 right-4 md:left-auto md:right-8 md:bottom-8 z-[80] max-w-sm w-full animate-in slide-in-from-bottom-10 fade-in duration-700">
+    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-8 md:bottom-8 z-[80] w-[calc(100%-2rem)] max-w-sm animate-in slide-in-from-bottom-10 fade-in duration-700">
       <div className="bg-brand-navy text-white p-1 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] border border-brand-teal/30 flex items-stretch relative overflow-hidden group">
         
         {/* Shine effect */}
@@ -30,7 +30,7 @@ export const MedicaidPromo: React.FC = () => {
         </div>
         
         <div className="p-4 flex-1 relative z-10">
-           <div className="flex justify-between items-start mb-1">
+           <div className="flex justify-between items-start mb-1 pr-8">
              <h4 className="font-display font-bold text-lg leading-tight">Waitlist Bypass</h4>
            </div>
            
@@ -50,11 +50,15 @@ export const MedicaidPromo: React.FC = () => {
         </div>
 
         <button 
-          onClick={() => setIsVisible(false)}
-          className="absolute top-2 right-2 text-white/20 hover:text-white transition-colors p-1"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsVisible(false);
+          }}
+          className="absolute top-1 right-1 text-white/40 hover:text-white hover:bg-white/10 transition-all p-2 rounded-full z-20 cursor-pointer"
           aria-label="Dismiss"
         >
-           <X size={14} />
+           <X size={18} />
         </button>
       </div>
     </div>
