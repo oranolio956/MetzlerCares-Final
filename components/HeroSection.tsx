@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { HeartHandshake, ArrowRight, ChevronDown, Activity, Building2, ArrowUpRight, ShieldCheck, Clock, Zap, Star, Crown } from 'lucide-react';
 import { Mascot } from './Mascot';
@@ -113,13 +112,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                
                {/* 
                   LEFT COLUMN: TYPOGRAPHY (7 Columns)
+                  Using order-1 on mobile ensures text comes first.
                */}
-               <div className="lg:col-span-7 flex flex-col justify-center items-start leading-[0.85] select-none order-1 lg:order-1">
-                   <h1 className="font-display font-bold text-[13vw] lg:text-[7.5vw] xl:text-[8vw] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.1s' }}>
+               <div className="lg:col-span-7 flex flex-col justify-center items-start leading-[0.85] select-none order-1">
+                   <h1 className="font-display font-bold text-[clamp(4rem,13vw,9rem)] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.1s' }}>
                       INVEST IN
                    </h1>
                    <div className="flex items-center gap-4 w-full">
-                      <h2 className="font-display font-bold text-[13vw] lg:text-[7.5vw] xl:text-[8vw] text-brand-teal tracking-[-0.04em] animate-slide-up opacity-0 whitespace-nowrap" style={{ animationDelay: '0.2s' }}>
+                      <h2 className="font-display font-bold text-[clamp(4rem,13vw,9rem)] text-brand-teal tracking-[-0.04em] animate-slide-up opacity-0 whitespace-nowrap" style={{ animationDelay: '0.2s' }}>
                          COLORADO
                       </h2>
                       {/* Line Decorator */}
@@ -127,7 +127,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                          <div className="absolute inset-0 bg-brand-navy/10 animate-slide-left" style={{ width: '200%', background: 'linear-gradient(90deg, transparent, rgba(26,42,58,0.2), transparent)' }}></div>
                       </div>
                    </div>
-                   <h2 className="font-display font-bold text-[13vw] lg:text-[7.5vw] xl:text-[8vw] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.3s' }}>
+                   <h2 className="font-display font-bold text-[clamp(4rem,13vw,9rem)] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.3s' }}>
                       RECOVERY<span className="text-brand-coral">.</span>
                    </h2>
                    
@@ -136,18 +136,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                       The protocol for direct-action aid. We replace bureaucracy with instant, verified funding for sober living rent and rehab access in Denver & Boulder.
                    </p>
 
-                   {/* Mobile Only HUD */}
+                   {/* Mobile Only HUD - Kept under text for immediate action */}
                    <div className="lg:hidden w-full mt-8 animate-slide-up opacity-0" style={{ animationDelay: '0.5s' }}>
                       <div className="flex gap-3">
                         <button 
                            onClick={() => onNavigate('apply')}
-                           className="flex-1 bg-brand-navy text-white py-4 rounded-xl font-bold"
+                           className="flex-1 bg-brand-navy text-white py-4 rounded-xl font-bold active:scale-95 transition-transform"
                         >
                            Get Help
                         </button>
                         <button 
                            onClick={() => onNavigate('donate')}
-                           className="flex-1 bg-brand-teal text-white py-4 rounded-xl font-bold"
+                           className="flex-1 bg-brand-teal text-white py-4 rounded-xl font-bold active:scale-95 transition-transform"
                         >
                            Invest
                         </button>
@@ -157,19 +157,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
 
                {/* 
                   RIGHT COLUMN: VISUAL COMPOSITION (5 Columns)
+                  order-2 ensures it stacks below text on mobile
                */}
-               <div className="lg:col-span-5 relative flex flex-col items-center lg:items-end justify-center order-2 lg:order-2 mt-8 lg:mt-0 lg:mb-12">
+               <div className="lg:col-span-5 relative flex flex-col items-center lg:items-end justify-center order-2 mt-8 lg:mt-0 lg:mb-12">
                   
                   {/* Visual Cluster Container */}
                   <div className="relative w-full max-w-md lg:max-w-full flex flex-col items-center lg:items-end">
                       
-                      {/* Mascot - Anchored */}
-                      <div className="relative w-[60vw] h-[60vw] max-w-[300px] max-h-[300px] lg:w-[400px] lg:h-[400px] animate-float z-0 lg:mr-24 opacity-60">
+                      {/* Mascot - Positioned relatively to stack naturally on mobile */}
+                      <div className="relative w-[60vw] h-[60vw] max-w-[300px] max-h-[300px] lg:w-[400px] lg:h-[400px] animate-float z-0 lg:mr-24 opacity-60 mb-8 lg:mb-0">
                          <Mascot expression="excited" variant="tech" className="w-full h-full drop-shadow-xl grayscale opacity-50" reactToScroll={true} />
                       </div>
 
                       {/* SYSTEM STATUS BOARD */}
-                      <div className="flex flex-col items-end gap-6 w-full max-w-sm relative z-20 -mt-24 lg:-mt-48 transition-transform duration-300">
+                      <div className="flex flex-col items-end gap-6 w-full max-w-sm relative z-20 -mt-12 lg:-mt-48 transition-transform duration-300">
                           
                           {/* 1. Small Rent Grant Status (Background) */}
                           <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-brand-navy/10 shadow-lg flex items-center justify-between animate-slide-up opacity-0 w-[90%] self-end mr-4 transform scale-95 origin-right" style={{ animationDelay: '0.6s' }}>

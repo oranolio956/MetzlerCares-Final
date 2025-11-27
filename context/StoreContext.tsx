@@ -1,7 +1,14 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Donation, Notification, RequestItem, BeneficiaryProfile } from '../types';
+import { Donation, Notification, RequestItem, BeneficiaryProfile, Message } from '../types';
 
 type UserType = 'donor' | 'beneficiary' | null;
+
+interface IntakeSessionState {
+  messages: Message[];
+  mockState: string;
+  hasStarted: boolean;
+  hasConsent: boolean;
+}
 
 interface StoreContextType {
   isCalmMode: boolean;
@@ -33,6 +40,10 @@ interface StoreContextType {
   login: (type: UserType) => void;
   logout: () => void;
   clearAllData: () => void;
+  // Chat Persistence
+  intakeSession: IntakeSessionState;
+  updateIntakeSession: (updates: Partial<IntakeSessionState>) => void;
+  resetIntakeSession: () => void;
 }
 
 const DEFAULT_BENEFICIARY: BeneficiaryProfile = {
@@ -47,6 +58,13 @@ const DEFAULT_BENEFICIARY: BeneficiaryProfile = {
   ]
 };
 
+const DEFAULT_INTAKE_SESSION: IntakeSessionState = {
+  messages: [],
+  mockState: 'GREETING',
+  hasStarted: false,
+  hasConsent: false
+};
+
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -59,6 +77,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [confettiTrigger, setConfettiTrigger] = useState(0);
   const [beneficiaryProfile, setBeneficiaryProfile] = useState<BeneficiaryProfile>(DEFAULT_BENEFICIARY);
   const [userType, setUserType] = useState<UserType>(null);
+  const [intakeSession, setIntakeSession] = useState<IntakeSessionState>(DEFAULT_INTAKE_SESSION);
   
   // Simulated Secure Session
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -155,7 +174,16 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setBeneficiaryProfile(DEFAULT_BENEFICIARY);
       setDonations([]);
       logout();
+      resetIntakeSession();
       window.location.reload(); // Hard reset
+  };
+
+  const updateIntakeSession = (updates: Partial<IntakeSessionState>) => {
+    setIntakeSession(prev => ({ ...prev, ...updates }));
+  };
+
+  const resetIntakeSession = () => {
+    setIntakeSession(DEFAULT_INTAKE_SESSION);
   };
 
   return (
@@ -183,7 +211,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       isAuthenticated: !!authToken,
       login,
       logout,
-      clearAllData
+      clearAllData,
+      intakeSession,
+      updateIntakeSession,
+      resetIntakeSession
     }}>
       {children}
     </StoreContext.Provider>

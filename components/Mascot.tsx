@@ -1,4 +1,3 @@
-
 import React, { memo, useId, useState, useEffect } from 'react';
 
 export interface MascotProps {
@@ -309,41 +308,72 @@ export const Mascot: React.FC<MascotProps> = memo(({
         {/* COMMUTE VARIANT: Goggles & Scarf */}
         {variant === 'commute' && (
            <g className="animate-slide-up">
-              {/* Scarf */}
+              {/* Scarf with gentle wave */}
               <path d="M120 300 Q200 340 280 300 L290 330 Q200 380 110 330 Z" fill="#FF8A75" />
-              <path d="M270 310 L320 360 L350 350 L290 300 Z" fill="#FF8A75" /> {/* Scarf Tail */}
+              <path d="M270 310 L320 360 L350 350 L290 300 Z" fill="#FF8A75">
+                 <animate attributeName="d" values="M270 310 L320 360 L350 350 L290 300 Z; M270 310 L330 350 L360 340 L290 300 Z; M270 310 L320 360 L350 350 L290 300 Z" dur="3s" repeatCount="indefinite" />
+              </path>
               
               {/* Goggles */}
               <g transform="translate(0, -10)">
                 <path d="M100 150 H300 V180 H100 Z" fill="#1A2A3A" opacity="0.2" /> {/* Strap */}
+                {/* Lenses with moving reflection */}
                 <circle cx="140" cy="180" r="35" fill={`url(#lensGrad-${uid})`} stroke="#A7ACD9" strokeWidth="4" />
                 <circle cx="260" cy="180" r="35" fill={`url(#lensGrad-${uid})`} stroke="#A7ACD9" strokeWidth="4" />
                 <path d="M175 180 L225 180" stroke="#1A2A3A" strokeWidth="8" /> {/* Bridge */}
-                {/* Lens Shine */}
-                <path d="M125 170 L145 155" stroke="white" strokeWidth="3" opacity="0.5" />
-                <path d="M245 170 L265 155" stroke="white" strokeWidth="3" opacity="0.5" />
+                
+                {/* Dynamic Shine */}
+                <g opacity="0.6">
+                    <path d="M120 170 L150 150" stroke="white" strokeWidth="4" strokeLinecap="round" />
+                    <path d="M240 170 L270 150" stroke="white" strokeWidth="4" strokeLinecap="round" />
+                </g>
               </g>
            </g>
         )}
 
-        {/* TECH VARIANT: AR Visor */}
+        {/* TECH VARIANT: AR Visor & Data */}
         {variant === 'tech' && (
-           <g className="animate-pulse" style={{ animationDuration: '4s' }}>
-              <path d="M110 160 Q200 140 290 160 L280 210 Q200 230 120 210 Z" fill={`url(#holoGrad-${uid})`} stroke="#A7ACD9" strokeWidth="2" opacity="0.8" />
-              <path d="M100 170 L90 190" stroke="#1A2A3A" strokeWidth="4" /> {/* Ear piece L */}
-              <path d="M300 170 L310 190" stroke="#1A2A3A" strokeWidth="4" /> {/* Ear piece R */}
-              {/* Digital lines on visor */}
-              <path d="M150 180 H250" stroke="white" strokeWidth="1" opacity="0.5" strokeDasharray="4 4" />
-              <circle cx="270" cy="170" r="2" fill="#2D9C8E" className="animate-ping" />
+           <g>
+              {/* Visor Glass */}
+              <path d="M110 160 Q200 140 290 160 L280 210 Q200 230 120 210 Z" fill={`url(#holoGrad-${uid})`} stroke="#A7ACD9" strokeWidth="2" opacity="0.9" />
+              
+              {/* Scanning Line */}
+              <rect x="120" y="160" width="160" height="2" fill="#2D9C8E" opacity="0.8">
+                 <animate attributeName="y" values="160; 200; 160" dur="2s" repeatCount="indefinite" />
+              </rect>
+
+              {/* Hardware bits */}
+              <path d="M100 170 L90 190" stroke="#1A2A3A" strokeWidth="4" />
+              <path d="M300 170 L310 190" stroke="#1A2A3A" strokeWidth="4" />
+              
+              {/* Floating Data Bits */}
+              <rect x="320" y="140" width="10" height="10" fill="#2D9C8E" opacity="0.6">
+                 <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite" />
+                 <animate attributeName="y" values="140; 120" dur="1.5s" repeatCount="indefinite" />
+              </rect>
+              <rect x="340" y="160" width="6" height="6" fill="#2D9C8E" opacity="0.4">
+                 <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" delay="0.5s" />
+                 <animate attributeName="y" values="160; 140" dur="2s" repeatCount="indefinite" />
+              </rect>
            </g>
         )}
 
-        {/* HOME VARIANT: Holding a Key */}
+        {/* HOME VARIANT: Golden Key & Sparkle */}
         {variant === 'home' && (
            <g transform="translate(280, 240) rotate(-10)">
-              <circle cx="0" cy="0" r="15" stroke="#F4D35E" strokeWidth="6" fill="none" />
-              <path d="M15 0 L50 0 L50 10 M35 0 L35 10" stroke="#F4D35E" strokeWidth="6" strokeLinecap="round" />
-              <circle cx="0" cy="0" r="15" stroke="white" strokeWidth="2" fill="none" opacity="0.5" />
+              {/* Key */}
+              <g className="animate-float" style={{ animationDuration: '3s' }}>
+                  <circle cx="0" cy="0" r="18" stroke="#F4D35E" strokeWidth="6" fill="none" />
+                  <path d="M18 0 L60 0 L60 12 M45 0 L45 12" stroke="#F4D35E" strokeWidth="6" strokeLinecap="round" />
+                  {/* Key Shine */}
+                  <circle cx="-5" cy="-5" r="4" fill="white" opacity="0.6" />
+              </g>
+              
+              {/* Sparkle */}
+              <path d="M60 -20 L65 -30 L70 -20 L80 -15 L70 -10 L65 0 L60 -10 L50 -15 Z" fill="#F4D35E" opacity="0.8">
+                 <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" />
+                 <animate attributeName="transform" type="scale" values="0.5; 1.2; 0.5" dur="2s" repeatCount="indefinite" />
+              </path>
            </g>
         )}
 

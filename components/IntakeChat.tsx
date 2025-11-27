@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Activity, Shield, Zap, LifeBuoy, CornerDownLeft, ArrowRight, FileCheck, MapPin, User, Trash2, Lock, Sparkles } from 'lucide-react';
 import { startIntakeSession, sendMessageToGemini } from '../services/geminiService';
@@ -11,6 +10,9 @@ import { useSound } from '../hooks/useSound';
 
 const MessageItem: React.FC<{ message: Message; isLast: boolean }> = ({ message, isLast }) => {
   const { isCalmMode } = useStore();
+  // Only animate if it's a new message in the current session view, 
+  // but for persistence, we might want to skip animation on restored messages.
+  // For simplicity, we just check if it's model role.
   const shouldAnimate = message.role === 'model' && isLast && !isCalmMode;
   const displayText = useTypewriter(message.text, 20, shouldAnimate);
 
@@ -43,23 +45,41 @@ const MessageItem: React.FC<{ message: Message; isLast: boolean }> = ({ message,
 };
 
 export const IntakeChat: React.FC = () => {
-  const [hasConsent, setHasConsent] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
+  // Global State for Persistence
+  const { 
+      intakeSession, 
+      updateIntakeSession, 
+      resetIntakeSession,
+      setCrisisMode, 
+      setShowLegalDocs,
+      isCalmMode
+  } = useStore();
+
   const [mode, setMode] = useState<'text' | 'voice'>('text');
-  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [mascotExpression, setMascotExpression] = useState<MascotProps['expression']>('happy');
   const [smartChips, setSmartChips] = useState<string[]>([]);
   
-  // Session State (Ephemeral, not in LocalStorage)
+  // Local Refs
   const sessionRef = useRef<any>(null); 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { setCrisisMode, setShowLegalDocs } = useStore();
   const { playClick, playSuccess } = useSound();
   const { connect, disconnect, isSpeaking, volume, connected } = useGeminiLive();
+
+  // Restore session object on mount if we have mockState
+  useEffect(() => {
+      if (intakeSession.hasStarted && !sessionRef.current) {
+          // Re-hydrate a lightweight session object
+          sessionRef.current = {
+              sessionId: `restored_${Date.now()}`,
+              type: 'INTAKE',
+              mockState: intakeSession.mockState
+          };
+      }
+  }, []);
 
   const toggleVoiceMode = () => {
      playClick();
@@ -82,98 +102,109 @@ export const IntakeChat: React.FC = () => {
      }
   }, [mode, isSpeaking, volume]);
 
-  // SMART REPLIES LOGIC (Context Aware)
+  // SMART REPLIES LOGIC (Revised to match Comprehensive Intake)
   useEffect(() => {
-      if (messages.length === 0) {
+      if (intakeSession.messages.length === 0) {
           setSmartChips(["I'm in Denver", "I'm in Boulder", "Colorado Springs", "Outside Colorado"]);
           return;
       }
       
-      const lastModelMsg = [...messages].reverse().find(m => m.role === 'model');
+      const lastModelMsg = [...intakeSession.messages].reverse().find(m => m.role === 'model');
       if (lastModelMsg && !isAiTyping) {
-          const fullText = lastModelMsg.text;
-          // Prioritize the last sentence for context as it usually contains the question
-          const sentences = fullText.split(/[.?!]/).filter(s => s.trim().length > 0);
-          const lastSentence = sentences[sentences.length - 1]?.toLowerCase() || fullText.toLowerCase();
+          const fullText = lastModelMsg.text.toLowerCase();
           
-          if (lastSentence.includes("safe") || lastSentence.includes("sleep") || lastSentence.includes("homeless")) {
-              setSmartChips(["I have a safe place", "I am homeless", "In a shelter", "Couch surfing"]);
-          } else if (lastSentence.includes("insurance") || lastSentence.includes("medicaid")) {
-              setSmartChips(["Yes, I have Medicaid", "Private Insurance", "No Insurance", "I don't know"]);
-          } else if (lastSentence.includes("specific") || lastSentence.includes("need") || lastSentence.includes("funding")) {
+          if (fullText.includes("arson") || fullText.includes("sex offense") || fullText.includes("violent")) {
+              setSmartChips(["No history", "Yes, in the past"]);
+          } else if (fullText.includes("income") || fullText.includes("job") || fullText.includes("plan")) {
+              setSmartChips(["I have a job", "Looking for work", "SSI / Disability", "Family support"]);
+          } else if (fullText.includes("medicaid") || fullText.includes("health first")) {
+              setSmartChips(["Yes, I have Medicaid", "No Insurance", "Private Insurance", "I need to apply"]);
+          } else if (fullText.includes("specific") || fullText.includes("need") || fullText.includes("funding")) {
               setSmartChips(["Rent Deposit", "Bus Pass", "Work Laptop", "ID Retrieval"]);
-          } else if (lastSentence.includes("sobriety") || lastSentence.includes("sober") || lastSentence.includes("clean")) {
-              setSmartChips(["Less than 30 Days", "1-6 Months", "6+ Months", "Just relapsed"]);
-          } else if (lastSentence.includes("colorado") || lastSentence.includes("located")) {
-              setSmartChips(["Denver Metro", "Boulder", "Colorado Springs", "Not in CO"]);
-          } else if (lastSentence.includes("ready") || lastSentence.includes("start")) {
+          } else if (fullText.includes("sobriety") || fullText.includes("sober") || fullText.includes("clean")) {
+              setSmartChips(["Over 6 Months", "30-90 Days", "Just a few days", "I'm currently using"]);
+          } else if (fullText.includes("safe") || fullText.includes("sleep")) {
+              setSmartChips(["I'm safe", "I'm homeless", "Couch surfing", "In a shelter"]);
+          } else if (fullText.includes("colorado") || fullText.includes("located")) {
+              setSmartChips(["Yes, in Colorado", "No, out of state"]);
+          } else if (fullText.includes("ready") || fullText.includes("start")) {
               setSmartChips(["I'm ready", "How does this work?"]);
           } else {
-              setSmartChips(["Yes", "No", "Explain more"]);
+              setSmartChips(["Yes", "No", "Tell me more"]);
           }
       } else {
           setSmartChips([]); // Hide while typing
       }
-  }, [messages, isAiTyping]);
+  }, [intakeSession.messages, isAiTyping]);
 
   const handleResetSession = () => {
-      if (window.confirm("Start a new intake session? This will clear all temporary data.")) {
+      if (window.confirm("Start a new intake session? This will clear your chat history.")) {
           playClick();
-          setMessages([]);
-          setHasStarted(false);
-          setHasConsent(false);
+          resetIntakeSession();
           sessionRef.current = null;
       }
   };
 
-  // Auto-start message
-  useEffect(() => {
-    if (hasStarted && hasConsent && !sessionRef.current && mode === 'text') {
-      if (messages.length === 0) {
-          sessionRef.current = startIntakeSession();
-          setIsAiTyping(true);
-          // Simulate network delay for realism
-          setTimeout(async () => {
-              const response = await sendMessageToGemini("Hello, I am ready to start.", sessionRef.current);
-              setMessages([{ id: 'init', role: 'model', text: response.text }]);
-              setIsAiTyping(false);
-          }, 800);
-      }
-    }
-  }, [hasStarted, hasConsent, mode]);
+  const startSession = () => {
+      playSuccess();
+      updateIntakeSession({ hasStarted: true });
+      sessionRef.current = startIntakeSession();
+      setIsAiTyping(true);
+      
+      // Simulate network delay for realism
+      setTimeout(async () => {
+          const response = await sendMessageToGemini("Hello, I am ready to start.", sessionRef.current);
+          updateIntakeSession({ 
+              messages: [{ id: 'init', role: 'model', text: response.text }] 
+          });
+          setIsAiTyping(false);
+      }, 800);
+  };
 
   useEffect(() => {
     if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
-  }, [messages, isAiTyping]);
+  }, [intakeSession.messages, isAiTyping]);
 
   const handleSend = async (text: string = inputText) => {
     if (!text.trim()) return;
     playClick();
+    
+    // Optimistic Update
     const userMsg: Message = { id: Date.now().toString(), role: 'user', text: text };
-    setMessages(prev => [...prev, userMsg]);
+    const newHistory = [...intakeSession.messages, userMsg];
+    updateIntakeSession({ messages: newHistory });
+    
     setInputText('');
     setIsAiTyping(true);
     if (inputRef.current) inputRef.current.focus();
 
     try {
-      const response = await sendMessageToGemini(text, sessionRef.current);
+      // Send FULL history to the service to maintain context
+      const response = await sendMessageToGemini(text, sessionRef.current, intakeSession.messages);
       
       // Proactive Crisis Check (Client Side Safety Net)
       if (response.text.toLowerCase().includes("988") || response.text.toLowerCase().includes("suicide")) {
          setCrisisMode(true);
       }
       
-      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: 'model', text: response.text }]);
+      // Update store with model response
+      updateIntakeSession({ 
+          messages: [...newHistory, { id: (Date.now() + 1).toString(), role: 'model', text: response.text }],
+          mockState: sessionRef.current?.mockState // Persist mock state if used
+      });
+
     } catch (e) {
-      setMessages(prev => [...prev, { id: 'err', role: 'model', text: "Connection interrupted. Please check your internet."}]);
+      updateIntakeSession({ 
+          messages: [...newHistory, { id: 'err', role: 'model', text: "Connection interrupted. Please check your internet."}]
+      });
     } finally {
       setIsAiTyping(false);
     }
   };
 
-  if (!hasStarted) {
+  if (!intakeSession.hasStarted) {
     return (
       <div className="w-full max-w-6xl mx-auto bg-brand-navy rounded-3xl md:rounded-[2rem] shadow-2xl overflow-hidden flex flex-col md:flex-row relative h-auto md:h-[600px]">
          {/* Left Side: Info */}
@@ -192,7 +223,7 @@ export const IntakeChat: React.FC = () => {
                </div>
                <div className="flex gap-4 text-[10px] md:text-xs font-bold uppercase tracking-widest text-brand-teal/80">
                   <span className="flex items-center gap-1"><Lock size={12} /> HIPAA-Compliant</span>
-                  <span className="flex items-center gap-1"><Zap size={12} /> No Persistent Storage</span>
+                  <span className="flex items-center gap-1"><Zap size={12} /> Encrypted Session</span>
                </div>
             </div>
          </div>
@@ -202,19 +233,18 @@ export const IntakeChat: React.FC = () => {
             <div className="w-full max-w-sm space-y-6 relative z-10">
                <div className="mb-4 flex justify-center"><div className="w-24 h-24 md:w-32 md:h-32 relative"><Mascot expression="happy" className="w-full h-full" /></div></div>
                
-               {!hasConsent ? (
+               {!intakeSession.hasConsent ? (
                  <div className="bg-white border border-brand-navy/10 rounded-xl p-6 animate-slide-up shadow-lg">
                     <h4 className="font-bold text-brand-navy mb-2 flex items-center gap-2"><Shield size={16}/> Privacy & Consent</h4>
                     <p className="text-xs text-brand-navy/60 mb-4 leading-relaxed">
                       This system uses AI to process your intake. By proceeding, you agree to our <button onClick={() => setShowLegalDocs(true)} className="text-brand-teal underline font-bold">Terms & Privacy Policy</button>. 
-                      We do not store your chat history permanently on this device.
                     </p>
                     <div className="flex items-center gap-3 mb-4 p-3 bg-brand-navy/5 rounded-lg border border-brand-navy/5">
                         <input type="checkbox" id="consent" className="w-5 h-5 rounded border-brand-navy text-brand-teal focus:ring-brand-teal" onChange={(e) => e.target.checked && playClick()} />
                         <label htmlFor="consent" className="text-xs font-bold text-brand-navy cursor-pointer">I understand and agree.</label>
                     </div>
                     <button 
-                      onClick={() => { playClick(); setHasConsent(true); }}
+                      onClick={() => { playClick(); updateIntakeSession({ hasConsent: true }); }}
                       className="w-full bg-brand-navy text-white py-3 rounded-lg font-bold text-sm hover:bg-brand-teal transition-colors"
                     >
                       Continue
@@ -222,8 +252,8 @@ export const IntakeChat: React.FC = () => {
                  </div>
                ) : (
                  <div className="space-y-4 animate-slide-up">
-                    <button onClick={() => { playSuccess(); setHasStarted(true); }} className="w-full bg-brand-navy text-white h-14 md:h-16 rounded-xl font-bold text-lg hover:bg-brand-teal transition-all flex items-center justify-between px-6 group shadow-lg active:scale-95"><span>Begin Session</span><ArrowRight className="group-hover:translate-x-1 transition-transform" /></button>
-                    <button onClick={() => { playClick(); setHasStarted(true); toggleVoiceMode(); }} className="w-full bg-white border-2 border-brand-navy/10 text-brand-navy h-14 md:h-16 rounded-xl font-bold text-lg hover:border-brand-navy/30 transition-all flex items-center justify-between px-6 group active:scale-95"><span>Voice Mode (Beta)</span><Mic size={20} className="text-brand-coral group-hover:scale-110 transition-transform" /></button>
+                    <button onClick={startSession} className="w-full bg-brand-navy text-white h-14 md:h-16 rounded-xl font-bold text-lg hover:bg-brand-teal transition-all flex items-center justify-between px-6 group shadow-lg active:scale-95"><span>Begin Session</span><ArrowRight className="group-hover:translate-x-1 transition-transform" /></button>
+                    <button onClick={() => { playClick(); startSession(); toggleVoiceMode(); }} className="w-full bg-white border-2 border-brand-navy/10 text-brand-navy h-14 md:h-16 rounded-xl font-bold text-lg hover:border-brand-navy/30 transition-all flex items-center justify-between px-6 group active:scale-95"><span>Voice Mode (Beta)</span><Mic size={20} className="text-brand-coral group-hover:scale-110 transition-transform" /></button>
                  </div>
                )}
             </div>
@@ -266,8 +296,8 @@ export const IntakeChat: React.FC = () => {
             aria-hidden={mode === 'voice' ? 'true' : 'false'}
             inert={mode === 'voice' ? true : undefined}
          >
-            {messages.map((msg, idx) => (
-               <MessageItem key={msg.id} message={msg} isLast={idx === messages.length - 1} />
+            {intakeSession.messages.map((msg, idx) => (
+               <MessageItem key={msg.id} message={msg} isLast={idx === intakeSession.messages.length - 1} />
             ))}
             {isAiTyping && (
                <div className="flex gap-4 animate-slide-up ml-12">
@@ -326,7 +356,8 @@ export const IntakeChat: React.FC = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 placeholder="Type your message..."
-                className="w-full bg-brand-navy/5 text-brand-navy placeholder:text-brand-navy/30 rounded-xl px-4 py-3 md:py-4 font-medium focus:outline-none focus:ring-2 focus:ring-brand-teal/20 transition-all pr-12 text-sm md:text-base"
+                /* NOTE: 'text-base' (16px) prevents iOS Safari zooming on focus */
+                className="w-full bg-brand-navy/5 text-brand-navy placeholder:text-brand-navy/30 rounded-xl px-4 py-3 md:py-4 font-medium focus:outline-none focus:ring-2 focus:ring-brand-teal/20 transition-all pr-12 text-base md:text-lg"
                 aria-label="Message input"
                 />
                 <button 

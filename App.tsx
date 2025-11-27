@@ -25,6 +25,7 @@ import { RecoveryKnowledgeGraph } from './components/RecoveryKnowledgeGraph';
 import { CoachChat } from './components/CoachChat';
 import { VisionBoard } from './components/VisionBoard';
 import { GlobalChat } from './components/GlobalChat';
+import { PeerCoachingTeaser } from './components/PeerCoachingTeaser';
 import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2, Sparkles, Image, Shield } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
@@ -109,15 +110,30 @@ const App: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    const handlePointerMove = (x: number, y: number) => {
+        const normX = (x / window.innerWidth) * 2 - 1;
+        const normY = (y / window.innerHeight) * 2 - 1;
+        document.body.style.setProperty('--mouse-x', Math.max(-1, Math.min(1, normX)).toFixed(2));
+        document.body.style.setProperty('--mouse-y', Math.max(-1, Math.min(1, normY)).toFixed(2));
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       if (isCalmMode) return;
-      const x = (e.clientX / window.innerWidth) * 2 - 1;
-      const y = (e.clientY / window.innerHeight) * 2 - 1;
-      document.body.style.setProperty('--mouse-x', Math.max(-1, Math.min(1, x)).toFixed(2));
-      document.body.style.setProperty('--mouse-y', Math.max(-1, Math.min(1, y)).toFixed(2));
+      handlePointerMove(e.clientX, e.clientY);
     };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isCalmMode || e.touches.length === 0) return;
+      handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    
+    return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('touchmove', handleTouchMove);
+    };
   }, [isCalmMode]);
 
   useEffect(() => {
@@ -155,7 +171,12 @@ const App: React.FC = () => {
 
     const content = (() => {
       switch (activeSection) {
-        case 'intro': return <HeroSection onNavigate={navigate} />;
+        case 'intro': return (
+            <>
+              <HeroSection onNavigate={navigate} />
+              <PeerCoachingTeaser onNavigate={navigate} />
+            </>
+        );
         case 'philosophy': return <PhilosophySection onNavigate={navigate} />;
         case 'donate': return (
             <SectionWrapper 
@@ -357,7 +378,7 @@ const App: React.FC = () => {
         </div>
 
         {/* MAIN CONTENT */}
-        <main className="flex-grow pt-[120px]">
+        <main className="flex-grow pt-[100px] md:pt-[128px]">
            {renderContent()}
         </main>
 

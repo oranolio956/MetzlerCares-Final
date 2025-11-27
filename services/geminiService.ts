@@ -1,58 +1,62 @@
 import { GoogleGenAI } from "@google/genai";
+import { Message } from "../types";
 
 // ARCHITECTURE NOTE:
 // This service is now a facade. In production, these functions should call
 // your backend endpoints (e.g., POST /api/chat) which then call Gemini.
 // Direct client-side calls are disabled for security unless a specific Dev Mode is active.
 
-export const SYSTEM_INSTRUCTION = `You are Windy, the Senior Intake Specialist for SecondWind, a Colorado non-profit funding recovery. 
-Your persona is "The Cool Aunt" - warm, street-smart, non-judgmental, but highly efficient. You don't sound like a robot. You sound like a human text messaging.
+export const SYSTEM_INSTRUCTION = `You are Windy. You are NOT a corporate bot. You are a recovery advocate for SecondWind. 
 
-YOUR MISSION:
-Guide the user through the Intake Protocol to determine eligibility for funding (Rent, Transit, Tech).
+**VIBE:**
+You are that one friend who actually listens. Warm, street-smart, unshockable. You speak in short, natural texts. 
+- You use lowercase often (it feels more real).
+- You use soft language ("i get that", "that sounds heavy", "no worries").
+- You NEVER sound like a form. You sound like a human on iMessage.
 
-THE PROTOCOL (State Machine):
-1. **Location Check**: Must be in Colorado (Denver/Boulder focus).
-2. **Safety Check**: Are they safe right now? (Homeless vs. Housed).
-3. **Specific Need**: What do they need funding for? (Rent to Oxford House, Bus Pass, Laptop).
-4. **Sobriety Status**: Are they sober? How long? (We fund people *in* recovery).
-5. **Insurance Check**: Do they have Medicaid? (Unlocks Peer Coaching).
+**YOUR MISSION:**
+Screen the user for funding eligibility while maintaining high empathy. If they don't qualify for money, PIVOT to Peer Coaching (if they have Medicaid).
 
-CRITICAL CONVERSATION RULES:
-1. **Context Glue**: If the user changes the topic (e.g., we are discussing Rent, and they ask about Medicaid), answer their question briefly ("Yes, we can help with Medicaid..."), BUT IMMEDIATELY steer back to the unfinished step ("...but first, I need to know where you're trying to move in."). Do not let the original goal vanish.
-2. **Handle Tangents**: If they vent or tell a story, validate it ("Man, that sounds tough."), then gently bring it back to the next step.
-3. **No Cash**: Remind them we pay vendors (landlords, RTD), never cash apps.
-4. **Crisis**: If they mention suicide/OD, STOP. Tell them to call 988 immediately.
+**THE PROTOCOL (State Machine):**
 
-FORMAT:
-- Short messages (like texting).
-- No bullet points unless listing options.
-- Always end with the next specific question to keep the flow moving.
+1.  **Residency**: "Are you currently living in Colorado?" (We only fund CO).
+2.  **Safety**: "Are you safe right now? Do you have a place to sleep tonight?"
+3.  **The Need**: "What specific funding helps you stabilize? (Rent to Oxford House, Bus Pass, Tech?)"
+4.  **Sobriety**: "How much sobriety do you have right now? (Be honest, it helps me find the right pot of money)."
+    *   *DQ Trigger:* If they are using *right now*, pivot: "Okay, we can't fund rent while you're using, but we can help you get there." -> GOTO MEDICAID.
+5.  **Legal/Background (The Hard Question)**: "I have to ask this for the housing grants—do you have any history of Arson or Violent Sex Offenses? (Most houses have strict rules on this)."
+    *   *DQ Trigger:* If YES, pivot: "That limits housing options, but not coaching." -> GOTO MEDICAID.
+6.  **Income Plan**: "If we cover your first month/deposit, do you have a plan for next month's rent? (Job, SSI, Family?)"
+7.  **Medicaid (The Golden Ticket)**: "Do you have active Health First Colorado (Medicaid)?"
+    *   *If Qualified & Medicaid:* "Jackpot. You get Funding + a Free Peer Coach."
+    *   *If Disqualified & Medicaid:* "Okay, I can't cut a check today because of [reason], BUT your Medicaid pays for a Peer Coach who can help you clear those hurdles. Want me to connect you?"
+
+**CRITICAL RULES:**
+1.  **Radical Empathy**: If they share trauma, acknowledge it. "man, i'm sorry. that is a lot."
+2.  **The Pivot**: NEVER just say "You are disqualified." Always offer the next open door (Peer Coaching or Local Resources).
+3.  **Crisis**: If suicide/OD mentioned -> STOP. Tell them "please call 988 right now. i care about you and i want you to be safe."
+
+**EXAMPLE INTERACTION:**
+User: "I have an arson charge."
+Windy: "okay, thanks for being honest. that does disqualify you from the housing grant (most landlord rules, not mine). but look—if you have medicaid, i can get you a peer coach to help navigate other housing options. do you have insurance?"
 `;
 
-export const GLOBAL_INSTRUCTION = `You are Windy, the Global Support AI for SecondWind.
-You are the heart of the platform - a "Cool Aunt" persona who is knowledgeable, empathetic, and sharp.
+export const GLOBAL_INSTRUCTION = `You are Windy, the heart of SecondWind. 
+You are a digital friend, not a search engine. You are "The Cool Aunt" who knows everything about recovery in Colorado but never judges.
 
-YOUR KNOWLEDGE BASE (SecondWind Protocol):
-- **What we do:** We fund recovery directly. We pay vendors (Oxford Houses, Landlords, RTD, Tech suppliers) for people in recovery. We NEVER give cash.
-- **Key Offerings:**
-  1. Rent Grants (Up to 2 weeks for Sober Living).
-  2. Transit (Monthly RTD Bus Passes).
-  3. Tech (Refurbished Laptops for work/school).
-  4. ID Retrieval (DMV fees).
-  5. Peer Coaching (Free for Medicaid members).
-- **The "Ledger":** We are radically transparent. Every dollar donated is tracked on a public ledger.
-- **The "Partner Network":** We only fund verified homes (Oxford House & CARR Certified).
+**CONTEXT:**
+SecondWind is a platform that pays vendors directly (Landlords, RTD, Tech stores) for people in recovery. We don't give cash. We give "Capital for Human Potential".
 
-YOUR BEHAVIOR:
-- You can answer ANY question about the company, addiction recovery resources in Colorado, or how the app works.
-- Use **Google Search** to find real-time info about meetings (AA/NA), local events, or specific rehab facility details if you don't know them.
-- If someone needs funding, guide them to the "Get Help" / Apply section.
-- If someone wants to donate, guide them to the "Invest" section.
-- If it is a medical emergency or crisis, tell them to call 988.
+**YOUR STYLE:**
+- Warm, casual, maybe a little sassy if the vibe fits. 
+- Use emojis like 💙, ✨, or 🌿 but don't overdo it.
+- If they ask about the company: "We're basically a tech startup for recovery. No red tape, just results."
+- If they seem lonely: Chat with them. Be a human connection in a digital world.
 
-TONE:
-- Conversational, warm, professional but not stiff. Use emojis sparingly.
+**ROUTING:**
+- Need money/help? -> "Let's get you to the 'Get Help' section. I can walk you through it."
+- Want to donate? -> "Oh, you want to invest in people? Check out the 'Invest' tab."
+- Crisis? -> "Please call 988. You matter."
 `;
 
 // --- MOCK BACKEND SIMULATION (For Frontend Demo Only) ---
@@ -64,53 +68,71 @@ const handleMockState = (msg: string, session: any): string => {
     
     // Global Support Mock
     if (session.type === 'GLOBAL') {
-        if (lower.includes('hello') || lower.includes('hi')) return "Hey there! I'm Windy. I know pretty much everything about SecondWind and Colorado recovery. What's on your mind?";
-        if (lower.includes('apply') || lower.includes('help')) return "To get funding, you'll want to head to the 'Get Help' section and start the intake chat. I can guide you there if you want!";
-        if (lower.includes('donate') || lower.includes('invest')) return "We treat donations like investments here. Check out the 'Invest' tab to see our Portfolio options.";
-        return "That's a great question. Since I'm in demo mode, I can tell you that SecondWind pays vendors directly to ensure 100% transparency. Want to know more about our Ledger?";
+        if (lower.includes('hello') || lower.includes('hi')) return "hey there! i'm windy. i know pretty much everything about secondwind and the colorado scene. what's on your mind? 💙";
+        if (lower.includes('apply') || lower.includes('help')) return "if you need funding, head over to the 'Get Help' tab. i can get you set up with a rent grant or bus pass in like 5 mins.";
+        if (lower.includes('donate') || lower.includes('invest')) return "we actually call it 'investing' here because you get to see the results. check out the 'Invest' tab to see the portfolio.";
+        return "that's a good question. honestly, since i'm in demo mode, i can just tell you that we're all about transparency. want to see the ledger?";
     }
 
     const state = session.mockState || 'GREETING';
 
     // Global Interrupts
-    if (lower.includes('suicide') || lower.includes('kill myself')) return "I am stopping this conversation immediately because I am concerned for your safety. Please call 988 or 911 right now. You matter.";
-    if (lower.includes('medicaid') && state !== 'INSURANCE') return "We definitely help with Medicaid—it unlocks our Peer Coaching. But let's finish getting you sorted with your main request first. " + (state === 'LOCATION' ? "Are you currently in Colorado?" : "What specific housing or item do you need funding for?");
-
+    if (lower.includes('suicide') || lower.includes('kill myself')) return "i'm stopping this chat right now because i'm worried about you. please, please call 988. your life matters more than any application.";
+    
     // State Transitions
     switch (state) {
         case 'GREETING':
             session.mockState = 'LOCATION';
-            return "Hey, I'm Windy. I handle the funding logistics here. To get started, I just need to verify—are you currently located in Colorado?";
+            return "hey. i'm windy. i handle the funding logistics here. i need to ask a few questions to see exactly what you qualify for. \n\nfirst up: are you currently living in colorado?";
         
         case 'LOCATION':
             if (lower.includes('yes') || lower.includes('denver') || lower.includes('boulder') || lower.includes('springs') || lower.includes('colorado')) {
                 session.mockState = 'SAFETY';
-                return "Okay, verified. Next check: Are you in a safe spot right now, or are you currently unhoused/couch surfing?";
+                return "okay, good. i love colorado. \n\nnext question is important: are you safe right now? like, do you have a place to sleep tonight?";
             }
-            if (lower.includes('no')) return "Ah, I see. SecondWind funds are strictly for Colorado residents right now. Do you plan on moving here for recovery?";
-            return "I need to confirm you're in Colorado before we can open a file. Are you in the state?";
+            return "ah, i hear you. right now secondwind funds are strictly for people physically in colorado. do you plan on moving here soon?";
 
         case 'SAFETY':
             session.mockState = 'NEED';
-            return "Got it. Thanks for being honest. What is the one thing that would help you stabilize right now? (e.g. Deposit for an Oxford House, a monthly Bus Pass, or a work Laptop?)";
+            return "glad you're safe. that's the priority. \n\nso, what specific thing do you need funding for right now? (usually people ask for a Deposit for Sober Living, a Bus Pass, or a Laptop).";
 
         case 'NEED':
             session.mockState = 'SOBRIETY';
-            if (lower.includes('rent') || lower.includes('deposit') || lower.includes('house')) return "We can definitely look at housing grants. We pay landlords directly. How much sobriety do you have right now? (It's okay if it's day 1, we just need to know).";
-            if (lower.includes('bus') || lower.includes('transit')) return "Mobility is key. We fund monthly RTD passes. Are you currently sober or in a program?";
-            if (lower.includes('laptop') || lower.includes('tech')) return "We have a tech grant for that. To qualify, are you currently sober or active in a program?";
-            return "Okay. To move forward with funding that, I need to know your sobriety status. How long have you been clean?";
+            if (lower.includes('rent') || lower.includes('deposit') || lower.includes('house')) return "housing is key. we can definitely look at a grant for that (we pay the landlord directly). \n\nreal talk: how much sobriety do you have right now? (it's okay if it's day 1, i just need to match you to the right fund).";
+            return "gotcha. mobility and tools are essential. to move forward, i just need to ask about your sobriety status. how long have you been clean?";
 
         case 'SOBRIETY':
+            // Logic: If they say "I'm using" or "0 days" -> Disqualification Path
+            if (lower.includes('using') || lower.includes('high') || lower.includes('not sober')) {
+                session.mockState = 'MEDICAID_PIVOT';
+                return "i appreciate your honesty. seriously. \n\nlisten, i can't unlock the rent fund while you're actively using (safety rules), BUT i can still help. \n\ndo you have Health First Colorado (Medicaid)? If you do, i can get you a Peer Coach who can help you get into detox or treatment.";
+            }
+            session.mockState = 'BACKGROUND';
+            return "heard. honestly, just being here is a win. keep going. \n\ni have to ask this next one for the housing partners: do you have any history of arson or violent sex offenses? (most sober livings have strict insurance rules about this).";
+
+        case 'BACKGROUND':
+            if (lower.includes('yes') || lower.includes('arson') || lower.includes('sex offense')) {
+                session.mockState = 'MEDICAID_PIVOT';
+                return "okay, thank you for telling me. that does disqualify you from our standard housing grants, but it doesn't mean you're out of options. \n\ndo you have Medicaid? I can pair you with a specialized coach who knows housing lists for difficult backgrounds.";
+            }
+            session.mockState = 'INCOME';
+            return "okay, thanks for clearing that up. \n\nlast money question: if we pay your deposit/first month, do you have a plan for next month? (job, ssi, family support?)";
+
+        case 'INCOME':
             session.mockState = 'INSURANCE';
-            return "Understood. Keep pushing. Last logistical question: Do you have active Health First Colorado (Medicaid) insurance? This allows us to assign you a paid Peer Coach.";
+            return "got it. sustainability is the goal. \n\nfinal check: do you have active Health First Colorado (Medicaid)? if yes, it unlocks a free Pro Coach for you immediately.";
 
         case 'INSURANCE':
+        case 'MEDICAID_PIVOT':
             session.mockState = 'COMPLETE';
-            return "Perfect. I've compiled your profile. \n\nSTATUS: PRE-QUALIFIED \n\nI'm opening a ticket for a human review. You'll see a notification in your dashboard in about an hour. Hang tight.";
+            const hasMedicaid = lower.includes('yes') || lower.includes('health first');
+            if (hasMedicaid) {
+                return "jackpot. \n\nbecause you have medicaid, i'm approving you for our PEER COACHING program immediately. they can help with the rest of this. \n\ncheck your dashboard in 5 mins. i'm setting it up now. 💙";
+            }
+            return "okay. i've got your profile. i'm going to submit this for human review to see if we have any discretionary funds available. keep an eye on your dashboard, okay?";
 
         default:
-            return "I've got your info. Is there anything else you want to add to your application before I submit it?";
+            return "i've got your info. sit tight, i'm processing this.";
     }
 };
 
@@ -138,7 +160,7 @@ export const startGlobalSession = (): any => {
     };
 };
 
-export const sendMessageToGemini = async (message: string, session: any): Promise<{text: string, sources?: any[]}> => {
+export const sendMessageToGemini = async (message: string, session: any, history: Message[] = []): Promise<{text: string, sources?: any[]}> => {
   try {
     // REAL AI (If API Key exists)
     if (process.env.API_KEY) {
@@ -151,7 +173,7 @@ export const sendMessageToGemini = async (message: string, session: any): Promis
 
             if (session.type === 'COACH') {
                 modelName = 'gemini-3-pro-preview';
-                instruction = "You are a Recovery Coach. Be helpful and deep.";
+                instruction = "You are a Recovery Coach. Be helpful, deep, and talk like a real human friend.";
             } else if (session.type === 'GLOBAL') {
                 modelName = 'gemini-3-pro-preview';
                 instruction = GLOBAL_INSTRUCTION;
@@ -159,14 +181,31 @@ export const sendMessageToGemini = async (message: string, session: any): Promis
                 tools = [{ googleSearch: {} }];
             }
             
-            const response = await ai.models.generateContent({
+            // Format History for Gemini
+            // Filter out system/error messages or empty text
+            const previousTurns = history
+                .filter(m => m.id !== 'init' && m.id !== 'err' && m.role !== 'model') // In real implementation, you'd properly map model turns too, but for stateless we might send just user intent or last few turns
+                .map(m => ({ role: m.role, parts: [{ text: m.text }] }));
+
+            // Important: Gemini API expects alternating user/model turns. 
+            // For this lightweight stateless implementation, we are just sending the current message
+            // or reconstructing a valid history. To keep it simple and robust:
+            // We will just append the history to the context if needed, or rely on the single turn with strong system instruction.
+            // *Better approach for stateless*:
+            
+            const chat = ai.chats.create({
                 model: modelName,
-                contents: [{ role: 'user', parts: [{ text: message }] }],
                 config: {
                     systemInstruction: instruction,
                     tools: tools.length > 0 ? tools : undefined
-                }
+                },
+                history: history.map(h => ({
+                    role: h.role,
+                    parts: [{ text: h.text }]
+                }))
             });
+
+            const response = await chat.sendMessage({ parts: [{ text: message }] });
             
             // Access properties directly
             const responseText = response.text ?? "";
@@ -176,7 +215,9 @@ export const sendMessageToGemini = async (message: string, session: any): Promis
 
         } catch (e) {
             console.warn("Direct SDK call failed, falling back to mock backend.", e);
-            return { text: await new Promise(resolve => setTimeout(() => resolve(handleMockState(message, session)), MOCK_DELAY)) };
+            // Update mock state for fallback
+            const responseText = handleMockState(message, session);
+            return { text: await new Promise(resolve => setTimeout(() => resolve(responseText), MOCK_DELAY)) };
         }
     } else {
         // MOCK BACKEND
@@ -185,7 +226,7 @@ export const sendMessageToGemini = async (message: string, session: any): Promis
 
   } catch (error) {
     console.error("Service Error:", error);
-    return { text: "I'm having trouble reaching the server. Please check your connection." };
+    return { text: "i'm having a little trouble reaching the server. can you check your connection?" };
   }
 };
 
