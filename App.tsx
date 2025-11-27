@@ -23,7 +23,7 @@ import { ImpactTicker } from './components/ImpactTicker';
 import { HyperLocalMap } from './components/HyperLocalMap';
 import { MedicaidPromo } from './components/MedicaidPromo';
 import { RecoveryKnowledgeGraph } from './components/RecoveryKnowledgeGraph';
-import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy } from 'lucide-react';
+import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2 } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SecondWind Logo">
@@ -185,6 +185,7 @@ const App: React.FC = () => {
         <CrisisOverlay isOpen={isCrisisMode} onClose={() => setCrisisMode(false)} />
         <LoginExperience isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} onLoginSuccess={handleLoginSuccess} />
         <NotificationSystem />
+        {/* MedicaidPromo is properly layered via z-index in CSS, mobile menu is z-[100], promo is z-[80] */}
         <MedicaidPromo />
 
         {/* MOBILE MENU - Lower Z-Index than Crisis Overlay but higher than content */}
@@ -202,7 +203,9 @@ const App: React.FC = () => {
               {[
                 { id: 'intro', icon: Activity, label: 'Home' },
                 { id: 'apply', icon: HeartHandshake, label: 'Get Help' },
+                { id: 'peer-coaching', icon: UserCircle, label: 'Coaching' },
                 { id: 'donate', icon: Activity, label: 'Invest' },
+                { id: 'partner', icon: Building2, label: 'Partner' },
                 { id: 'philosophy', icon: Globe, label: 'Protocol' },
                 { id: 'ledger', icon: Activity, label: 'Ledger' }
               ].map(item => (
@@ -230,9 +233,17 @@ const App: React.FC = () => {
                   </div>
                   
                   <nav className="hidden lg:flex items-center gap-1 bg-white/80 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-sm absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                     {['intro', 'philosophy', 'donate', 'apply', 'ledger'].map((id) => (
-                        <button key={id} onClick={() => { navigate(id); playClick(); }} className={`px-5 py-2 rounded-full text-sm font-bold transition-all capitalize ${activeSection === id ? 'bg-brand-navy text-white shadow-md' : 'text-brand-navy/60 hover:text-brand-navy hover:bg-brand-navy/5'}`}>
-                          {id === 'intro' ? 'Home' : id}
+                     {[
+                       { id: 'intro', label: 'Home' },
+                       { id: 'philosophy', label: 'Protocol' },
+                       { id: 'peer-coaching', label: 'Coaching' },
+                       { id: 'donate', label: 'Invest' },
+                       { id: 'partner', label: 'Network' },
+                       { id: 'apply', label: 'Apply' },
+                       { id: 'ledger', label: 'Ledger' }
+                     ].map((item) => (
+                        <button key={item.id} onClick={() => { navigate(item.id); playClick(); }} className={`px-5 py-2 rounded-full text-sm font-bold transition-all capitalize ${activeSection === item.id ? 'bg-brand-navy text-white shadow-md' : 'text-brand-navy/60 hover:text-brand-navy hover:bg-brand-navy/5'}`}>
+                          {item.label}
                         </button>
                      ))}
                   </nav>

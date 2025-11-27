@@ -215,7 +215,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                                         <div className="w-8 h-8 rounded-full border-2 border-[#1A2A3A] bg-brand-teal flex items-center justify-center text-[10px] font-bold">You</div>
                                         <div className="w-8 h-8 rounded-full border-2 border-[#1A2A3A] bg-white flex items-center justify-center text-[10px] font-bold text-brand-navy">Coach</div>
                                     </div>
-                                    <button className="bg-brand-teal text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 group-hover:bg-white group-hover:text-brand-navy transition-colors shadow-lg">
+                                    <button className="bg-white text-brand-navy px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-brand-teal hover:text-white transition-colors shadow-lg">
                                         Unlock Now <ArrowRight size={14} />
                                     </button>
                                 </div>

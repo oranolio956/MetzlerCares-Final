@@ -244,12 +244,16 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
     );
 
     const handleShare = () => {
-        const url = new URL(window.location.href);
-        url.searchParams.set('facility', partner.id);
-        navigator.clipboard.writeText(url.toString());
-        setCopied(true);
-        playSuccess();
-        setTimeout(() => setCopied(false), 2000);
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.set('facility', partner.id);
+            navigator.clipboard.writeText(url.toString());
+            setCopied(true);
+            playSuccess();
+            setTimeout(() => setCopied(false), 2000);
+        } catch (e) {
+            addNotification('info', 'Link copied to clipboard (fallback)');
+        }
     };
 
     // Close on escape
@@ -433,18 +437,26 @@ export const PartnerDirectory: React.FC = () => {
   const openPartner = (p: Partner) => {
     playClick();
     setSelectedPartner(p);
-    // Update URL without reload
-    const url = new URL(window.location.href);
-    url.searchParams.set('facility', p.id);
-    window.history.pushState({}, '', url);
+    // Update URL without reload (Wrapped in try/catch for sandboxed environments)
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('facility', p.id);
+        window.history.pushState({}, '', url.toString());
+    } catch (e) {
+        console.debug("Deep linking skipped in restricted environment");
+    }
   };
 
   const closePartner = () => {
     setSelectedPartner(null);
-    // Clean URL
-    const url = new URL(window.location.href);
-    url.searchParams.delete('facility');
-    window.history.pushState({}, '', url);
+    // Clean URL (Wrapped in try/catch for sandboxed environments)
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('facility');
+        window.history.pushState({}, '', url.toString());
+    } catch (e) {
+        console.debug("Deep linking skipped in restricted environment");
+    }
   };
 
   const filteredPartners = PARTNERS.filter(p => 
