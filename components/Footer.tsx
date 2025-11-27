@@ -122,7 +122,7 @@ export const Footer: React.FC<{ onNavigate: (route: string) => void }> = ({ onNa
            <div className="flex gap-6 text-xs text-brand-lavender/40 font-bold uppercase tracking-widest">
               <button onClick={() => setShowLegalDocs(true)} className="hover:text-white transition-colors">Privacy</button>
               <button onClick={() => setShowLegalDocs(true)} className="hover:text-white transition-colors">Terms</button>
-              <a href="#" className="hover:text-white transition-colors">Sitemap</a>
+              <a href="/sitemap.xml" target="_blank" className="hover:text-white transition-colors">Sitemap</a>
            </div>
         </div>
 
