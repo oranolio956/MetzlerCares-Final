@@ -40,33 +40,34 @@ export const validateFile = (
   }
 };
 
-// Upload file to storage (S3 implementation would go here)
-// For now, this is a placeholder that would integrate with AWS S3
-export const uploadFile = async (
+// Upload file to storage
+export const uploadFileToStorage = async (
   file: Express.Multer.File,
   applicationId: string
 ): Promise<FileUploadResult> => {
   // Validate file
   validateFile(file);
 
-  // In production, this would:
-  // 1. Generate unique filename
-  // 2. Upload to S3
-  // 3. Get public URL
-  // 4. Return file metadata
-
-  // For now, return a placeholder URL
-  const fileUrl = `https://storage.secondwind.org/documents/${applicationId}/${file.originalname}`;
+  // Use storage service
+  const { uploadFile } = await import('./storageService.js');
   
-  logger.info('File upload processed:', {
+  const result = await uploadFile({
+    file: file.buffer,
+    fileName: file.originalname,
+    contentType: file.mimetype,
+    folder: `documents/${applicationId}`,
+  });
+  
+  logger.info('File uploaded:', {
     applicationId,
     fileName: file.originalname,
     fileSize: file.size,
     fileType: file.mimetype,
+    url: result.url,
   });
 
   return {
-    fileUrl,
+    fileUrl: result.url,
     fileName: file.originalname,
     fileType: file.mimetype,
     fileSize: file.size,
@@ -147,7 +148,20 @@ export const deleteDocument = async (
       throw new ValidationError('Document does not belong to user');
     }
 
-    // Delete from database (S3 deletion would happen here too)
+    const document = result.rows[0];
+
+    // Delete from storage
+    try {
+      const { deleteFile } = await import('./storageService.js');
+      // Extract key from URL or use file_url as key
+      const key = document.file_url.replace('https://storage.secondwind.org/', '');
+      await deleteFile(key);
+    } catch (error) {
+      logger.warn('Failed to delete file from storage:', error);
+      // Continue with database deletion even if storage deletion fails
+    }
+
+    // Delete from database
     await pool.query('DELETE FROM documents WHERE id = $1', [documentId]);
 
     logger.info('Document deleted:', { documentId, userId });

@@ -134,16 +134,22 @@ export const deleteChatSession = async (sessionId: string, userId: string): Prom
 export const cleanupExpiredChatSessions = async (): Promise<number> => {
   const pool = getDatabasePool();
 
-  const result = await pool.query(
-    `DELETE FROM chat_sessions 
-     WHERE expires_at IS NOT NULL AND expires_at < NOW()
-     RETURNING id`
-  );
+  try {
+    // Delete expired sessions and their messages
+    const result = await pool.query(
+      `DELETE FROM chat_sessions 
+       WHERE expires_at IS NOT NULL AND expires_at < NOW()
+       RETURNING id`
+    );
 
-  const count = result.rows.length;
-  if (count > 0) {
-    logger.info(`Cleaned up ${count} expired chat sessions`);
+    const count = result.rows.length;
+    if (count > 0) {
+      logger.info(`Cleaned up ${count} expired chat sessions`);
+    }
+
+    return count;
+  } catch (error) {
+    logger.error('Failed to cleanup expired chat sessions:', error);
+    return 0;
   }
-
-  return count;
 };

@@ -13,13 +13,25 @@ const env = loadEnv();
 const app = express();
 
 // Security middleware
-app.use(helmet());
-app.use(
-  cors({
-    origin: env.CORS_ORIGIN,
-    credentials: true,
-  })
-);
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
+
+// CORS configuration
+import { getCorsOptions } from './config/cors.js';
+app.use(cors(getCorsOptions()));
+
+// Environment validation middleware
+import { validateEnvironment } from './middleware/validateEnv.js';
+app.use(validateEnvironment);
 
 // Raw body middleware for Stripe webhooks (must be before json parser)
 app.use('/api/v1/webhooks/stripe', express.raw({ type: 'application/json' }));
@@ -28,35 +40,33 @@ app.use('/api/v1/webhooks/stripe', express.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Request logging middleware
-app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.path}`, {
-    ip: req.ip,
-    userAgent: req.get('user-agent'),
-  });
-  next();
-});
+// Request ID middleware
+import { requestId } from './middleware/requestId.js';
+app.use(requestId);
+
+// Request logging middleware (with response time)
+import { requestLogger } from './middleware/requestLogger.js';
+app.use(requestLogger);
 
 // Rate limiting
 import { apiRateLimiter } from './middleware/rateLimit.js';
 app.use(`/api/${env.API_VERSION}`, apiRateLimiter);
 
 // Health check endpoint
+import { performHealthCheck } from './utils/healthCheck.js';
 app.get('/health', async (req, res) => {
-  const dbHealth = await checkDatabaseHealth();
-  const redisHealth = await checkRedisHealth();
-
-  const status = {
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    services: {
-      database: dbHealth ? 'healthy' : 'unhealthy',
-      redis: redisHealth ? 'healthy' : 'unhealthy',
-    },
-  };
-
-  const isHealthy = dbHealth && redisHealth;
-  res.status(isHealthy ? 200 : 503).json(status);
+  try {
+    const health = await performHealthCheck();
+    const statusCode = health.status === 'healthy' ? 200 : health.status === 'degraded' ? 200 : 503;
+    res.status(statusCode).json(health);
+  } catch (error) {
+    logger.error('Health check failed:', error);
+    res.status(503).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      error: 'Health check failed',
+    });
+  }
 });
 
 // API routes
@@ -92,7 +102,11 @@ const initializeConnections = async () => {
     
     // Start background jobs
     const { startSessionCleanup } = await import('./services/sessionCleanup.js');
+    const { startChatCleanup } = await import('./services/chatCleanup.js');
+    const { startDataRetentionCleanup } = await import('./services/dataRetention.js');
     startSessionCleanup();
+    startChatCleanup();
+    startDataRetentionCleanup();
   } catch (error) {
     logger.error('Failed to initialize connections:', error);
     process.exit(1);
@@ -106,7 +120,11 @@ const shutdown = async () => {
   try {
     // Stop background jobs
     const { stopSessionCleanup } = await import('./services/sessionCleanup.js');
+    const { stopChatCleanup } = await import('./services/chatCleanup.js');
+    const { stopDataRetentionCleanup } = await import('./services/dataRetention.js');
     stopSessionCleanup();
+    stopChatCleanup();
+    stopDataRetentionCleanup();
     
     await closeDatabasePool();
     await closeRedisClient();

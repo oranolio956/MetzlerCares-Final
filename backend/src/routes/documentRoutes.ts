@@ -5,6 +5,7 @@ import {
   removeDocument,
 } from '../controllers/documentController.js';
 import { authenticate } from '../middleware/auth.js';
+import { uploadRateLimiter } from '../middleware/rateLimit.js';
 import { param } from 'express-validator';
 import { validate } from '../middleware/validator.js';
 import multer from 'multer';
@@ -41,6 +42,7 @@ router.use(authenticate);
 // Upload document
 router.post(
   '/applications/:applicationId/documents',
+  uploadRateLimiter,
   validate([
     param('applicationId').isUUID().withMessage('Invalid application ID'),
   ]),

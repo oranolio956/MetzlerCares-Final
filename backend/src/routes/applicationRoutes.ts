@@ -7,6 +7,7 @@ import {
   removeApplication,
 } from '../controllers/applicationController.js';
 import { authenticate, requireUserType } from '../middleware/auth.js';
+import { requireCFR42Compliance, preventRedisclosure } from '../middleware/cfr42.js';
 import { body, param, query } from 'express-validator';
 import { validate } from '../middleware/validator.js';
 
@@ -34,9 +35,11 @@ router.post(
   submitApplication
 );
 
-// Get user's applications
+// Get user's applications (42 CFR Part 2 compliance)
 router.get(
   '/',
+  requireCFR42Compliance('APPLICATION'),
+  preventRedisclosure(),
   validate([
     query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('limit must be between 1 and 100'),
     query('offset').optional().isInt({ min: 0 }).withMessage('offset must be a non-negative integer'),

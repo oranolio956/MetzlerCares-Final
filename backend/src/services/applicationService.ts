@@ -38,13 +38,31 @@ export const createApplication = async (input: CreateApplicationInput): Promise<
       [input.userId, input.type.trim(), input.details?.trim() || null]
     );
 
+    const application = result.rows[0];
     logger.info('Application created:', {
-      applicationId: result.rows[0].id,
+      applicationId: application.id,
       userId: input.userId,
       type: input.type,
     });
 
-    return result.rows[0];
+    // Send notification email (async, don't block)
+    setImmediate(async () => {
+      try {
+        const { getUserById } = await import('./userService.js');
+        const user = await getUserById(input.userId);
+        if (user?.email) {
+          const { sendApplicationStatusEmail } = await import('./emailService.js');
+          await sendApplicationStatusEmail(user.email, {
+            type: input.type,
+            status: 'reviewing',
+          });
+        }
+      } catch (error) {
+        logger.warn('Failed to send application email:', error);
+      }
+    });
+
+    return application;
   } catch (error: any) {
     logger.error('Failed to create application:', error);
     throw new DatabaseError('Failed to create application');
@@ -162,8 +180,33 @@ export const updateApplication = async (
       throw new NotFoundError('Application');
     }
 
+    const updated = result.rows[0];
     logger.info('Application updated:', { applicationId: id, updates: input });
-    return result.rows[0];
+
+    // Send notification email if status changed (async, don't block)
+    if (input.status) {
+      setImmediate(async () => {
+        try {
+          const application = await getApplicationById(id);
+          if (application) {
+            const { getUserById } = await import('./userService.js');
+            const user = await getUserById(application.user_id);
+            if (user?.email) {
+              const { sendApplicationStatusEmail } = await import('./emailService.js');
+              await sendApplicationStatusEmail(user.email, {
+                type: application.type,
+                status: application.status,
+                note: input.status === 'action_needed' ? 'Action required' : undefined,
+              });
+            }
+          }
+        } catch (error) {
+          logger.warn('Failed to send status update email:', error);
+        }
+      });
+    }
+
+    return updated;
   } catch (error) {
     if (error instanceof NotFoundError || error instanceof ValidationError) {
       throw error;

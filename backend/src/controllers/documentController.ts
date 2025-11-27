@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/errorHandler.js';
 import { AuthenticationError, NotFoundError, ValidationError } from '../utils/errors.js';
-import { uploadFile, saveDocument, getApplicationDocuments, deleteDocument } from '../services/fileService.js';
+import { uploadFileToStorage, saveDocument, getApplicationDocuments, deleteDocument } from '../services/fileService.js';
 import { getApplicationById } from '../services/applicationService.js';
 
 // Upload document
@@ -28,7 +28,7 @@ export const uploadDocument = asyncHandler(async (req: Request, res: Response): 
     }
 
     // Upload file
-    const fileResult = await uploadFile(file, applicationId);
+    const fileResult = await uploadFileToStorage(file, applicationId);
 
     // Save document record
     const document = await saveDocument(applicationId, fileResult);

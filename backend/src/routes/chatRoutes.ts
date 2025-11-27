@@ -7,6 +7,7 @@ import {
   deleteSession,
 } from '../controllers/chatController.js';
 import { authenticate } from '../middleware/auth.js';
+import { requireCFR42Compliance, preventRedisclosure } from '../middleware/cfr42.js';
 import { chatRateLimiter } from '../middleware/rateLimit.js';
 import { body, param, query } from 'express-validator';
 import { validate } from '../middleware/validator.js';
@@ -39,9 +40,11 @@ router.post(
   sendMessage
 );
 
-// Get conversation history
+// Get conversation history (42 CFR Part 2 compliance)
 router.get(
   '/sessions/:sessionId/history',
+  requireCFR42Compliance('CHAT'),
+  preventRedisclosure(),
   validate([
     param('sessionId').isUUID().withMessage('Invalid session ID'),
   ]),

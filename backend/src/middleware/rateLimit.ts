@@ -1,31 +1,34 @@
 import rateLimit from 'express-rate-limit';
-import { getEnv } from '../config/env.js';
-
-const env = getEnv();
+import { getRateLimitConfig } from '../utils/rateLimitConfig.js';
 
 // General API rate limiter
 export const apiRateLimiter = rateLimit({
-  windowMs: parseInt(env.RATE_LIMIT_WINDOW_MS, 10),
-  max: parseInt(env.RATE_LIMIT_MAX_REQUESTS, 10),
-  message: 'Too many requests from this IP, please try again later.',
+  ...getRateLimitConfig('api'),
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for health checks
+    return req.path === '/health' || req.path === '/api/v1/status';
+  },
 });
 
 // Stricter rate limiter for authentication endpoints
 export const authRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 requests per window
-  message: 'Too many authentication attempts, please try again later.',
+  ...getRateLimitConfig('auth'),
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 // Rate limiter for AI chat endpoints
 export const chatRateLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 20, // 20 requests per minute
-  message: 'Too many chat requests, please slow down.',
+  ...getRateLimitConfig('chat'),
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Rate limiter for file uploads
+export const uploadRateLimiter = rateLimit({
+  ...getRateLimitConfig('upload'),
   standardHeaders: true,
   legacyHeaders: false,
 });

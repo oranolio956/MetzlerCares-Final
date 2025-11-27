@@ -20,8 +20,26 @@ export const createUser = async (
       [email, name, userType, oauthProvider, oauthId]
     );
 
-    logger.info('User created:', { userId: result.rows[0].id, email });
-    return result.rows[0];
+    const user = result.rows[0];
+    logger.info('User created:', { userId: user.id, email });
+
+    // Auto-create beneficiary profile if user is beneficiary
+    if (userType === 'beneficiary') {
+      try {
+        const { createOrUpdateBeneficiaryProfile } = await import('./beneficiaryService.js');
+        await createOrUpdateBeneficiaryProfile(user.id, {
+          days_sober: 0,
+          next_milestone: null,
+          insurance_status: 'none',
+        });
+        logger.info('Beneficiary profile auto-created:', { userId: user.id });
+      } catch (error) {
+        logger.error('Failed to create beneficiary profile:', error);
+        // Don't fail user creation if profile creation fails
+      }
+    }
+
+    return user;
   } catch (error: any) {
     if (error.code === '23505') {
       // Unique constraint violation

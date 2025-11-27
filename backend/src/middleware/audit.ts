@@ -31,6 +31,7 @@ export const auditLog = async (
             req.ip,
             req.get('user-agent') || null,
             JSON.stringify({
+              requestId: req.id,
               method: req.method,
               path: req.path,
               query: req.query,

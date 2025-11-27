@@ -16,15 +16,19 @@ export const logger = winston.createLogger({
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.printf(
-          ({ timestamp, level, message, ...meta }) => {
-            let msg = `${timestamp} [${level}]: ${message}`;
-            if (Object.keys(meta).length > 0) {
-              msg += ` ${JSON.stringify(meta)}`;
-            }
-            return msg;
-          }
-        )
+    winston.format.printf(
+      ({ timestamp, level, message, requestId, ...meta }) => {
+        let msg = `${timestamp} [${level}]`;
+        if (requestId) {
+          msg += ` [${requestId}]`;
+        }
+        msg += `: ${message}`;
+        if (Object.keys(meta).length > 0) {
+          msg += ` ${JSON.stringify(meta)}`;
+        }
+        return msg;
+      }
+    )
       ),
     }),
   ],

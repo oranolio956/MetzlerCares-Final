@@ -5,6 +5,8 @@ import {
   updateProfile,
 } from '../controllers/beneficiaryController.js';
 import { authenticate, requireUserType } from '../middleware/auth.js';
+import { requireCFR42Compliance, preventRedisclosure } from '../middleware/cfr42.js';
+import { requireHIPAAAccess } from '../middleware/hipaa.js';
 import { body } from 'express-validator';
 import { validate } from '../middleware/validator.js';
 
@@ -14,8 +16,14 @@ const router = Router();
 router.use(authenticate);
 router.use(requireUserType(['beneficiary']));
 
-// Get dashboard
-router.get('/me/dashboard', getDashboard);
+// Get dashboard (HIPAA + 42 CFR Part 2)
+router.get(
+  '/me/dashboard',
+  requireHIPAAAccess('BENEFICIARY_PROFILE', (req) => req.user?.userId !== undefined),
+  requireCFR42Compliance('PROFILE'),
+  preventRedisclosure(),
+  getDashboard
+);
 
 // Verify insurance
 router.post(

@@ -39,16 +39,14 @@ export const generateVisionImage = async (
     throw new ValidationError('Prompt must be 1000 characters or less');
   }
 
-  // In production, this would call Gemini's image generation API
-  // For now, we'll use a placeholder that would integrate with the actual API
-  // The actual implementation would be:
-  // const client = getGeminiClient();
-  // const model = client.models.getGenerativeModel({ model: 'imagen-3' });
-  // const result = await model.generateImage({ prompt: input.prompt, size: SIZE_DIMENSIONS[input.size] });
+  // Generate image using image generation service
+  const { generateImage } = await import('./imageGenerationService.js');
+  const imageUrl = await generateImage(input.prompt.trim(), input.size);
 
-  // Placeholder: Generate a unique image URL
-  // In production, this would be an S3/CDN URL
-  const imageUrl = `https://storage.secondwind.org/visions/${input.userId}/${Date.now()}.png`;
+  // Upload to storage (in production)
+  const { uploadFile } = await import('./storageService.js');
+  // For now, we'll use the URL directly
+  // In production: const uploadResult = await uploadFile({ file: imageBuffer, fileName: 'vision.png', contentType: 'image/png', folder: `visions/${input.userId}` });
 
   // Save to database
   const pool = getDatabasePool();

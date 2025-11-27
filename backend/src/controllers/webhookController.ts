@@ -75,11 +75,72 @@ const handlePaymentSuccess = async (paymentIntent: Stripe.PaymentIntent): Promis
     // Update donation status
     await updateDonationStatus(donation.id, 'succeeded');
 
+    // CRITICAL FIX: Create transaction for transparency ledger
+    try {
+      const { createTransaction } = await import('../services/transactionService.js');
+      const { getVendorByName, createVendor } = await import('../services/vendorService.js');
+      const { 
+        mapImpactToCategory, 
+        getDefaultVendor, 
+        getVendorCategory 
+      } = await import('../utils/vendorAssignment.js');
+      const { generateRecipientHash } = await import('../utils/crypto.js');
+
+      const category = mapImpactToCategory(donation.impact_type);
+      const vendorName = getDefaultVendor(donation.impact_type);
+
+      // Get or create vendor
+      let vendor = await getVendorByName(vendorName);
+      if (!vendor) {
+        vendor = await createVendor({
+          name: vendorName,
+          category: getVendorCategory(donation.impact_type),
+        });
+      }
+
+      // Generate recipient hash (privacy-preserving identifier)
+      const recipientHash = generateRecipientHash(donation.user_id, donation.id);
+
+      // Create transaction
+      await createTransaction({
+        donationId: donation.id,
+        category,
+        amount: parseFloat(donation.amount.toString()),
+        vendor: vendor.name,
+        recipientHash,
+      });
+
+      logger.info('Transaction created for donation:', {
+        donationId: donation.id,
+        category,
+        amount: donation.amount,
+        vendor: vendor.name,
+      });
+    } catch (error) {
+      logger.error('Failed to create transaction for donation:', error);
+      // Don't fail the webhook if transaction creation fails, but log it
+    }
+
     // Generate and store receipt
     try {
       const receiptData = await generateReceiptData(donation.id);
-      // In production, generate PDF and upload to S3, then store URL
-      // For now, we'll just log it
+      
+      // Send receipt email
+      if (receiptData.donorEmail) {
+        try {
+          const { sendReceiptEmail } = await import('../services/emailService.js');
+          await sendReceiptEmail(receiptData.donorEmail, {
+            donationId: receiptData.donationId,
+            amount: receiptData.amount,
+            itemLabel: receiptData.itemLabel,
+            timestamp: receiptData.timestamp,
+          });
+        } catch (error) {
+          logger.error('Failed to send receipt email:', error);
+          // Don't fail if email fails
+        }
+      }
+
       logger.info('Receipt generated for donation:', {
         donationId: donation.id,
         amount: receiptData.amount,

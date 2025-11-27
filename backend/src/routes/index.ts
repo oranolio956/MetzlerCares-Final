@@ -15,6 +15,7 @@ import partnerRoutes from './partnerRoutes.js';
 import visionRoutes from './visionRoutes.js';
 import analyticsRoutes from './analyticsRoutes.js';
 import notificationRoutes from './notificationRoutes.js';
+import securityRoutes from './securityRoutes.js';
 
 const router = Router();
 const env = getEnv();
@@ -45,5 +46,6 @@ router.use(`${apiPrefix}/partners`, partnerRoutes);
 router.use(`${apiPrefix}/vision`, visionRoutes);
 router.use(`${apiPrefix}/analytics`, analyticsRoutes);
 router.use(`${apiPrefix}/notifications`, notificationRoutes);
+router.use(`${apiPrefix}/security`, securityRoutes);
 
 export default router;
