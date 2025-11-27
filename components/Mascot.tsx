@@ -1,3 +1,4 @@
+
 import React, { memo, useId, useState, useEffect } from 'react';
 
 export interface MascotProps {

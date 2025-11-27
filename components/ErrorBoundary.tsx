@@ -1,3 +1,4 @@
+
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { Mascot } from './Mascot';
 import { RefreshCw } from 'lucide-react';

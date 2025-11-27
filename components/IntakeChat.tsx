@@ -246,8 +246,8 @@ export const IntakeChat: React.FC = () => {
       <div className="flex-1 relative overflow-hidden bg-[#FDFBF7]" aria-live="polite">
          <div 
             className={`absolute inset-0 overflow-y-auto custom-scrollbar p-4 md:p-8 transition-opacity duration-300 ${mode === 'voice' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-            aria-hidden={mode === 'voice'}
-            inert={mode === 'voice' ? '' : undefined}
+            aria-hidden={mode === 'voice' ? 'true' : 'false'}
+            inert={mode === 'voice' ? true : undefined}
          >
             {messages.map((msg, idx) => (
                <MessageItem key={msg.id} message={msg} isLast={idx === messages.length - 1} />
@@ -267,7 +267,7 @@ export const IntakeChat: React.FC = () => {
          {/* VOICE OVERLAY */}
          <div 
             className={`absolute inset-0 bg-[#FDFBF7] z-10 flex flex-col items-center justify-center transition-transform duration-500 ${mode === 'voice' ? 'translate-y-0' : 'translate-y-full'}`} 
-            aria-hidden={mode !== 'voice'}
+            aria-hidden={mode !== 'voice' ? 'true' : 'false'}
             aria-modal="true"
          >
              <div className="relative w-72 h-72 flex items-center justify-center mb-8">

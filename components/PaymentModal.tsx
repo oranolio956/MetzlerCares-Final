@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { ShieldCheck, Lock, X, ChevronRight, CreditCard, Banknote, PenTool, Download, Copy, Check } from 'lucide-react';
 import { Mascot } from './Mascot';

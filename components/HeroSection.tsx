@@ -172,7 +172,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                       <div className="flex flex-col items-end gap-6 w-full max-w-sm relative z-20 -mt-24 lg:-mt-48 transition-transform duration-300">
                           
                           {/* 1. Small Rent Grant Status (Background) */}
-                          <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-brand-navy/10 shadow-lg flex items-center justify-between animate-slide-up opacity-0 w-[90%] self-end mr-4" style={{ animationDelay: '0.6s' }}>
+                          <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-brand-navy/10 shadow-lg flex items-center justify-between animate-slide-up opacity-0 w-[90%] self-end mr-4 transform scale-95 origin-right" style={{ animationDelay: '0.6s' }}>
                              <div className="flex items-center gap-3">
                                 <div className="p-2 bg-brand-yellow/10 rounded-lg text-brand-yellow shrink-0"><Clock size={16} /></div>
                                 <div>
@@ -186,37 +186,39 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                           {/* 2. THE GOLDEN TICKET: PEER COACHING (Featured) */}
                           <div 
                             onClick={() => onNavigate('peer-coaching')}
-                            className="w-full relative group cursor-pointer animate-slide-up opacity-0 transform hover:scale-[1.02] transition-all duration-300"
+                            // Increased scale, padding, and z-index for prominence
+                            className="w-full relative group cursor-pointer animate-slide-up opacity-0 transform scale-105 hover:scale-[1.08] transition-all duration-300 z-30"
                             style={{ animationDelay: '0.7s' }}
                           >
-                             {/* Pulsing Ring */}
-                             <div className="absolute -inset-1 bg-gradient-to-r from-brand-teal via-brand-yellow to-brand-teal rounded-2xl opacity-75 blur group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-text-shimmer bg-[length:200%_auto]"></div>
+                             {/* Enhanced Pulsing Ring with stronger glow */}
+                             <div className="absolute -inset-1.5 bg-gradient-to-r from-brand-teal via-brand-yellow to-brand-teal rounded-2xl opacity-80 blur-md group-hover:opacity-100 group-hover:blur-lg transition duration-1000 group-hover:duration-200 animate-text-shimmer bg-[length:200%_auto]"></div>
                              
-                             {/* Card Body */}
-                             <div className="relative bg-[#1A2A3A] text-white p-6 rounded-xl flex flex-col gap-4 overflow-hidden border border-white/10 shadow-2xl">
+                             {/* Card Body - Larger padding */}
+                             <div className="relative bg-[#1A2A3A] text-white p-8 rounded-xl flex flex-col gap-6 overflow-hidden border border-white/20 shadow-[0_20px_60px_-15px_rgba(45,156,142,0.5)]">
                                 
                                 {/* Background Shine */}
                                 <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
                                 <div className="flex justify-between items-start">
-                                    <div className="flex items-center gap-2 px-3 py-1 bg-brand-yellow text-brand-navy rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg">
-                                        <Crown size={12} fill="currentColor" /> Premium Access
+                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-brand-yellow text-brand-navy rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
+                                        <Crown size={14} fill="currentColor" /> Premium Access
                                     </div>
-                                    <div className="w-2 h-2 rounded-full bg-brand-teal animate-pulse shadow-[0_0_10px_#2D9C8E]"></div>
+                                    <div className="w-3 h-3 rounded-full bg-brand-teal animate-pulse shadow-[0_0_15px_#2D9C8E]"></div>
                                 </div>
 
                                 <div>
-                                    <h3 className="font-display font-bold text-2xl text-white mb-1">Peer Coaching</h3>
-                                    <p className="text-sm text-brand-lavender font-medium">Instant Medicaid Approval. Skip the waitlist.</p>
+                                    <h3 className="font-display font-bold text-3xl md:text-4xl text-white mb-2">Peer Coaching</h3>
+                                    <p className="text-base md:text-lg text-brand-lavender font-medium leading-relaxed">Instant Medicaid Approval. <br/>Skip the waitlist.</p>
                                 </div>
 
-                                <div className="mt-2 pt-4 border-t border-white/10 flex justify-between items-center">
-                                    <div className="flex -space-x-2">
-                                        <div className="w-8 h-8 rounded-full border-2 border-[#1A2A3A] bg-brand-teal flex items-center justify-center text-[10px] font-bold">You</div>
-                                        <div className="w-8 h-8 rounded-full border-2 border-[#1A2A3A] bg-white flex items-center justify-center text-[10px] font-bold text-brand-navy">Coach</div>
+                                <div className="mt-2 pt-6 border-t border-white/10 flex justify-between items-center">
+                                    <div className="flex -space-x-3">
+                                        <div className="w-10 h-10 rounded-full border-2 border-[#1A2A3A] bg-brand-teal flex items-center justify-center text-xs font-bold shadow-lg">You</div>
+                                        <div className="w-10 h-10 rounded-full border-2 border-[#1A2A3A] bg-white flex items-center justify-center text-xs font-bold text-brand-navy shadow-lg">Coach</div>
                                     </div>
-                                    <button className="bg-white text-brand-navy px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-brand-teal hover:text-white transition-colors shadow-lg">
-                                        Unlock Now <ArrowRight size={14} />
+                                    {/* Enhanced High-Contrast Button */}
+                                    <button className="bg-white text-brand-navy px-6 py-3 rounded-xl font-bold text-base flex items-center gap-2 hover:bg-brand-teal hover:text-white transition-colors shadow-xl hover:shadow-2xl">
+                                        Unlock Now <ArrowRight size={18} />
                                     </button>
                                 </div>
                              </div>
