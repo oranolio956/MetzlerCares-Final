@@ -1,39 +1,45 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export const useTypewriter = (text: string, speed = 30, shouldAnimate = true) => {
   const [displayedText, setDisplayedText] = useState(shouldAnimate ? '' : text);
+  const startTimeRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
+    // Immediate update if animation is disabled
     if (!shouldAnimate) {
       setDisplayedText(text);
       return;
     }
 
+    // Reset if text changes
     setDisplayedText('');
-    let i = 0;
+    startTimeRef.current = null;
     
-    // Use requestAnimationFrame for smoother performance than setInterval
-    let rafId: number;
-    let lastTime = performance.now();
-    
-    const animate = (time: number) => {
-      if (time - lastTime >= speed) {
-        setDisplayedText((prev) => text.slice(0, prev.length + 1));
-        lastTime = time;
-      }
+    const animate = () => {
+      if (!startTimeRef.current) startTimeRef.current = Date.now();
       
-      if (i < text.length) {
-        i++; // Logic handled by slice via displayedText length check mostly
-        if (displayedText.length < text.length) {
-            rafId = requestAnimationFrame(animate);
-        }
+      const now = Date.now();
+      const elapsed = now - startTimeRef.current;
+      
+      // Calculate how many characters should be shown based on real time passed
+      const charIndex = Math.floor(elapsed / speed);
+      
+      if (charIndex >= text.length) {
+        setDisplayedText(text);
+        return;
       }
+
+      setDisplayedText(text.slice(0, charIndex + 1));
+      rafRef.current = requestAnimationFrame(animate);
     };
 
-    rafId = requestAnimationFrame(animate);
+    rafRef.current = requestAnimationFrame(animate);
 
-    return () => cancelAnimationFrame(rafId);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, [text, speed, shouldAnimate]);
 
   return displayedText;

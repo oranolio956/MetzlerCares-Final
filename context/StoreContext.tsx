@@ -9,6 +9,10 @@ interface StoreContextType {
   toggleCalmMode: () => void;
   isSoundEnabled: boolean;
   toggleSound: () => void;
+  // Crisis Management
+  isCrisisMode: boolean;
+  setCrisisMode: (active: boolean) => void;
+  // Data
   donations: Donation[];
   addDonation: (donation: Donation) => void;
   notifications: Notification[];
@@ -30,7 +34,7 @@ const DEFAULT_BENEFICIARY: BeneficiaryProfile = {
   name: "Alex",
   daysSober: 42,
   nextMilestone: 60,
-  insuranceStatus: 'pending', // Default to pending to show the UI flow
+  insuranceStatus: 'pending', 
   requests: [
     { id: '1', type: 'Rent Assistance (October)', date: '2 days ago', status: 'reviewing' },
     { id: '2', type: 'Bus Pass (Monthly)', date: 'Sep 28, 2024', status: 'funded' },
@@ -43,6 +47,7 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isCalmMode, setIsCalmMode] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [isCrisisMode, setCrisisMode] = useState(false);
   const [donations, setDonations] = useState<Donation[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [confettiTrigger, setConfettiTrigger] = useState(0);
@@ -138,6 +143,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       toggleCalmMode,
       isSoundEnabled,
       toggleSound,
+      isCrisisMode,
+      setCrisisMode,
       donations,
       addDonation,
       notifications,

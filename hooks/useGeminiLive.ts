@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality, FunctionDeclaration, Type } from "@google/genai";
 import { useStore } from '../context/StoreContext';
+import { SYSTEM_INSTRUCTION } from '../services/geminiService';
 
 const submitApplicationTool: FunctionDeclaration = {
   name: 'submit_application',
@@ -119,9 +120,7 @@ export const useGeminiLive = () => {
         model: 'gemini-2.5-flash-native-audio-preview-09-2025',
         config: {
           responseModalities: [Modality.AUDIO],
-          systemInstruction: {
-             parts: [{ text: "You are Windy, a strict but kind Intake Specialist for SecondWind. Your job is to SCREEN applicants. \n\nPROTOCOL:\n1. Ask Location (CO only).\n2. Ask Safety (If crisis, direct to 988 and STOP).\n3. Ask Sobriety Date (>30 days preferred).\n4. Ask Housing Status.\n5. Ask Medicaid Status.\n6. Ask Specific Vendor Need (No cash).\n\nDISQUALIFICATION RULES:\n- If Suicidal/Crisis -> STOP immediately, tell them to call 988.\n- If Active Use -> Disqualify for cash, offer Peer Coaching if Medicaid.\n- If Cash request -> Disqualify.\n\nKeep conversation on track. If they veer off-topic, gently guide them back to the intake steps." }]
-          },
+          systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
           tools: [{ functionDeclarations: [submitApplicationTool] }]
         },
         callbacks: {

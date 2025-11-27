@@ -106,7 +106,7 @@ export const LoginExperience: React.FC<LoginExperienceProps> = ({ isOpen, onClos
                  ? "Access your impact portfolio and track your social ROI in real-time." 
                  : selectedRole === 'beneficiary' 
                  ? "Connect with Windy to access rent, transit, and tech assistance immediately." 
-                 : "Select your role to access the MetzlerFoundations ecosystem."}
+                 : "Select your role to access the SecondWind Protocol ecosystem."}
              </p>
           </div>
 

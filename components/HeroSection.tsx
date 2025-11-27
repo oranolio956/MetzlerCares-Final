@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { HeartHandshake, ArrowRight, Wind, ChevronDown, Activity, Building2, Sparkles, ArrowUpRight } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { SEOHead } from './SEOHead';
@@ -13,7 +13,7 @@ interface HeroSectionProps {
 const easeOutExpo = (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
 const AnimatedCounter = ({ end, prefix = '$' }: { end: number, prefix?: string }) => {
-  const [count, setCount] = useState(0);
+  const [count, ReactSetCount] = React.useState(0);
 
   useEffect(() => {
     let startTime: number | null = null;
@@ -24,7 +24,7 @@ const AnimatedCounter = ({ end, prefix = '$' }: { end: number, prefix?: string }
       const progress = Math.min((timestamp - startTime) / duration, 1);
       const easedProgress = easeOutExpo(progress);
       
-      setCount(Math.floor(easedProgress * end));
+      ReactSetCount(Math.floor(easedProgress * end));
 
       if (progress < 1) {
         requestAnimationFrame(animate);
@@ -38,23 +38,31 @@ const AnimatedCounter = ({ end, prefix = '$' }: { end: number, prefix?: string }
 };
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
-  const [offset, setOffset] = useState(0);
   const { isCalmMode } = useStore();
-  const heroRef = useRef<HTMLDivElement>(null);
+  
+  // Refs for direct DOM manipulation to avoid re-renders on scroll
+  const blob1Ref = useRef<HTMLDivElement>(null);
+  const blob2Ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isCalmMode) return;
+    
     const handleScroll = () => {
-      if (heroRef.current) {
-        setOffset(window.pageYOffset);
+      const y = window.scrollY;
+      if (blob1Ref.current) {
+        blob1Ref.current.style.transform = `translateY(${y * 0.2}px)`;
+      }
+      if (blob2Ref.current) {
+        blob2Ref.current.style.transform = `translateY(${y * -0.1}px)`;
       }
     };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isCalmMode]);
 
   return (
-    <div className="w-full relative bg-[#FDFBF7]" ref={heroRef}>
+    <div className="w-full relative bg-[#FDFBF7]">
       <SEOHead 
          title="SecondWind | Sober Living Funding & Rehab Assistance Colorado" 
          description="Direct-action recovery in Colorado. We pay sober living rent, provide transit for rehab, and fund technology for recovery in Denver and Boulder."
@@ -87,12 +95,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
             
             {/* Parallax blobs */}
             <div 
-                className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-brand-teal/5 rounded-full blur-[80px] md:blur-[120px]"
-                style={{ transform: `translateY(${offset * 0.2}px)` }}
+                ref={blob1Ref}
+                className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] bg-brand-teal/5 rounded-full blur-[80px] md:blur-[120px] transition-transform duration-75 ease-out"
             ></div>
             <div 
-                className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-brand-coral/5 rounded-full blur-[80px] md:blur-[120px]"
-                style={{ transform: `translateY(${offset * -0.1}px)` }}
+                ref={blob2Ref}
+                className="absolute bottom-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-brand-coral/5 rounded-full blur-[80px] md:blur-[120px] transition-transform duration-75 ease-out"
             ></div>
         </div>
 
