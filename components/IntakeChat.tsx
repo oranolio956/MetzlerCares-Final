@@ -111,6 +111,7 @@ export const IntakeChat: React.FC = () => {
       if (lastModelMsg && !isAiTyping) {
           const fullText = lastModelMsg.text.toLowerCase();
           
+          // Enhanced mapping for disqualification logic
           if (fullText.includes("arson") || fullText.includes("sex offense") || fullText.includes("violent")) {
               setSmartChips(["No history", "Yes, in the past"]);
           } else if (fullText.includes("income") || fullText.includes("job") || fullText.includes("plan")) {
@@ -128,7 +129,7 @@ export const IntakeChat: React.FC = () => {
           } else if (fullText.includes("ready") || fullText.includes("start")) {
               setSmartChips(["I'm ready", "How does this work?"]);
           } else {
-              setSmartChips(["Yes", "No", "Tell me more"]);
+              setSmartChips([]);
           }
       } else {
           setSmartChips([]); // Hide while typing

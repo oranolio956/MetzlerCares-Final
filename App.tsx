@@ -113,23 +113,37 @@ const App: React.FC = () => {
   useEffect(() => {
     const orgSchema = {
       "@context": "https://schema.org",
-      "@type": "NGO",
-      "name": "SecondWind Colorado",
-      "url": "https://secondwind.org",
-      "logo": "https://secondwind.org/logo.png",
-      "sameAs": [
-        "https://www.facebook.com/secondwind",
-        "https://twitter.com/SecondWindCO",
-        "https://www.instagram.com/secondwind"
-      ],
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+1-720-555-0123",
-        "contactType": "customer service",
-        "areaServed": ["US-CO"],
-        "availableLanguage": ["en", "es"]
-      },
-      "areaServed": "Colorado"
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "SecondWind Colorado",
+          "url": "https://secondwind.org",
+          "logo": "https://secondwind.org/logo.png",
+          "sameAs": [
+            "https://www.facebook.com/secondwind",
+            "https://twitter.com/SecondWindCO",
+            "https://www.instagram.com/secondwind"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+1-720-555-0123",
+            "contactType": "customer service",
+            "areaServed": ["US-CO"],
+            "availableLanguage": ["en", "es"]
+          },
+          "areaServed": "Colorado"
+        },
+        {
+          "@type": "WebSite",
+          "name": "SecondWind Recovery Platform",
+          "url": "https://secondwind.org",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://secondwind.org/?facility={search_term_string}#partner",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
     };
 
     const script = document.createElement('script');

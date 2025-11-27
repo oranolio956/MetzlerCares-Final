@@ -231,6 +231,44 @@ export const sendMessageToGemini = async (message: string, session: any, history
 };
 
 export const generateVisionImage = async (prompt: string, size: '1K' | '2K' | '4K'): Promise<string> => {
+    // REAL AI IMAGE GENERATION
+    if (process.env.API_KEY) {
+        try {
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            // Use 'gemini-3-pro-image-preview' for high quality as requested
+            const response = await ai.models.generateContent({
+                model: 'gemini-3-pro-image-preview',
+                contents: {
+                    parts: [{ text: prompt }],
+                },
+                config: {
+                    imageConfig: {
+                        aspectRatio: "16:9", // Vision boards look best in landscape
+                        imageSize: size
+                    }
+                },
+            });
+
+            // Iterate through parts to find the image
+            for (const part of response.candidates[0].content.parts) {
+                if (part.inlineData) {
+                    return `data:image/png;base64,${part.inlineData.data}`;
+                }
+            }
+            throw new Error("No image data returned from model.");
+
+        } catch (e) {
+            console.error("Image Gen Failed:", e);
+            // Fallback to mock if API fails
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve("https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=3506&auto=format&fit=crop"); 
+                }, 1500);
+            });
+        }
+    }
+
+    // MOCK FALLBACK
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve("https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=3506&auto=format&fit=crop"); 
