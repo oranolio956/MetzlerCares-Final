@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- 
+     Top 1% Strategy: 
+     Since this is a Single Page App (SPA), we consolidate ALL authority 
+     to the root. We do not use hash fragments (#) as they are ignored 
+     by standard sitemap parsers.
+  -->
+
+  <url>
+    <loc>https://secondwind.org/</loc>
+    <lastmod>2024-10-24T12:00:00+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- 
+     If you eventually move to "History Mode" routing (real paths like /donate),
+     you would uncomment and add them here. For now, we drive bots to the entry.
+  -->
+
+</urlset>

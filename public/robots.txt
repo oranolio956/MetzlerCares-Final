@@ -1,0 +1,26 @@
+# Group 1: All Robots
+User-agent: *
+Allow: /
+
+# Block Private Ecosystems (Save Crawl Budget)
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /portal/
+Disallow: /account/
+
+# Block Spider Traps (Infinite URL spaces)
+Disallow: /*?q=
+Disallow: /*?filter=
+Disallow: /*?search=
+Disallow: /*&sort=
+
+# Allow Assets (Crucial for "Visually Stunning" rendering)
+Allow: /assets/
+Allow: /*.js
+Allow: /*.css
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.svg
+
+# Sitemaps
+Sitemap: https://secondwind.org/sitemap.xml
