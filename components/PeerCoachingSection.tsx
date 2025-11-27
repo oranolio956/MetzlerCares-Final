@@ -363,7 +363,7 @@ export const PeerCoachingSection: React.FC<PeerCoachingSectionProps> = ({ onNavi
                     <p className="text-brand-navy/60 text-lg leading-relaxed mb-8">
                         This isn't a handout. It's a strategy. We map out the steps to get you from "surviving" to "thriving" using the resources you're entitled to.
                     </p>
-                    <Mascot expression="confident" variant="commute" className="w-48 h-48" />
+                    <Mascot expression="celebration" variant="commute" className="w-48 h-48" />
                 </div>
 
                 <div className="lg:w-2/3 relative">

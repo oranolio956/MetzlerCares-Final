@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useRef } from 'react';
-import { HeartHandshake, ArrowRight, Wind, ChevronDown, Zap, ShieldCheck, FileText, Lock, ArrowUpRight, Activity, Building2, Users, Sparkles } from 'lucide-react';
+import { HeartHandshake, ArrowRight, Wind, ChevronDown, Activity, Building2, Sparkles, ArrowUpRight } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { SEOHead } from './SEOHead';
 import { useStore } from '../context/StoreContext';
@@ -54,7 +54,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
   }, [isCalmMode]);
 
   return (
-    <div className="w-full" ref={heroRef}>
+    <div className="w-full relative" ref={heroRef}>
       <SEOHead 
          title="SecondWind | Sober Living Funding & Rehab Assistance Colorado" 
          description="Direct-action recovery in Colorado. We pay sober living rent, provide transit for rehab, and fund technology for recovery in Denver and Boulder."
@@ -71,9 +71,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
          }}
       />
 
-      {/* --- HERO FOLD: EDITORIAL LAYOUT --- */}
+      {/* --- HERO FOLD: GRID LAYOUT --- */}
       <section 
-        className="relative min-h-[100dvh] w-full overflow-hidden flex flex-col pt-24 pb-4 md:pb-8"
+        className="relative min-h-[100dvh] w-full overflow-hidden flex flex-col pt-24 md:pt-32 pb-4 md:pb-8"
         aria-label="Introduction"
       >
         {/* Abstract Background Elements */}
@@ -96,68 +96,71 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
             ></div>
         </div>
 
-        <div className="relative z-10 w-full max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 flex-grow flex flex-col justify-center">
+        {/* 12-COLUMN GRID CONTAINER */}
+        <div className="relative z-10 w-full max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
            
-           {/* MASSIVE TYPOGRAPHY LAYER */}
-           <div className="relative w-full mt-12 md:mt-0">
+           {/* LEFT ZONE: MASSIVE TYPOGRAPHY (Cols 1-8) */}
+           <div className="lg:col-span-8 relative flex flex-col justify-center h-full order-2 lg:order-1">
               <div className="flex flex-col items-start leading-[0.85] select-none pointer-events-none mix-blend-darken relative z-10">
-                 <h1 className="font-display font-bold text-[13vw] md:text-[11vw] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.1s' }}>
+                 <h1 className="font-display font-bold text-[13vw] lg:text-[10vw] xl:text-[9vw] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.1s' }}>
                     INVEST IN
                  </h1>
                  <div className="flex items-center gap-4 w-full">
-                    <h1 className="font-display font-bold text-[13vw] md:text-[11vw] text-brand-teal tracking-[-0.04em] animate-slide-up opacity-0 whitespace-nowrap" style={{ animationDelay: '0.2s' }}>
+                    <h1 className="font-display font-bold text-[13vw] lg:text-[10vw] xl:text-[9vw] text-brand-teal tracking-[-0.04em] animate-slide-up opacity-0 whitespace-nowrap" style={{ animationDelay: '0.2s' }}>
                        COLORADO
                     </h1>
                     {/* Desktop Line Decorator */}
-                    <div className="hidden md:block h-[1.5vw] flex-grow bg-brand-navy/5 rounded-full mt-4 animate-slide-up opacity-0 origin-left overflow-hidden relative" style={{ animationDelay: '0.4s', transform: 'scaleX(1)' }}>
+                    <div className="hidden lg:block h-[1.5vw] flex-grow bg-brand-navy/5 rounded-full mt-4 animate-slide-up opacity-0 origin-left overflow-hidden relative" style={{ animationDelay: '0.4s', transform: 'scaleX(1)' }}>
                        <div className="absolute inset-0 bg-brand-navy/10 animate-slide-left" style={{ width: '200%', background: 'linear-gradient(90deg, transparent, rgba(26,42,58,0.2), transparent)' }}></div>
                     </div>
                  </div>
-                 <h1 className="font-display font-bold text-[13vw] md:text-[11vw] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.3s' }}>
+                 <h1 className="font-display font-bold text-[13vw] lg:text-[10vw] xl:text-[9vw] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.3s' }}>
                     RECOVERY<span className="text-brand-coral">.</span>
                  </h1>
               </div>
+           </div>
 
-              {/* MASCOT INTERACTION LAYER (Overlaps Text) */}
+           {/* RIGHT ZONE: INTERACTIVE & MASCOT (Cols 9-12) */}
+           <div className="lg:col-span-4 relative h-full flex flex-col justify-center items-center lg:items-end gap-6 order-1 lg:order-2">
+              
+              {/* MASCOT LAYER */}
               <div 
-                className="absolute right-[-8%] top-[12%] md:right-0 md:top-[8%] w-[50vw] h-[50vw] md:w-[38vw] md:h-[38vw] max-w-[550px] max-h-[550px] z-20 pointer-events-none animate-float"
+                className="relative w-[60vw] h-[60vw] lg:w-[28vw] lg:h-[28vw] max-w-[450px] max-h-[450px] z-20 pointer-events-none animate-float lg:absolute lg:right-[-20%] lg:top-[10%]"
                 style={{ transform: `translateY(${offset * 0.15}px)` }}
               >
                  <Mascot expression="excited" variant="tech" className="w-full h-full drop-shadow-[0_20px_50px_rgba(45,156,142,0.3)]" />
               </div>
 
-              {/* MANIFESTO SNIPPET (Adaptive Positioning) */}
-              <div className="mt-8 md:mt-0 relative md:absolute left-0 md:left-[55%] bottom-auto md:bottom-[15%] z-20 max-w-sm md:max-w-md animate-slide-up opacity-0 w-full" style={{ animationDelay: '0.6s' }}>
-                  <div className="bg-white/70 backdrop-blur-xl p-5 md:p-6 rounded-2xl border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.05)] md:rotate-1 hover:rotate-0 transition-transform duration-500 group mb-4">
+              {/* CARDS STACK */}
+              <div className="flex flex-col gap-4 w-full max-w-sm lg:mt-[300px] relative z-30">
+                  
+                  {/* MANIFESTO CARD */}
+                  <div className="bg-white/70 backdrop-blur-xl p-5 md:p-6 rounded-2xl border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.05)] hover:rotate-1 transition-transform duration-500 group animate-slide-up opacity-0" style={{ animationDelay: '0.6s' }}>
                      <div className="flex items-center gap-2 mb-2 md:mb-3 text-brand-navy/40 font-mono text-[10px] md:text-xs uppercase tracking-widest">
-                        <Wind size={14} className="animate-pulse text-brand-teal" /> The Colorado Recovery Protocol
+                        <Wind size={14} className="animate-pulse text-brand-teal" /> The Protocol
                      </div>
-                     <h2 className="sr-only">Sober Living Funding in Denver</h2>
                      <p className="font-medium text-brand-navy text-base md:text-lg leading-relaxed">
-                        We replaced the bureaucracy with a bridge. <span className="text-brand-teal font-bold bg-brand-teal/10 px-1 rounded group-hover:bg-brand-teal group-hover:text-white transition-colors cursor-default">Direct-to-vendor payments</span> for sober living rent and rehab access across Colorado.
+                        We replaced the bureaucracy with a bridge. <span className="text-brand-teal font-bold bg-brand-teal/10 px-1 rounded cursor-default">Direct-to-vendor payments</span> for rent and rehab.
                      </p>
                   </div>
 
-                  {/* UPGRADED PEER COACHING TEASER */}
+                  {/* PEER COACHING CARD */}
                   <div 
                     onClick={() => onNavigate('peer-coaching')}
-                    className="relative bg-brand-navy text-white p-1 rounded-2xl shadow-xl cursor-pointer transform hover:scale-105 hover:-rotate-1 transition-all group"
+                    className="relative bg-brand-navy text-white p-1 rounded-2xl shadow-xl cursor-pointer transform hover:scale-105 transition-all group animate-slide-up opacity-0"
+                    style={{ animationDelay: '0.7s' }}
                   >
-                     {/* Pop Art Border */}
                      <div className="absolute inset-0 rounded-2xl border-2 border-dashed border-brand-yellow opacity-30 group-hover:opacity-100 transition-opacity"></div>
-                     
                      <div className="bg-brand-navy rounded-xl p-4 flex items-center justify-between relative overflow-hidden">
-                        {/* Shine */}
                         <div className="absolute top-0 right-0 w-20 h-20 bg-brand-teal/30 rounded-full blur-xl -mr-6 -mt-6 animate-pulse"></div>
-                        
                         <div className="flex items-center gap-4 relative z-10">
                            <div className="bg-brand-yellow text-brand-navy p-3 rounded-xl shadow-lg font-bold transform group-hover:rotate-12 transition-transform">
                               <Sparkles size={20} fill="currentColor" />
                            </div>
                            <div>
                               <span className="text-[10px] font-bold uppercase tracking-widest text-brand-yellow mb-0.5 block">New Feature</span>
-                              <span className="font-display font-bold text-lg leading-none block">Free Peer Coaching</span>
-                              <span className="text-xs text-white/60">Unlock with Medicaid</span>
+                              <span className="font-display font-bold text-lg leading-none block">Peer Coaching</span>
+                              <span className="text-xs text-white/60">Free with Medicaid</span>
                            </div>
                         </div>
                         <div className="bg-white/10 p-2 rounded-full group-hover:bg-white group-hover:text-brand-navy transition-colors">
@@ -165,6 +168,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                         </div>
                      </div>
                   </div>
+
               </div>
            </div>
 
@@ -219,7 +223,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
         
       </section>
 
-      {/* --- TRUST SIGNALS (SEO & CREDIBILITY BRIDGE) --- */}
+      {/* --- TRUST SIGNALS --- */}
       <div className="w-full bg-brand-navy/5 py-6 md:py-8 border-y border-brand-navy/5 overflow-hidden">
          <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 flex flex-col md:flex-row items-center gap-4 md:gap-12">
             <div className="text-brand-navy/40 text-xs font-bold uppercase tracking-widest whitespace-nowrap shrink-0">

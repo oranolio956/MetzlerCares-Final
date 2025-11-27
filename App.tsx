@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { IntakeChat } from './components/IntakeChat';
 import { DonationFlow } from './components/DonationFlow';
@@ -148,7 +147,7 @@ const App: React.FC = () => {
           <SectionWrapper
             id="partner"
             title="Partner With Us | Recovery Residence Network"
-            description="Join the SecondWind network. We fill beds with verified leads and pay rent directly via protocol transfer."
+            description="Join the SecondWind network. We fill beds with verified leads and pay the rent directly via protocol transfer."
           >
             <PartnerFlow />
           </SectionWrapper>
@@ -219,244 +218,112 @@ const App: React.FC = () => {
                  <BrandLogo className="w-8 h-8 grayscale brightness-200" />
                  <span className="font-display font-bold text-lg">Menu</span>
               </div>
-              <button 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors"
-              >
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-white/50 hover:text-white transition-colors">
                 <X size={24} />
               </button>
            </div>
            
-           <div className="flex-1 flex flex-col justify-center px-6 md:px-8 space-y-4 md:space-y-8 overflow-y-auto py-4">
-              {[
-                { id: 'intro', label: 'Home' },
-                { id: 'philosophy', label: 'Protocol' },
-                { id: 'donate', label: 'Invest' },
-                { id: 'apply', label: 'Intake' },
-                { id: 'peer-coaching', label: 'Peer Coaching' },
-                { id: 'ledger', label: 'Ledger' },
-                { id: 'partner', label: 'Partners' }
-              ].map((item, idx) => (
-                <button
-                  key={item.id}
-                  onClick={() => { playClick(); navigate(item.id); }}
-                  className="text-left font-display font-bold text-3xl md:text-5xl flex items-center justify-between group py-1"
-                  style={{ transitionDelay: `${idx * 50}ms` }}
-                >
-                  <span className={`transition-colors ${activeSection === item.id ? 'text-brand-teal' : 'text-white group-hover:text-brand-teal/80'}`}>{item.label}</span>
-                  <ArrowRight className={`opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-brand-teal hidden md:block`} size={32} />
-                </button>
-              ))}
-              <button
-                onClick={() => { playClick(); setIsMobileMenuOpen(false); setIsLoginOpen(true); }}
-                className="text-left font-display font-bold text-3xl md:text-5xl flex items-center justify-between group text-brand-coral py-1"
-              >
-                <span>Login</span>
-                <LogIn size={28} className="md:w-8 md:h-8" />
+           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+              <button onClick={() => { navigate('intro'); setIsMobileMenuOpen(false); }} className="flex items-center gap-4 p-4 text-2xl font-display font-bold text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                  <Activity size={24} /> Home
+              </button>
+              <button onClick={() => { navigate('apply'); setIsMobileMenuOpen(false); }} className="flex items-center gap-4 p-4 text-2xl font-display font-bold text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                  <HeartHandshake size={24} /> Get Help
+              </button>
+              <button onClick={() => { navigate('donate'); setIsMobileMenuOpen(false); }} className="flex items-center gap-4 p-4 text-2xl font-display font-bold text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                  <TrendingUp size={24} /> Invest
+              </button>
+              <button onClick={() => { navigate('philosophy'); setIsMobileMenuOpen(false); }} className="flex items-center gap-4 p-4 text-2xl font-display font-bold text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                  <Globe size={24} /> Protocol
+              </button>
+              <button onClick={() => { navigate('peer-coaching'); setIsMobileMenuOpen(false); }} className="flex items-center gap-4 p-4 text-2xl font-display font-bold text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                  <Zap size={24} /> Peer Coaching
+              </button>
+              <button onClick={() => { navigate('partner'); setIsMobileMenuOpen(false); }} className="flex items-center gap-4 p-4 text-2xl font-display font-bold text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                  <UserCircle size={24} /> Partner
+              </button>
+              <button onClick={() => { navigate('ledger'); setIsMobileMenuOpen(false); }} className="flex items-center gap-4 p-4 text-2xl font-display font-bold text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all">
+                  <Activity size={24} /> Ledger
               </button>
            </div>
 
-           <div className="p-6 md:p-8 border-t border-white/10 bg-brand-navy/50 backdrop-blur-sm shrink-0">
-              <div className="flex gap-4 mb-6 md:mb-8">
-                  <button 
-                    onClick={() => { playClick(); toggleSound(); }} 
-                    className="flex-1 py-3 md:py-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center gap-2 font-bold text-xs md:text-sm hover:bg-white/10 transition-colors"
-                  >
-                      {isSoundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-                      {isSoundEnabled ? 'Sound On' : 'Sound Off'}
-                  </button>
-                  <button 
-                    onClick={() => { playClick(); toggleCalmMode(); }} 
-                    className="flex-1 py-3 md:py-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center gap-2 font-bold text-xs md:text-sm hover:bg-white/10 transition-colors"
-                  >
-                      {isCalmMode ? <EyeOff size={16} /> : <Eye size={16} />}
-                      {isCalmMode ? 'Calm Mode' : 'Standard'}
-                  </button>
-              </div>
-              <div className="flex justify-between items-center opacity-40 text-[10px] md:text-xs font-bold uppercase tracking-widest">
-                 <span>© 2024 MetzlerFoundations</span>
-                 <div className="flex gap-4">
-                    <Twitter size={14} />
-                    <Instagram size={14} />
-                 </div>
-              </div>
+           <div className="p-4 border-t border-white/10 shrink-0">
+              {userType ? (
+                <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="w-full bg-white/10 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2">
+                  <LogOut size={20} /> Sign Out
+                </button>
+              ) : (
+                <button onClick={() => { setIsLoginOpen(true); setIsMobileMenuOpen(false); }} className="w-full bg-brand-teal text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2">
+                  <LogIn size={20} /> Member Login
+                </button>
+              )}
            </div>
         </div>
 
-        {/* GLOBAL BACKGROUND BLOBS */}
-        <div 
-            className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
-            aria-hidden="true"
-        >
-            <div className="absolute top-[-10%] left-[-20%] md:left-[10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] bg-brand-teal opacity-[0.05] rounded-full filter blur-[60px] md:blur-[100px] animate-blob mix-blend-multiply"></div>
-            <div className="absolute bottom-[-10%] right-[-20%] md:right-[10%] w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-brand-coral opacity-[0.05] rounded-full filter blur-[60px] md:blur-[100px] animate-blob mix-blend-multiply" style={{animationDelay: '2s'}}></div>
-        </div>
+        {/* HEADER */}
+        <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-brand-navy/90 backdrop-blur-md py-3 shadow-lg' : 'bg-transparent py-4 md:py-6'}`}>
+           <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 flex items-center justify-between">
+              
+              <div className="flex items-center gap-2 cursor-pointer group" onClick={() => navigate('intro')}>
+                 <BrandLogo className={`w-8 h-8 md:w-10 md:h-10 transition-transform group-hover:rotate-12 ${isCalmMode || scrolled ? 'brightness-100' : 'brightness-0 md:brightness-100'}`} />
+                 <span className={`font-display font-bold text-xl tracking-tight ${isCalmMode || scrolled ? 'text-white' : 'text-brand-navy md:text-brand-navy opacity-0 md:opacity-100'}`}>SecondWind</span>
+              </div>
 
-        <Confetti />
-        <NotificationSystem />
+              {/* Desktop Nav */}
+              <nav className="hidden lg:flex items-center gap-1 bg-white/80 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-sm">
+                 {[
+                   { id: 'intro', label: 'Home' },
+                   { id: 'philosophy', label: 'Protocol' },
+                   { id: 'donate', label: 'Invest' },
+                   { id: 'apply', label: 'Get Help' },
+                   { id: 'ledger', label: 'Ledger' }
+                 ].map((link) => (
+                    <button 
+                      key={link.id}
+                      onClick={() => navigate(link.id)}
+                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeSection === link.id ? 'bg-brand-navy text-white shadow-md' : 'text-brand-navy/60 hover:text-brand-navy hover:bg-brand-navy/5'}`}
+                    >
+                      {link.label}
+                    </button>
+                 ))}
+              </nav>
 
-        {/* --- RE-DESIGNED HEADER --- */}
-        <header className={`fixed top-0 left-0 right-0 z-50 flex justify-center transition-all duration-300 ${scrolled ? 'py-2 px-2 md:py-3 md:px-4' : 'py-4 px-4 md:py-6'} pointer-events-none`}>
-            <div className={`
-              w-full max-w-[1800px]
-              ${scrolled ? 'bg-white/90 shadow-[0_8px_32px_rgba(0,0,0,0.05)] border-white/40' : 'bg-transparent border-transparent'}
-              backdrop-blur-xl border
-              rounded-2xl
-              flex items-center justify-between
-              pl-4 pr-3 py-2.5 md:px-6 md:py-4
-              pointer-events-auto
-              transition-all duration-500
-            `}>
-                {/* Identity */}
-                <div 
-                  onClick={() => { playClick(); navigate('intro'); }}
-                  className="flex items-center gap-2.5 md:gap-3 cursor-pointer group select-none shrink-0"
-                >
-                   <div className="relative transition-transform duration-500 group-hover:-translate-y-0.5">
-                      <BrandLogo className="w-8 h-8 md:w-10 md:h-10" />
-                      <div className="absolute inset-0 bg-brand-teal rounded-full blur-md opacity-0 group-hover:opacity-40 transition-opacity"></div>
-                   </div>
-                   <div className="flex flex-col">
-                      <h1 className="font-display font-bold text-lg md:text-2xl leading-none tracking-tight text-brand-navy">SecondWind</h1>
-                      <span className={`text-[10px] md:text-xs font-bold uppercase tracking-widest transition-colors ${scrolled ? 'text-brand-navy/40' : 'text-brand-navy/60'}`}>Protocol</span>
-                   </div>
-                </div>
+              {/* Controls */}
+              <div className="flex items-center gap-3">
+                 <button onClick={toggleSound} className={`p-2.5 rounded-full transition-colors hidden sm:flex ${scrolled ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-brand-navy/40 hover:text-brand-navy hover:bg-brand-navy/5'}`}>
+                    {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                 </button>
+                 <button onClick={toggleCalmMode} className={`p-2.5 rounded-full transition-colors hidden sm:flex ${scrolled ? 'text-white/60 hover:text-white hover:bg-white/10' : 'text-brand-navy/40 hover:text-brand-navy hover:bg-brand-navy/5'}`}>
+                    {isCalmMode ? <EyeOff size={20} /> : <Eye size={20} />}
+                 </button>
+                 
+                 {userType ? (
+                    <button onClick={() => navigate(userType === 'donor' ? 'donor-portal' : 'portal')} className="hidden sm:flex items-center gap-2 px-4 py-2 bg-brand-navy text-white rounded-full font-bold text-sm hover:bg-brand-teal transition-colors shadow-lg">
+                       <UserCircle size={18} />
+                       <span>Dashboard</span>
+                    </button>
+                 ) : (
+                    <button onClick={() => setIsLoginOpen(true)} className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-colors border-2 ${scrolled ? 'border-white/20 text-white hover:bg-white hover:text-brand-navy' : 'border-brand-navy/10 text-brand-navy hover:border-brand-navy'}`}>
+                       <LogIn size={16} />
+                       <span>Login</span>
+                    </button>
+                 )}
 
-                {/* Actions */}
-                <div className="flex items-center gap-1.5 md:gap-3">
-                   {userType ? (
-                     <div className="flex items-center gap-1 md:gap-2">
-                        {/* Mobile Dashboard Icon Only */}
-                        <button 
-                          onClick={() => { playClick(); navigate(userType === 'donor' ? 'donor-portal' : 'portal'); }}
-                          className="md:hidden p-2 rounded-full hover:bg-brand-navy/5 text-brand-navy transition-colors"
-                          aria-label="Dashboard"
-                        >
-                          <UserCircle size={22} />
-                        </button>
+                 <button onClick={() => setIsMobileMenuOpen(true)} className={`lg:hidden p-2 rounded-full ${scrolled ? 'text-white' : 'text-brand-navy'}`}>
+                    <Menu size={24} />
+                 </button>
+              </div>
 
-                        <button 
-                          onClick={() => { playClick(); navigate(userType === 'donor' ? 'donor-portal' : 'portal'); }}
-                          className="hidden md:flex items-center gap-2 px-4 py-2 bg-brand-navy/5 hover:bg-brand-navy/10 rounded-full text-sm font-bold text-brand-navy transition-colors"
-                        >
-                          <UserCircle size={18} />
-                          <span>Dashboard</span>
-                        </button>
-                        <button 
-                          onClick={() => { playClick(); logout(); navigate('intro'); }}
-                          className="p-2 md:p-3 rounded-full hover:bg-brand-coral/10 text-brand-navy/40 hover:text-brand-coral transition-colors"
-                          title="Logout"
-                        >
-                          <LogOut size={20} />
-                        </button>
-                     </div>
-                   ) : (
-                     <>
-                        {/* Mobile Login Icon Only */}
-                        <button 
-                           onClick={() => { playClick(); setIsLoginOpen(true); }}
-                           className="md:hidden p-2 rounded-full hover:bg-brand-navy/5 text-brand-navy transition-colors"
-                           aria-label="Login"
-                        >
-                           <LogIn size={22} />
-                        </button>
-
-                        <button 
-                           onClick={() => { playClick(); setIsLoginOpen(true); }}
-                           className="hidden md:flex items-center gap-2 px-5 py-2.5 bg-brand-navy text-white rounded-full text-sm font-bold hover:bg-brand-teal transition-all shadow-md active:scale-95"
-                        >
-                           <LogIn size={16} />
-                           <span>Login</span>
-                        </button>
-                     </>
-                   )}
-                   
-                   <div className="h-6 w-px bg-brand-navy/10 mx-0.5 md:hidden"></div>
-
-                   <button 
-                     onClick={() => setIsMobileMenuOpen(true)}
-                     className="p-2 rounded-full hover:bg-brand-navy/5 transition-colors relative group"
-                     aria-label="Menu"
-                   >
-                     <Menu size={24} className="text-brand-navy" />
-                   </button>
-                </div>
-            </div>
+           </div>
         </header>
 
         {/* MAIN CONTENT AREA */}
-        <main id="main-content" className={`flex-grow relative z-10 transition-all duration-500 ${isLoginOpen ? 'blur-sm scale-95 opacity-50' : 'scale-100 opacity-100'}`}>
-            {renderContent()}
+        <main className="flex-grow flex flex-col relative z-0">
+           {renderContent()}
         </main>
-        
-        {/* FOOTER - Updated Aesthetic */}
-        <footer className="relative z-10 bg-brand-navy text-white pt-24 pb-12 overflow-hidden rounded-t-[3rem] mt-0">
-            <div className="absolute top-0 left-0 w-full h-px bg-white/10"></div>
-            <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] bg-brand-teal/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-            <div className="w-full max-w-[1600px] mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-12 gap-12 relative z-10">
-               
-               <div className="md:col-span-4 flex flex-col items-start">
-                  <div className="flex items-center gap-3 mb-8">
-                    <BrandLogo className="w-12 h-12" />
-                    <span className="font-display font-bold text-3xl tracking-tight">SecondWind</span>
-                  </div>
-                  <p className="text-brand-lavender max-w-sm text-lg leading-relaxed mb-8 font-medium">
-                     Rebuilding the safety net with direct-to-vendor payments and radical transparency.
-                  </p>
-                  
-                  {/* LIVE IMPACT COUNTER */}
-                  <div className="mb-8 p-6 bg-white/5 border border-white/10 rounded-2xl inline-flex flex-col gap-2">
-                      <span className="text-xs font-bold uppercase tracking-widest text-brand-teal flex items-center gap-2"><Zap size={12} className="fill-brand-teal" /> Total Capital Deployed</span>
-                      <span className="text-3xl font-mono font-bold tracking-tight text-white">$1,240,402.00</span>
-                  </div>
-               </div>
-
-               {/* SEO POWERHOUSE FOOTER SECTION */}
-               <div className="md:col-span-2">
-                  <h4 className="font-bold text-white mb-8 uppercase tracking-widest text-xs opacity-50 flex items-center gap-2"><MapPin size={12} /> Service Areas</h4>
-                  <ul className="space-y-4 text-brand-lavender/60 text-sm">
-                     <li><a href="#" className="hover:text-brand-teal transition-colors">Denver Sober Living</a></li>
-                     <li><a href="#" className="hover:text-brand-teal transition-colors">Boulder Rehab Support</a></li>
-                     <li><a href="#" className="hover:text-brand-teal transition-colors">Colorado Springs Recovery</a></li>
-                     <li><a href="#" className="hover:text-brand-teal transition-colors">Fort Collins Oxford Houses</a></li>
-                     <li><a href="#" className="hover:text-brand-teal transition-colors">Aurora Addiction Help</a></li>
-                  </ul>
-               </div>
-
-               <div className="md:col-span-2">
-                  <h4 className="font-bold text-white mb-8 uppercase tracking-widest text-xs opacity-50">Platform</h4>
-                  <ul className="space-y-6 text-brand-lavender/80 font-medium">
-                     <li><button onClick={() => navigate('intro')} className="hover:text-brand-teal transition-colors">Home</button></li>
-                     <li><button onClick={() => navigate('donate')} className="hover:text-brand-teal transition-colors">Invest</button></li>
-                     <li><button onClick={() => navigate('apply')} className="hover:text-brand-teal transition-colors">Intake</button></li>
-                     <li><button onClick={() => navigate('peer-coaching')} className="hover:text-brand-teal transition-colors">Peer Coaching</button></li>
-                     <li><button onClick={() => navigate('ledger')} className="hover:text-brand-teal transition-colors">Live Ledger</button></li>
-                     <li><button onClick={() => navigate('partner')} className="hover:text-brand-teal transition-colors font-bold text-brand-teal">Partner With Us</button></li>
-                  </ul>
-               </div>
-
-               <div className="md:col-span-4">
-                  <div className="bg-[#233549] p-8 rounded-3xl">
-                     <h4 className="font-bold text-white mb-3 text-xl">Transparency Report</h4>
-                     <p className="text-brand-lavender text-sm mb-6 leading-relaxed">Subscribe to our monthly impact audits. We send the raw data, not marketing fluff.</p>
-                     <div className="flex gap-2">
-                        <input type="email" placeholder="Email Address" className="bg-black/20 border-none rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 flex-1 outline-none focus:ring-2 focus:ring-brand-teal" />
-                        <button className="bg-brand-teal text-white p-3 rounded-xl hover:bg-brand-teal/80 transition-colors"><ArrowRight size={18} /></button>
-                     </div>
-                  </div>
-               </div>
-
-            </div>
-            <div className="w-full max-w-[1600px] mx-auto px-6 md:px-12 mt-24 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/30 font-bold uppercase tracking-widest">
-               <span>© 2024 MetzlerFoundations, Inc.</span>
-               <div className="flex gap-8">
-                  <a href="#" className="hover:text-white transition-colors">Privacy</a>
-                  <a href="#" className="hover:text-white transition-colors">Terms</a>
-                  <a href="#" className="hover:text-white transition-colors">Sitemap</a>
-               </div>
-            </div>
-        </footer>
+        <NotificationSystem />
+        <Confetti />
 
       </div>
     </ErrorBoundary>
