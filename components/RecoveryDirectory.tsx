@@ -26,6 +26,10 @@ const REGIONS = [
 ];
 
 export const RecoveryDirectory: React.FC = () => {
+  const scrollToPartners = () => {
+      document.getElementById('partner-directory')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section className="w-full bg-[#152232] border-t border-brand-navy/20 py-16 lg:py-24" aria-label="Colorado Recovery Directory">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
@@ -46,13 +50,13 @@ export const RecoveryDirectory: React.FC = () => {
                 </div>
                 
                 {/* Cities List - Semantic List for SEO */}
-                <div className="bg-brand-navy/40 p-6 rounded-2xl border border-white/5">
+                <div className="bg-brand-navy/40 p-6 rounded-2xl border border-white/5 group hover:border-brand-teal/30 transition-colors">
                    <h3 className="text-white font-bold mb-4 flex items-center gap-2">
                       <Navigation size={16} className="text-brand-coral" /> Service Areas
                    </h3>
                    <ul className="space-y-2">
                       {region.areas.map(area => (
-                        <li key={area} className="text-brand-lavender/60 text-sm hover:text-white transition-colors cursor-default flex items-center gap-2">
+                        <li key={area} onClick={scrollToPartners} className="text-brand-lavender/60 text-sm hover:text-white transition-colors cursor-pointer flex items-center gap-2">
                            <span className="w-1 h-1 bg-brand-teal rounded-full"></span>
                            {area} Sober Living
                         </li>
@@ -84,7 +88,7 @@ export const RecoveryDirectory: React.FC = () => {
                  <span className="text-brand-lavender/40 text-xs font-bold uppercase tracking-widest block mb-2">Protocol Stats</span>
                  <p className="text-white/80 text-sm max-w-xl">
                     SecondWind is a 501(c)(3) non-profit organization complying with all Colorado BHA (Behavioral Health Administration) standards for recovery residences. 
-                    We function as a financial bridge for indigent applicants seeking entry into <a href="#partner" className="text-brand-teal hover:underline">Oxford House™</a> and CARR (Colorado Association of Recovery Residences) certified homes.
+                    We function as a financial bridge for indigent applicants seeking entry into <a href="#partner-directory" className="text-brand-teal hover:underline">Oxford House™</a> and CARR (Colorado Association of Recovery Residences) certified homes.
                  </p>
               </div>
               <a href="#apply" className="flex items-center gap-2 text-brand-teal font-bold text-sm hover:text-white transition-colors">

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, Building2, MapPin, ShieldCheck, Activity, Search, X, Phone, Globe, Users, Wifi, Coffee, Bus, Ban, ArrowRight, HeartHandshake, BedDouble, FileCheck } from 'lucide-react';
+import { CheckCircle2, Building2, MapPin, ShieldCheck, Activity, Search, X, Phone, Globe, Users, Wifi, Coffee, Bus, Ban, ArrowRight, HeartHandshake, BedDouble, FileCheck, Share2, Copy, ExternalLink, Clock } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { useSound } from '../hooks/useSound';
 
@@ -233,8 +233,25 @@ const PARTNERS: Partner[] = [
 ];
 
 const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ partner, onClose }) => {
-    const { playClick } = useSound();
+    const { playClick, playSuccess } = useSound();
+    const { beneficiaryProfile, addNotification } = useStore();
+    const [copied, setCopied] = useState(false);
     
+    // Check if current user has an active application for this facility
+    const activeApplication = beneficiaryProfile?.requests.find(r => 
+        r.details?.toLowerCase().includes(partner.name.toLowerCase()) || 
+        r.type.toLowerCase().includes(partner.name.toLowerCase())
+    );
+
+    const handleShare = () => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('facility', partner.id);
+        navigator.clipboard.writeText(url.toString());
+        setCopied(true);
+        playSuccess();
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     // Close on escape
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => { if(e.key === 'Escape') onClose(); };
@@ -244,17 +261,23 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-brand-navy/80 backdrop-blur-sm" onClick={onClose} aria-hidden="true"></div>
+            <div className="absolute inset-0 bg-brand-navy/80 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} aria-hidden="true"></div>
             
-            <div className="relative w-full max-w-3xl bg-[#FDFBF7] rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
+            <div className="relative w-full max-w-3xl bg-[#FDFBF7] rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90dvh] flex flex-col">
                 
                 {/* Header Image Area */}
                 <div className="h-40 bg-brand-navy relative shrink-0">
                     <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
                     <div className="absolute inset-0 bg-gradient-to-t from-[#FDFBF7] to-transparent"></div>
-                    <button onClick={onClose} className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors backdrop-blur-md">
-                        <X size={24} />
-                    </button>
+                    
+                    <div className="absolute top-4 right-4 flex gap-2">
+                        <button onClick={handleShare} className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors backdrop-blur-md" title="Copy Link">
+                            {copied ? <CheckCircle2 size={24} className="text-brand-teal" /> : <Share2 size={24} />}
+                        </button>
+                        <button onClick={onClose} className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full transition-colors backdrop-blur-md">
+                            <X size={24} />
+                        </button>
+                    </div>
                     
                     <div className="absolute -bottom-8 left-8 flex items-end">
                         <div className="w-24 h-24 bg-white rounded-2xl p-4 shadow-lg flex items-center justify-center text-brand-navy border-4 border-[#FDFBF7]">
@@ -263,7 +286,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                     </div>
                 </div>
 
-                <div className="px-8 pt-12 pb-8 overflow-y-auto custom-scrollbar">
+                <div className="px-8 pt-12 pb-8 overflow-y-auto custom-scrollbar flex-1">
                     
                     <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
                         <div>
@@ -286,16 +309,26 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                         </div>
                         
                         <div className="flex gap-2 w-full md:w-auto">
-                            <a href="#apply" onClick={onClose} className="flex-1 md:flex-none bg-brand-teal text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-navy transition-colors shadow-lg flex items-center justify-center gap-2">
-                                <HeartHandshake size={18} /> Apply for Funding
-                            </a>
+                            {activeApplication ? (
+                                <div className="flex-1 md:flex-none bg-brand-navy/5 text-brand-navy px-6 py-3 rounded-xl font-bold flex flex-col items-center justify-center border border-brand-navy/10 min-w-[160px]">
+                                    <span className="text-[10px] uppercase tracking-widest text-brand-navy/50">Application Status</span>
+                                    <span className={`text-sm flex items-center gap-2 ${activeApplication.status === 'funded' ? 'text-brand-teal' : 'text-brand-yellow'}`}>
+                                        {activeApplication.status === 'funded' ? <CheckCircle2 size={16} /> : <Clock size={16} />}
+                                        {activeApplication.status === 'funded' ? 'Approved & Paid' : 'In Review'}
+                                    </span>
+                                </div>
+                            ) : (
+                                <a href="#apply" onClick={onClose} className="flex-1 md:flex-none bg-brand-teal text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-navy transition-colors shadow-lg flex items-center justify-center gap-2">
+                                    <HeartHandshake size={18} /> Apply for Funding
+                                </a>
+                            )}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Main Content */}
                         <div className="md:col-span-2 space-y-8">
-                            <div className="prose prose-sm text-brand-navy/80 leading-relaxed">
+                            <div className="prose prose-sm text-brand-navy/80 leading-relaxed bg-white p-6 rounded-2xl border border-brand-navy/5 shadow-sm">
                                 <p className="text-lg">{partner.details.description}</p>
                             </div>
 
@@ -337,19 +370,19 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                             </div>
 
                             <div className="space-y-3">
-                                <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy">
-                                    <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center"><Phone size={14} /></div>
+                                <a href={`tel:${partner.details.phone}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy group">
+                                    <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center group-hover:bg-brand-teal group-hover:text-white transition-colors"><Phone size={14} /></div>
                                     <div className="text-sm font-bold">{partner.details.phone}</div>
-                                </div>
+                                </a>
                                 <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy">
                                     <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center"><Users size={14} /></div>
                                     <div className="text-sm font-bold">Capacity: {partner.details.capacity}</div>
                                 </div>
                                 {partner.details.website && (
-                                    <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy">
-                                        <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center"><Globe size={14} /></div>
+                                    <a href={partner.details.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-navy/5 transition-colors text-brand-navy group">
+                                        <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center group-hover:bg-brand-teal group-hover:text-white transition-colors"><ExternalLink size={14} /></div>
                                         <div className="text-sm font-bold underline">Visit Website</div>
-                                    </div>
+                                    </a>
                                 )}
                             </div>
                         </div>
@@ -365,6 +398,54 @@ export const PartnerDirectory: React.FC = () => {
   const [filter, setFilter] = useState('');
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const { playClick } = useSound();
+
+  // DEEP LINKING LOGIC
+  useEffect(() => {
+    // 1. Check URL on mount
+    const params = new URLSearchParams(window.location.search);
+    const facilityId = params.get('facility');
+    if (facilityId) {
+        const p = PARTNERS.find(x => x.id === facilityId);
+        if(p) {
+            setSelectedPartner(p);
+            // Optional: Scroll to directory if deep linked
+            setTimeout(() => {
+                document.getElementById('partner-directory')?.scrollIntoView({ behavior: 'smooth' });
+            }, 500);
+        }
+    }
+    
+    // 2. Handle browser back/forward buttons
+    const handlePopState = () => {
+        const newParams = new URLSearchParams(window.location.search);
+        const newId = newParams.get('facility');
+        if (newId) {
+             const p = PARTNERS.find(x => x.id === newId);
+             if (p) setSelectedPartner(p);
+        } else {
+             setSelectedPartner(null);
+        }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const openPartner = (p: Partner) => {
+    playClick();
+    setSelectedPartner(p);
+    // Update URL without reload
+    const url = new URL(window.location.href);
+    url.searchParams.set('facility', p.id);
+    window.history.pushState({}, '', url);
+  };
+
+  const closePartner = () => {
+    setSelectedPartner(null);
+    // Clean URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('facility');
+    window.history.pushState({}, '', url);
+  };
 
   const filteredPartners = PARTNERS.filter(p => 
     p.name.toLowerCase().includes(filter.toLowerCase()) || 
@@ -404,7 +485,7 @@ export const PartnerDirectory: React.FC = () => {
              {filteredPartners.map((partner) => (
                <button 
                   key={partner.id}
-                  onClick={() => { playClick(); setSelectedPartner(partner); }}
+                  onClick={() => openPartner(partner)}
                   className="bg-white border border-brand-navy/5 rounded-xl p-6 hover:shadow-lg hover:border-brand-teal/30 transition-all group text-left relative overflow-hidden"
                   itemScope 
                   itemType="https://schema.org/Place"
@@ -459,7 +540,7 @@ export const PartnerDirectory: React.FC = () => {
 
       {/* MODAL */}
       {selectedPartner && (
-        <FacilityModal partner={selectedPartner} onClose={() => setSelectedPartner(null)} />
+        <FacilityModal partner={selectedPartner} onClose={closePartner} />
       )}
     </>
   );
