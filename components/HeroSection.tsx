@@ -1,5 +1,6 @@
+
 import React, { useEffect, useRef } from 'react';
-import { HeartHandshake, ArrowRight, ChevronDown, Activity, Building2, ArrowUpRight, ShieldCheck, Clock, Zap } from 'lucide-react';
+import { HeartHandshake, ArrowRight, ChevronDown, Activity, Building2, ArrowUpRight, ShieldCheck, Clock, Zap, Star, Crown } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { SEOHead } from './SEOHead';
 import { useStore } from '../context/StoreContext';
@@ -113,7 +114,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                {/* 
                   LEFT COLUMN: TYPOGRAPHY (7 Columns)
                */}
-               <div className="lg:col-span-7 flex flex-col justify-center items-start leading-[0.85] select-none order-1">
+               <div className="lg:col-span-7 flex flex-col justify-center items-start leading-[0.85] select-none order-1 lg:order-1">
                    <h1 className="font-display font-bold text-[13vw] lg:text-[7.5vw] xl:text-[8vw] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.1s' }}>
                       INVEST IN
                    </h1>
@@ -135,7 +136,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                       The protocol for direct-action aid. We replace bureaucracy with instant, verified funding for sober living rent and rehab access in Denver & Boulder.
                    </p>
 
-                   {/* Mobile Only HUD (Moved here for flow) */}
+                   {/* Mobile Only HUD */}
                    <div className="lg:hidden w-full mt-8 animate-slide-up opacity-0" style={{ animationDelay: '0.5s' }}>
                       <div className="flex gap-3">
                         <button 
@@ -157,30 +158,23 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                {/* 
                   RIGHT COLUMN: VISUAL COMPOSITION (5 Columns)
                */}
-               <div className="lg:col-span-5 relative flex flex-col items-center lg:items-end justify-center order-2 mt-8 lg:mt-0 lg:mb-12">
+               <div className="lg:col-span-5 relative flex flex-col items-center lg:items-end justify-center order-2 lg:order-2 mt-8 lg:mt-0 lg:mb-12">
                   
                   {/* Visual Cluster Container */}
                   <div className="relative w-full max-w-md lg:max-w-full flex flex-col items-center lg:items-end">
                       
                       {/* Mascot - Anchored */}
-                      <div className="relative w-[60vw] h-[60vw] max-w-[300px] max-h-[300px] lg:w-[500px] lg:h-[500px] lg:max-w-none lg:max-h-none animate-float z-10 lg:-mr-12">
-                         <Mascot expression="excited" variant="tech" className="w-full h-full drop-shadow-2xl" reactToScroll={true} />
+                      <div className="relative w-[60vw] h-[60vw] max-w-[300px] max-h-[300px] lg:w-[400px] lg:h-[400px] animate-float z-0 lg:mr-24 opacity-60">
+                         <Mascot expression="excited" variant="tech" className="w-full h-full drop-shadow-xl grayscale opacity-50" reactToScroll={true} />
                       </div>
 
-                      {/* SYSTEM STATUS BOARD - Scarcity vs Access */}
-                      <div className="flex flex-col gap-3 w-full max-w-sm relative z-20 -mt-12 lg:-mt-32 lg:mr-8 transition-transform duration-300">
+                      {/* SYSTEM STATUS BOARD */}
+                      <div className="flex flex-col items-end gap-6 w-full max-w-sm relative z-20 -mt-24 lg:-mt-48 transition-transform duration-300">
                           
-                          {/* STATUS HEADER */}
-                          <div className="bg-brand-navy text-white px-4 py-3 rounded-t-xl flex items-center justify-between text-xs font-bold uppercase tracking-widest shadow-lg animate-slide-up opacity-0 border-b border-white/10" style={{ animationDelay: '0.55s' }}>
-                              <span>Network Status</span>
-                              <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-brand-teal animate-pulse"></div> Online</div>
-                          </div>
-
-                          {/* RENT GRANT (Waitlist) */}
-                          <div className="bg-white/95 backdrop-blur-xl p-4 rounded-b-none rounded-xl border border-brand-navy/10 shadow-lg flex items-center justify-between animate-slide-up opacity-0 relative overflow-hidden" style={{ animationDelay: '0.6s' }}>
-                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-yellow"></div>
-                             <div className="flex items-center gap-3 pl-2">
-                                <div className="p-2 bg-brand-yellow/10 rounded-lg text-brand-yellow shrink-0"><Clock size={18} /></div>
+                          {/* 1. Small Rent Grant Status (Background) */}
+                          <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-brand-navy/10 shadow-lg flex items-center justify-between animate-slide-up opacity-0 w-[90%] self-end mr-4" style={{ animationDelay: '0.6s' }}>
+                             <div className="flex items-center gap-3">
+                                <div className="p-2 bg-brand-yellow/10 rounded-lg text-brand-yellow shrink-0"><Clock size={16} /></div>
                                 <div>
                                     <div className="font-bold text-brand-navy text-sm">Rent Grants</div>
                                     <div className="text-[10px] text-brand-navy/50 font-bold uppercase tracking-wider">High Demand</div>
@@ -189,25 +183,43 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                              <span className="px-2 py-1 bg-brand-yellow/10 text-brand-yellow rounded text-[10px] font-bold uppercase tracking-wide border border-brand-yellow/20">Waitlist</span>
                           </div>
 
-                          {/* PEER COACHING (Instant) */}
+                          {/* 2. THE GOLDEN TICKET: PEER COACHING (Featured) */}
                           <div 
                             onClick={() => onNavigate('peer-coaching')}
-                            className="bg-brand-teal text-white p-4 rounded-xl shadow-xl flex items-center justify-between cursor-pointer transform hover:scale-105 transition-all duration-300 ring-4 ring-white/20 animate-slide-up opacity-0 relative overflow-hidden group" 
+                            className="w-full relative group cursor-pointer animate-slide-up opacity-0 transform hover:scale-[1.02] transition-all duration-300"
                             style={{ animationDelay: '0.7s' }}
                           >
-                             {/* Shine Effect */}
-                             <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                             {/* Pulsing Ring */}
+                             <div className="absolute -inset-1 bg-gradient-to-r from-brand-teal via-brand-yellow to-brand-teal rounded-2xl opacity-75 blur group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-text-shimmer bg-[length:200%_auto]"></div>
                              
-                             <div className="flex items-center gap-3 relative z-10">
-                                <div className="p-2 bg-white/20 rounded-lg text-white shrink-0"><Zap size={18} fill="currentColor" /></div>
+                             {/* Card Body */}
+                             <div className="relative bg-[#1A2A3A] text-white p-6 rounded-xl flex flex-col gap-4 overflow-hidden border border-white/10 shadow-2xl">
+                                
+                                {/* Background Shine */}
+                                <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+
+                                <div className="flex justify-between items-start">
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-brand-yellow text-brand-navy rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg">
+                                        <Crown size={12} fill="currentColor" /> Premium Access
+                                    </div>
+                                    <div className="w-2 h-2 rounded-full bg-brand-teal animate-pulse shadow-[0_0_10px_#2D9C8E]"></div>
+                                </div>
+
                                 <div>
-                                    <div className="font-bold text-white text-sm">Peer Coaching</div>
-                                    <div className="text-[10px] text-white/80 font-bold uppercase tracking-wider">Medicaid Unlocks</div>
+                                    <h3 className="font-display font-bold text-2xl text-white mb-1">Peer Coaching</h3>
+                                    <p className="text-sm text-brand-lavender font-medium">Instant Medicaid Approval. Skip the waitlist.</p>
+                                </div>
+
+                                <div className="mt-2 pt-4 border-t border-white/10 flex justify-between items-center">
+                                    <div className="flex -space-x-2">
+                                        <div className="w-8 h-8 rounded-full border-2 border-[#1A2A3A] bg-brand-teal flex items-center justify-center text-[10px] font-bold">You</div>
+                                        <div className="w-8 h-8 rounded-full border-2 border-[#1A2A3A] bg-white flex items-center justify-center text-[10px] font-bold text-brand-navy">Coach</div>
+                                    </div>
+                                    <button className="bg-brand-teal text-white px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 group-hover:bg-white group-hover:text-brand-navy transition-colors shadow-lg">
+                                        Unlock Now <ArrowRight size={14} />
+                                    </button>
                                 </div>
                              </div>
-                             <span className="px-3 py-1.5 bg-white text-brand-teal rounded text-xs font-bold flex items-center gap-1 shadow-sm group-hover:bg-brand-navy group-hover:text-white transition-colors relative z-10">
-                                Instant <ArrowRight size={10} />
-                             </span>
                           </div>
 
                       </div>

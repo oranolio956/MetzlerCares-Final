@@ -22,6 +22,7 @@ import { PartnerDirectory } from './components/PartnerDirectory';
 import { ImpactTicker } from './components/ImpactTicker';
 import { HyperLocalMap } from './components/HyperLocalMap';
 import { MedicaidPromo } from './components/MedicaidPromo';
+import { RecoveryKnowledgeGraph } from './components/RecoveryKnowledgeGraph';
 import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
@@ -272,7 +273,8 @@ const App: React.FC = () => {
            {renderContent()}
         </main>
 
-        {/* SEO COMPONENTS */}
+        {/* SEO & KNOWLEDGE COMPONENTS */}
+        <RecoveryKnowledgeGraph />
         <RecoveryDirectory />
         <PartnerDirectory />
         <HyperLocalMap />
