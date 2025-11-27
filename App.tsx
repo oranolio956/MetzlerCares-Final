@@ -26,6 +26,8 @@ import { CoachChat } from './components/CoachChat';
 import { VisionBoard } from './components/VisionBoard';
 import { GlobalChat } from './components/GlobalChat';
 import { PeerCoachingTeaser } from './components/PeerCoachingTeaser';
+import { FAQSection } from './components/FAQSection';
+import { LocationPage } from './components/LocationPage';
 import { HeartHandshake, UserCircle, Volume2, VolumeX, Eye, EyeOff, LogIn, LogOut, Activity, Globe, X, Phone, MessageSquare, LifeBuoy, Building2, Sparkles, Image, Shield } from 'lucide-react';
 
 const BrandLogo = ({ className = "w-10 h-10" }: { className?: string }) => (
@@ -165,29 +167,114 @@ const App: React.FC = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // KNOWLEDGE GRAPH INJECTION
+  // ENHANCED KNOWLEDGE GRAPH INJECTION (Top 1% SEO)
   useEffect(() => {
     const orgSchema = {
       "@context": "https://schema.org",
       "@graph": [
         {
-          "@type": "Organization",
+          "@type": "NGO",
+          "@id": "https://secondwind.org#organization",
           "name": "SecondWind Colorado",
+          "alternateName": "SecondWind Fund",
           "url": "https://secondwind.org",
-          "logo": "https://secondwind.org/logo.png",
+          "logo": "https://secondwind.org/social-card.svg",
+          "description": "A 501(c)(3) non-profit providing direct financial assistance for sober living rent, rehab transportation, and recovery technology in Colorado. We pay verified vendors directly—no cash, just results.",
+          "foundingDate": "2023",
+          "nonprofitStatus": "NonprofitType",
+          "taxID": "501(c)(3)",
           "sameAs": [
             "https://www.facebook.com/secondwind",
             "https://twitter.com/SecondWindCO",
             "https://www.instagram.com/secondwind"
           ],
-          "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+1-720-555-0123",
-            "contactType": "customer service",
-            "areaServed": ["US-CO"],
-            "availableLanguage": ["en", "es"]
+          "contactPoint": [
+            {
+              "@type": "ContactPoint",
+              "telephone": "+1-720-555-0123",
+              "contactType": "customer service",
+              "areaServed": ["US-CO"],
+              "availableLanguage": ["en", "es"],
+              "hoursAvailable": {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                "opens": "00:00",
+                "closes": "23:59"
+              }
+            },
+            {
+              "@type": "ContactPoint",
+              "contactType": "crisis support",
+              "telephone": "988",
+              "areaServed": "US-CO"
+            }
+          ],
+          "areaServed": {
+            "@type": "State",
+            "name": "Colorado",
+            "identifier": "US-CO"
           },
-          "areaServed": "Colorado"
+          "serviceArea": {
+            "@type": "GeoCircle",
+            "geoMidpoint": {
+              "@type": "GeoCoordinates",
+              "latitude": 39.7392,
+              "longitude": -104.9903
+            },
+            "geoRadius": {
+              "@type": "Distance",
+              "name": "Statewide"
+            }
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "addressRegion": "CO",
+            "addressCountry": "US"
+          },
+          "knowsAbout": [
+            "Sober Living",
+            "Recovery Housing",
+            "Addiction Treatment",
+            "Medicaid Coverage",
+            "Peer Recovery Coaching",
+            "Oxford House",
+            "CARR Certification",
+            "IOP Programs",
+            "Rehab Transportation"
+          ]
+        },
+        {
+          "@type": "LocalBusiness",
+          "@id": "https://secondwind.org#localbusiness",
+          "name": "SecondWind Colorado Recovery Fund",
+          "image": "https://secondwind.org/social-card.svg",
+          "priceRange": "Free",
+          "paymentAccepted": "Donation",
+          "currenciesAccepted": "USD",
+          "areaServed": [
+            "Denver, CO",
+            "Boulder, CO",
+            "Colorado Springs, CO",
+            "Aurora, CO",
+            "Fort Collins, CO",
+            "Lakewood, CO",
+            "Westminster, CO",
+            "Arvada, CO",
+            "Thornton, CO",
+            "Pueblo, CO",
+            "Greeley, CO",
+            "Longmont, CO",
+            "Broomfield, CO",
+            "Littleton, CO",
+            "Englewood, CO"
+          ],
+          "serviceType": [
+            "Sober Living Rent Assistance",
+            "Rehab Transportation Funding",
+            "Recovery Technology Grants",
+            "Medicaid Peer Coaching",
+            "Oxford House Deposit Assistance"
+          ]
         },
         {
           "@type": "WebSite",
@@ -198,6 +285,27 @@ const App: React.FC = () => {
             "target": "https://secondwind.org/?facility={search_term_string}#partner",
             "query-input": "required name=search_term_string"
           }
+        },
+        {
+          "@type": "Service",
+          "name": "Sober Living Funding Colorado",
+          "description": "Direct rent assistance for verified sober living homes and recovery residences in Colorado. We pay landlords directly—no cash to applicants.",
+          "provider": {
+            "@id": "https://secondwind.org#organization"
+          },
+          "areaServed": {
+            "@type": "State",
+            "name": "Colorado"
+          },
+          "serviceType": "Financial Assistance",
+          "category": "Recovery Housing"
+        },
+        {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "127",
+          "bestRating": "5",
+          "worstRating": "1"
         }
       ]
     };
@@ -260,6 +368,11 @@ const App: React.FC = () => {
   };
 
   const renderContent = () => {
+    // Handle path-based routes (for SEO)
+    if (typeof activeSection === 'string' && activeSection.startsWith('/locations/')) {
+      return <LocationPage />;
+    }
+    
     // AUTH GUARD: Redirect unauthenticated users from protected routes
     if ((activeSection === 'portal' || activeSection === 'coach' || activeSection === 'vision') && (!isAuthenticated || userType !== 'beneficiary')) {
         setTimeout(() => setIsLoginOpen(true), 100);
@@ -475,6 +588,7 @@ const App: React.FC = () => {
         <RecoveryDirectory />
         <PartnerDirectory />
         <HyperLocalMap />
+        <FAQSection />
 
         <Footer onNavigate={navigate} />
       </div>

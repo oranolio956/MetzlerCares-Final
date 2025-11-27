@@ -5,13 +5,15 @@ interface SEOHeadProps {
   description?: string;
   schema?: Record<string, any>;
   path?: string; // Optional path for canonical tags
+  breadcrumbs?: Array<{ name: string; url: string }>; // Enhanced breadcrumb support
 }
 
 export const SEOHead: React.FC<SEOHeadProps> = ({ 
   title, 
   description = "A direct-action recovery resource platform. Invest in human potential.",
   schema,
-  path
+  path,
+  breadcrumbs
 }) => {
   useEffect(() => {
     // 1. Update Title
@@ -50,12 +52,42 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       document.head.appendChild(link);
     }
 
-    // 5. Inject JSON-LD Schema (Silent SEO Feature)
+    // 5. Enhanced Breadcrumb Schema (if breadcrumbs provided, merge with existing schema)
+    let finalSchema = schema;
+    if (breadcrumbs && breadcrumbs.length > 0) {
+      const breadcrumbSchema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": breadcrumbs.map((crumb, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "name": crumb.name,
+          "item": crumb.url
+        }))
+      };
+
+      // Merge with existing schema if provided
+      if (schema && schema["@graph"]) {
+        finalSchema = {
+          ...schema,
+          "@graph": [...schema["@graph"], breadcrumbSchema]
+        };
+      } else if (schema) {
+        finalSchema = {
+          "@context": "https://schema.org",
+          "@graph": [schema, breadcrumbSchema]
+        };
+      } else {
+        finalSchema = breadcrumbSchema;
+      }
+    }
+
+    // 6. Inject JSON-LD Schema (Silent SEO Feature)
     // Now supports multiple concurrent schemas (e.g. Breadcrumbs + Product)
-    if (schema) {
+    if (finalSchema) {
       const script = document.createElement('script');
       script.type = 'application/ld+json';
-      script.text = JSON.stringify(schema);
+      script.text = JSON.stringify(finalSchema);
       const id = `schema-${Math.random().toString(36).substr(2, 9)}`;
       script.id = id;
       
@@ -66,7 +98,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
         if (el) el.remove();
       };
     }
-  }, [title, description, schema, path]);
+  }, [title, description, schema, path, breadcrumbs]);
 
   return null;
 };
