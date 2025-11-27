@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Clock, AlertCircle, Calendar, UploadCloud, ChevronRight, Star, LifeBuoy, Sparkles, Image, Plus, FolderOpen } from 'lucide-react';
+import { CheckCircle2, Clock, AlertCircle, Calendar, UploadCloud, ChevronRight, Star, LifeBuoy, Sparkles, Image, Plus, FolderOpen, Lock } from 'lucide-react';
 import { Mascot } from './Mascot';
 import { ApplicationStatus } from '../types';
 import { useStore } from '../context/StoreContext';
 import { useRouter } from '../hooks/useRouter';
+import { useSound } from '../hooks/useSound';
 
 export const BeneficiaryDashboard: React.FC = () => {
-  const { beneficiaryProfile, verifyInsurance, submitIntakeRequest, setCrisisMode } = useStore();
+  const { beneficiaryProfile, verifyInsurance, submitIntakeRequest, setCrisisMode, triggerConfetti } = useStore();
   const [isVerifying, setIsVerifying] = useState(false);
+  const [pledgeLocked, setPledgeLocked] = useState(false);
   const { navigate } = useRouter();
+  const { playSuccess, playClick } = useSound();
 
   // Calculate progress percentage, capped at 100%
   const progressPercent = Math.min(100, (beneficiaryProfile.daysSober / beneficiaryProfile.nextMilestone) * 100);
@@ -30,16 +33,11 @@ export const BeneficiaryDashboard: React.FC = () => {
     }
   };
 
-  const handleVerifyInsurance = () => {
-      setIsVerifying(true);
-      setTimeout(() => {
-          verifyInsurance('verified');
-          setIsVerifying(false);
-      }, 2000);
-  };
-
-  const handleApplyMedicaid = () => {
-      submitIntakeRequest({ type: 'Medicaid Application', details: 'Assistance applying for Colorado Medicaid to access Peer Coaching services.' });
+  const handlePledge = () => {
+      if (pledgeLocked) return;
+      playSuccess();
+      triggerConfetti();
+      setPledgeLocked(true);
   };
 
   return (
@@ -61,24 +59,39 @@ export const BeneficiaryDashboard: React.FC = () => {
              <div className="relative z-10">
                <div className="flex items-center gap-4 mb-2">
                  <h2 className="font-display font-bold text-3xl md:text-4xl">Welcome home, {beneficiaryProfile.name}.</h2>
-                 <Mascot expression="happy" className="w-10 h-10 md:w-12 md:h-12 shrink-0" />
+                 <Mascot expression={pledgeLocked ? "celebration" : "happy"} className="w-10 h-10 md:w-12 md:h-12 shrink-0" />
                </div>
                <p className="text-brand-lavender text-base md:text-lg">Your recovery is the priority. We handle the logistics.</p>
              </div>
           </div>
 
-          <div className="bg-white border-4 border-brand-teal p-6 rounded-[2.5rem] rounded-br-none shadow-xl w-full lg:w-auto lg:min-w-[280px]">
-             <div className="flex items-center justify-between mb-2">
-               <span className="text-xs font-bold uppercase tracking-widest text-brand-navy/60">Sober Streak</span>
-               <Star className="text-brand-yellow fill-brand-yellow" size={20} />
-             </div>
-             <div className="text-6xl font-display font-bold text-brand-navy leading-none">
+          <div className="bg-white border-4 border-brand-teal p-6 rounded-[2.5rem] rounded-br-none shadow-xl w-full lg:w-auto lg:min-w-[320px] flex flex-col items-center text-center">
+             
+             {/* PLEDGE SLIDER */}
+             {!pledgeLocked ? (
+                 <div className="w-full mb-4">
+                    <p className="text-xs font-bold uppercase tracking-widest text-brand-navy/60 mb-3">Commit to Today</p>
+                    <div className="relative h-12 bg-brand-navy/5 rounded-full p-1 cursor-pointer group" onClick={handlePledge}>
+                        <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-brand-navy/30 uppercase tracking-widest pointer-events-none">Slide to Lock In</div>
+                        <div className="h-full aspect-square bg-brand-navy rounded-full shadow-md transform transition-transform group-hover:translate-x-2 flex items-center justify-center text-white">
+                            <ChevronRight size={20} />
+                        </div>
+                    </div>
+                 </div>
+             ) : (
+                 <div className="w-full mb-4 bg-brand-teal/10 rounded-2xl p-3 flex items-center justify-center gap-2 animate-in zoom-in">
+                    <CheckCircle2 className="text-brand-teal" size={20} />
+                    <span className="font-bold text-brand-teal text-sm">Pledge Locked</span>
+                 </div>
+             )}
+
+             <div className="text-6xl font-display font-bold text-brand-navy leading-none mb-4">
                {beneficiaryProfile.daysSober}<span className="text-2xl text-brand-teal">days</span>
              </div>
-             <div className="mt-4 w-full bg-brand-navy/5 h-2 rounded-full overflow-hidden">
+             <div className="w-full bg-brand-navy/5 h-2 rounded-full overflow-hidden">
                <div className="h-full bg-brand-teal transition-all duration-1000 ease-out" style={{ width: `${progressPercent}%` }}></div>
              </div>
-             <p className="text-xs text-brand-navy/60 mt-2 text-right">
+             <p className="text-xs text-brand-navy/60 mt-2">
                 {Math.max(0, beneficiaryProfile.nextMilestone - beneficiaryProfile.daysSober)} days to next chip
              </p>
           </div>
@@ -114,7 +127,7 @@ export const BeneficiaryDashboard: React.FC = () => {
                     </div>
                     <div className="text-left">
                         <h4 className="font-bold text-xl">Vision Board</h4>
-                        <p className="text-white/80 text-sm">Visualize your goals with Nano Banana Pro</p>
+                        <p className="text-white/80 text-sm">Visualize your goals with AI</p>
                     </div>
                 </div>
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-brand-teal transition-colors">
