@@ -92,7 +92,7 @@ export const RecoveryKnowledgeGraph: React.FC = () => {
       "name": t.term,
       "termCode": t.acronym || t.term,
       "description": t.definition,
-      "inDefinedTermSet": "https://secondwind.org/glossary"
+      "inDefinedTermSet": "https://metzlercares.com/glossary"
     }))
   };
 

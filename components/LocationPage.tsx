@@ -692,9 +692,9 @@ export const LocationPage: React.FC = () => {
   }
 
   const breadcrumbs = [
-    { name: 'Home', url: 'https://secondwind.org/' },
-    { name: 'Locations', url: 'https://secondwind.org/locations' },
-    { name: `${cityData.name} Sober Living`, url: `https://secondwind.org/locations/${cityData.slug}` }
+    { name: 'Home', url: 'https://metzlercares.com/' },
+    { name: 'Locations', url: 'https://metzlercares.com/locations' },
+    { name: `${cityData.name} Sober Living`, url: `https://metzlercares.com/locations/${cityData.slug}` }
   ];
 
   const locationSchema = {
@@ -705,7 +705,7 @@ export const LocationPage: React.FC = () => {
         name: `Sober Living Funding ${cityData.name}, Colorado`,
         description: cityData.description,
         provider: {
-          '@id': 'https://secondwind.org#organization'
+          '@id': 'https://metzlercares.com#organization'
         },
         areaServed: {
           '@type': 'City',

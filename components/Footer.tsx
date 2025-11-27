@@ -101,7 +101,7 @@ export const Footer: React.FC<{ onNavigate: (route: string) => void }> = ({ onNa
            <div>
               <h4 className="font-bold text-lg mb-6 text-brand-teal">Contact</h4>
               <ul className="space-y-4 text-sm font-medium text-brand-lavender/60">
-                 <li className="flex items-center gap-2"><Mail size={16} /> help@secondwind.org</li>
+                 <li className="flex items-center gap-2"><Mail size={16} /> help@metzlercares.com</li>
                  <li className="flex items-center gap-2"><Phone size={16} /> +1 (720) 555-0123</li>
                  <li className="mt-4 pt-4 border-t border-white/10">
                     <p className="text-xs opacity-50 mb-2">Non-Profit Status</p>

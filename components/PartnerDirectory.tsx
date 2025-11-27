@@ -172,7 +172,7 @@ const FacilityModal: React.FC<{ partner: Partner; onClose: () => void }> = ({ pa
                     "@context": "https://schema.org",
                     "@type": "LocalBusiness",
                     "name": partner.name,
-                    "image": "https://secondwind.org/social-card.svg",
+                    "image": "https://metzlercares.com/social-card.svg",
                     "telephone": partner.details.phone,
                     "address": {
                         "@type": "PostalAddress",
