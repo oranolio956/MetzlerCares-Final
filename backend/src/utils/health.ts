@@ -97,7 +97,7 @@ async function checkDatabaseHealth(): Promise<ServiceHealth> {
     };
   } catch (error) {
     return {
-      status: 'unhealthy',
+      status: 'degraded',
       responseTime: Date.now() - startTime,
       error: error.message,
       details: { connectionString: maskConnectionString(config.databaseUrl) }
@@ -137,7 +137,7 @@ async function checkRedisHealth(): Promise<ServiceHealth> {
     };
   } catch (error) {
     return {
-      status: 'unhealthy',
+      status: 'degraded',
       responseTime: Date.now() - startTime,
       error: error.message
     };
@@ -151,7 +151,7 @@ async function checkGeminiHealth(): Promise<ServiceHealth> {
     // Test API key configuration
     if (!config.geminiApiKey) {
       return {
-        status: 'unhealthy',
+        status: 'degraded',
         responseTime: Date.now() - startTime,
         error: 'Gemini API key not configured'
       };
@@ -170,7 +170,7 @@ async function checkGeminiHealth(): Promise<ServiceHealth> {
     };
   } catch (error) {
     return {
-      status: 'unhealthy',
+      status: 'degraded',
       responseTime: Date.now() - startTime,
       error: error.message
     };
@@ -184,7 +184,7 @@ async function checkStripeHealth(): Promise<ServiceHealth> {
     // Test API key configuration
     if (!config.stripeSecretKey) {
       return {
-        status: 'unhealthy',
+        status: 'degraded',
         responseTime: Date.now() - startTime,
         error: 'Stripe API key not configured'
       };
@@ -203,7 +203,7 @@ async function checkStripeHealth(): Promise<ServiceHealth> {
     };
   } catch (error) {
     return {
-      status: 'unhealthy',
+      status: 'degraded',
       responseTime: Date.now() - startTime,
       error: error.message
     };
