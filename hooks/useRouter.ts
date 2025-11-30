@@ -20,6 +20,9 @@ export const useRouter = () => {
     if (path.startsWith('/services/')) {
       return path; // e.g., '/services/sober-living-rent-assistance'
     }
+    if (path.startsWith('/blog/')) {
+      return path; // e.g., '/blog/colorado-sober-living-checklist'
+    }
     if (path.startsWith('/facilities/')) {
       return path; // e.g., '/facilities/tribe-recovery'
     }
@@ -50,7 +53,8 @@ export const useRouter = () => {
       newRoute.startsWith('/locations/') ||
       newRoute.startsWith('/services/') ||
       newRoute.startsWith('/guides/') ||
-      newRoute.startsWith('/facilities/')
+      newRoute.startsWith('/facilities/') ||
+      newRoute.startsWith('/blog/')
     ) {
       window.history.pushState({}, '', newRoute);
       setRoute(newRoute);

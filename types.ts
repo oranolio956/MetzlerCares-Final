@@ -38,6 +38,30 @@ export interface BeneficiaryProfile {
   requests: RequestItem[];
 }
 
+export type ReviewerRole = 'beneficiary' | 'donor' | 'provider';
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  role: ReviewerRole;
+  citySlug: string;
+  rating: number;
+  summary: string;
+  quote: string;
+  service: string;
+  date: string;
+  videoUrl?: string;
+}
+
+export interface ReviewSubmission {
+  name: string;
+  citySlug: string;
+  service: string;
+  rating: number;
+  quote: string;
+  role: ReviewerRole;
+}
+
 export interface ImpactStory {
   id: string;
   beneficiary: string;
