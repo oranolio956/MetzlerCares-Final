@@ -371,3 +371,4 @@ app.listen(PORT, () => {
   console.log(`   • GET /api/transparency/ledger - Public transaction ledger`);
   console.log(`   • GET /api/vendors - Available service providers`);
 });
+

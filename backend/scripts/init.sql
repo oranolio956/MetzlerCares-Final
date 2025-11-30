@@ -175,3 +175,4 @@ VALUES (
     '{"name": "System Administrator", "phone": null, "location": {"city": "Denver", "state": "CO"}}'
 )
 ON CONFLICT (email) DO NOTHING;
+

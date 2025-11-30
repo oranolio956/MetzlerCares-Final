@@ -364,3 +364,4 @@ tail -f logs/app.log
 ---
 
 **Ready to deploy SecondWind and start making an impact! 🚀**
+
