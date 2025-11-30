@@ -169,6 +169,11 @@ app.get('/api/health/tracing', async (req: Request, res: Response) => {
 // Stripe webhook middleware - raw body for signature verification
 app.use('/api/webhooks/stripe', express.raw({ type: 'application/json' }));
 
+// Test route
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API routes are working!', timestamp: new Date().toISOString() });
+});
+
 // API routes
 app.use('/api/auth', authRouter);
 app.use('/api/chat', chatRouter);
