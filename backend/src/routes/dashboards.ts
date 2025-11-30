@@ -178,27 +178,45 @@ dashboardRouter.get('/beneficiary', requireBeneficiary, async (req, res) => {
   try {
     const { userId } = req.user!;
 
-    // Get beneficiary profile and stats
-    const beneficiaryQuery = `
-      SELECT
-        b.*,
-        u.email,
-        u.created_at as member_since,
-        COUNT(t.id) as total_support_received,
-        SUM(t.amount) as total_amount_received,
-        MAX(t.created_at) as last_support_date
-      FROM beneficiaries b
-      JOIN users u ON b.user_id = u.id
-      LEFT JOIN transactions t ON t.beneficiary_id = b.id AND t.status = 'completed'
-      WHERE b.user_id = $1
-      GROUP BY b.id, u.id
-    `;
+    let beneficiary;
+    if (postgresAvailable) {
+      // Get beneficiary profile and stats
+      const beneficiaryQuery = `
+        SELECT
+          b.*,
+          u.email,
+          u.created_at as member_since,
+          COUNT(t.id) as total_support_received,
+          SUM(t.amount) as total_amount_received,
+          MAX(t.created_at) as last_support_date
+        FROM beneficiaries b
+        JOIN users u ON b.user_id = u.id
+        LEFT JOIN transactions t ON t.beneficiary_id = b.id AND t.status = 'completed'
+        WHERE b.user_id = $1
+        GROUP BY b.id, u.id
+      `;
 
-    const beneficiaryResult = await pool.query(beneficiaryQuery, [userId]);
-    const beneficiary = beneficiaryResult.rows[0];
+      const beneficiaryResult = await dbQuery(beneficiaryQuery, [userId]);
+      beneficiary = beneficiaryResult.rows[0];
 
-    if (!beneficiary) {
-      return res.status(404).json({ error: 'Beneficiary profile not found' });
+      if (!beneficiary) {
+        return res.status(404).json({ error: 'Beneficiary profile not found' });
+      }
+    } else {
+      // Mock beneficiary data
+      beneficiary = {
+        user_id: userId,
+        email: req.user?.email || 'beneficiary@example.com',
+        member_since: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+        total_support_received: 8,
+        total_amount_received: 650.00,
+        last_support_date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+        days_sober: 45,
+        medicaid_status: 'eligible',
+        application_status: 'approved',
+        sobriety_start_date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+        next_check_in: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      };
     }
 
     // Get recent support (last 10 transactions)
