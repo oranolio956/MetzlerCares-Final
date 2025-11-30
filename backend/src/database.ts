@@ -49,8 +49,9 @@ export async function initializeDatabase() {
     console.log('✅ Database schema initialized');
 
   } catch (error) {
-    console.error('❌ Database initialization failed:', error);
-    throw error;
+    console.warn('⚠️ Database initialization failed, running in degraded mode:', error.message);
+    console.warn('⚠️ Some features may not work properly without database connectivity');
+    // Don't throw error - allow app to start in degraded mode
   }
 }
 

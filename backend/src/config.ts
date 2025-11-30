@@ -68,6 +68,6 @@ export const config = {
   stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
   // Database configuration
-  databaseUrl: process.env.DATABASE_URL,
-  redisUrl: process.env.REDIS_URL,
+  databaseUrl: process.env.DATABASE_URL || 'postgresql://user:pass@localhost:5432/secondwind',
+  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
 };
