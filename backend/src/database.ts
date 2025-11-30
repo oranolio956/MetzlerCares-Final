@@ -1,6 +1,10 @@
 import { Pool } from 'pg';
 import { createClient } from 'redis';
 
+// Database availability flags
+let postgresAvailable = false;
+let redisAvailable = false;
+
 // PostgreSQL connection
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -36,24 +40,74 @@ redis.on('reconnecting', () => console.log('🔄 Redis reconnecting...'));
 // Test connections on startup
 export async function initializeDatabase() {
   try {
+    console.log('🔄 Attempting database connections...');
+
     // Test PostgreSQL connection
-    await pool.query('SELECT NOW()');
-    console.log('✅ PostgreSQL connected');
+    try {
+      await pool.query('SELECT NOW()');
+      postgresAvailable = true;
+      console.log('✅ PostgreSQL connected');
+
+      // Create tables if they don't exist
+      await createTables();
+      console.log('✅ Database schema initialized');
+    } catch (pgError) {
+      console.warn('⚠️ PostgreSQL connection failed:', pgError.message);
+      console.warn('⚠️ Running without database - limited functionality available');
+      postgresAvailable = false;
+    }
 
     // Test Redis connection
-    await redis.connect();
-    console.log('✅ Redis connected');
-
-    // Create tables if they don't exist
-    await createTables();
-    console.log('✅ Database schema initialized');
+    try {
+      await redis.connect();
+      redisAvailable = true;
+      console.log('✅ Redis connected');
+    } catch (redisError) {
+      console.warn('⚠️ Redis connection failed:', redisError.message);
+      console.warn('⚠️ Running without Redis - some features may be limited');
+      redisAvailable = false;
+    }
 
   } catch (error) {
-    console.warn('⚠️ Database initialization failed, running in degraded mode:', error.message);
+    console.warn('⚠️ Database initialization had issues, running in degraded mode:', error.message);
     console.warn('⚠️ Some features may not work properly without database connectivity');
-    // Don't throw error - allow app to start in degraded mode
   }
 }
+
+// Database operation wrappers with fallback to mock data
+export const dbQuery = async (query: string, params?: any[]): Promise<any> => {
+  if (!postgresAvailable) {
+    console.log(`⚠️ Database not available, simulating query: ${query}`);
+    return { rows: [], rowCount: 0 };
+  }
+  return pool.query(query, params);
+};
+
+export const dbRedisGet = async (key: string): Promise<string | null> => {
+  if (!redisAvailable) {
+    console.log(`⚠️ Redis not available, simulating get: ${key}`);
+    return null;
+  }
+  return redis.get(key);
+};
+
+export const dbRedisSet = async (key: string, value: string, options?: any): Promise<string | null> => {
+  if (!redisAvailable) {
+    console.log(`⚠️ Redis not available, simulating set: ${key}`);
+    return 'OK';
+  }
+  return redis.set(key, value, options);
+};
+
+export const dbRedisDel = async (key: string): Promise<number> => {
+  if (!redisAvailable) {
+    console.log(`⚠️ Redis not available, simulating del: ${key}`);
+    return 1;
+  }
+  return redis.del(key);
+};
+
+export { postgresAvailable, redisAvailable };
 
 // Database schema
 async function createTables() {

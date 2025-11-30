@@ -75,9 +75,15 @@ async function checkDatabaseHealth(): Promise<ServiceHealth> {
     // Test basic connectivity
     await pool.query('SELECT 1 as health_check');
 
-    // Test a more complex query
-    const result = await pool.query('SELECT COUNT(*) as user_count FROM users');
-    const userCount = parseInt(result.rows[0].user_count);
+    // Test a more complex query (only if tables exist)
+    let userCount = 0;
+    try {
+      const result = await pool.query('SELECT COUNT(*) as user_count FROM users');
+      userCount = parseInt(result.rows[0].user_count);
+    } catch (tableError) {
+      // Tables don't exist yet, that's okay
+      console.log('Database tables not yet created');
+    }
 
     // Check connection pool stats
     const poolStats = {

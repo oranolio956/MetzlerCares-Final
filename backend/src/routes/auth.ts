@@ -3,7 +3,11 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { config } from '../config.js';
-import { pool, redis } from '../database.js';
+import { pool, redis, dbQuery, dbRedisGet, dbRedisSet, dbRedisDel, postgresAvailable } from '../database.js';
+
+// Mock data for when database is not available
+const mockUsers: any[] = [];
+let nextUserId = 1;
 
 // Validation schemas
 const registerSchema = z.object({
@@ -47,14 +51,14 @@ async function generateTokens(userId: number, role: string) {
   );
 
   // Store refresh token in Redis
-  await redis.set(`refresh:${userId}`, refreshToken, { EX: 7 * 24 * 60 * 60 }); // 7 days
+  await dbRedisSet(`refresh:${userId}`, refreshToken, { EX: 7 * 24 * 60 * 60 }); // 7 days
 
   return { accessToken, refreshToken };
 }
 
 async function logAuditEvent(userId: number | null, action: string, details: any, req: any) {
   try {
-    await pool.query(
+    await dbQuery(
       'INSERT INTO audit_logs (user_id, action, resource_type, old_values, ip_address, user_agent) VALUES ($1, $2, $3, $4, $5, $6)',
       [
         userId,
@@ -78,10 +82,15 @@ authRouter.post('/register', async (req, res) => {
     const { email, password, role, profile } = registerSchema.parse(req.body);
 
     // Check if user already exists
-    const existingUser = await pool.query(
-      'SELECT id FROM users WHERE email = $1',
-      [email]
-    );
+    let existingUser;
+    if (postgresAvailable) {
+      existingUser = await dbQuery(
+        'SELECT id FROM users WHERE email = $1',
+        [email]
+      );
+    } else {
+      existingUser = { rows: mockUsers.filter(u => u.email === email) };
+    }
 
     if (existingUser.rows.length > 0) {
       await logAuditEvent(null, 'REGISTRATION_FAILED', { email, reason: 'user_exists' }, req);
@@ -93,42 +102,54 @@ authRouter.post('/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Create user
-    const userResult = await pool.query(
-      'INSERT INTO users (email, password_hash, role, profile) VALUES ($1, $2, $3, $4) RETURNING id, email, role, profile',
-      [email, passwordHash, role, JSON.stringify(profile)]
-    );
+    let user;
+    if (postgresAvailable) {
+      const userResult = await dbQuery(
+        'INSERT INTO users (email, password_hash, role, profile) VALUES ($1, $2, $3, $4) RETURNING id, email, role, profile',
+        [email, passwordHash, role, JSON.stringify(profile)]
+      );
+      user = userResult.rows[0];
 
-    const user = userResult.rows[0];
+      // Create role-specific profile within transaction
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
 
-    // Create role-specific profile within transaction
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
+        // Create role-specific profile
+        if (role === 'beneficiary') {
+          await client.query(
+            'INSERT INTO beneficiaries (user_id) VALUES ($1)',
+            [user.id]
+          );
+        } else if (role === 'donor') {
+          await client.query(
+            'INSERT INTO donors (user_id) VALUES ($1)',
+            [user.id]
+          );
+        } else if (role === 'vendor') {
+          await client.query(
+            'INSERT INTO vendors (user_id, business_name, vendor_type) VALUES ($1, $2, $3)',
+            [user.id, profile.name || `${profile.firstName || 'Business'} ${profile.lastName || 'Owner'}`, 'housing']
+          );
+        }
 
-      // Create role-specific profile
-      if (role === 'beneficiary') {
-        await client.query(
-          'INSERT INTO beneficiaries (user_id) VALUES ($1)',
-          [user.id]
-        );
-      } else if (role === 'donor') {
-        await client.query(
-          'INSERT INTO donors (user_id) VALUES ($1)',
-          [user.id]
-        );
-      } else if (role === 'vendor') {
-        await client.query(
-          'INSERT INTO vendors (user_id, business_name, vendor_type) VALUES ($1, $2, $3)',
-          [user.id, profile.name || `${profile.firstName || 'Business'} ${profile.lastName || 'Owner'}`, 'housing']
-        );
+        await client.query('COMMIT');
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
       }
-
-      await client.query('COMMIT');
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
+    } else {
+      // Mock user creation
+      user = {
+        id: nextUserId++,
+        email,
+        password_hash: passwordHash,
+        role,
+        profile: JSON.stringify(profile)
+      };
+      mockUsers.push(user);
     }
 
     // Generate tokens
@@ -166,10 +187,15 @@ authRouter.post('/login', async (req, res) => {
     const { email, password } = loginSchema.parse(req.body);
 
     // Find user
-    const userResult = await pool.query(
-      'SELECT id, email, password_hash, role, profile, is_active FROM users WHERE email = $1',
-      [email]
-    );
+    let userResult;
+    if (postgresAvailable) {
+      userResult = await dbQuery(
+        'SELECT id, email, password_hash, role, profile, is_active FROM users WHERE email = $1',
+        [email]
+      );
+    } else {
+      userResult = { rows: mockUsers.filter(u => u.email === email) };
+    }
 
     if (userResult.rows.length === 0) {
       await logAuditEvent(null, 'LOGIN_FAILED', { email, reason: 'user_not_found' }, req);
