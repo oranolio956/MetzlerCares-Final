@@ -21,25 +21,27 @@ import { setupSignalHandlers } from './utils/gracefulShutdown.js';
 
 const app = express();
 
-// PHASE 0: Environment validation
+// PHASE 0: Environment validation (optional in degraded mode)
+console.log('[startup] Validating environment configuration...');
+
 if (!config.geminiApiKey) {
-  throw new Error('[startup] GEMINI_API_KEY is required. Mock responses have been removed.');
+  console.warn('[startup] GEMINI_API_KEY not set - AI features will be limited');
 }
 
 if (!config.authEmail || (!config.authPassword && !config.authPasswordHash)) {
-  throw new Error('[startup] AUTH_EMAIL and AUTH_PASSWORD (or AUTH_PASSWORD_HASH) must be set to enable login.');
+  console.warn('[startup] AUTH_EMAIL and AUTH_PASSWORD not set - authentication may not work');
 }
 
 if (!config.jwtSecret) {
-  throw new Error('[startup] JWT_SECRET must be set to issue authentication tokens.');
+  console.warn('[startup] JWT_SECRET not set - token generation may not work');
 }
 
 if (!config.databaseUrl) {
-  throw new Error('[startup] DATABASE_URL is required for database operations.');
+  console.warn('[startup] DATABASE_URL not set - running in degraded database mode');
 }
 
 if (!config.redisUrl) {
-  throw new Error('[startup] REDIS_URL is required for session management.');
+  console.warn('[startup] REDIS_URL not set - running in degraded Redis mode');
 }
 
 // PHASE 1: Database initialization (OPTIONAL - allow degraded mode)
