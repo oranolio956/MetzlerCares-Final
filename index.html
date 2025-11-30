@@ -7,8 +7,12 @@
     <!-- Top 1% SEO: Explicit Control -->
     <title>SecondWind | Colorado Sober Living & Recovery Fund</title>
     <meta name="description" content="The #1 direct-aid platform for recovery in Colorado. We fund sober living rent, rehab transit, and essential tech for people in Denver, Boulder, and Colorado Springs." />
+    <meta name="keywords" content="sober living, recovery housing, rehab transportation, recovery technology, Colorado recovery, sober living Denver, addiction recovery, recovery support, sober housing Colorado" />
+    <meta name="author" content="SecondWind" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <link rel="canonical" href="https://metzlercares.com/" />
+    <link rel="alternate" hreflang="en" href="https://metzlercares.com/" />
     
     <!-- Performance: Preload Critical Assets (LCP Optimization) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,6 +33,113 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@SecondWindCO" />
     <meta name="twitter:image" content="https://metzlercares.com/social-card.svg" />
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://metzlercares.com/#organization",
+          "name": "SecondWind",
+          "alternateName": "SecondWind Recovery Fund",
+          "url": "https://metzlercares.com",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://metzlercares.com/social-card.svg",
+            "width": 1200,
+            "height": 630
+          },
+          "description": "A direct-action recovery resource platform connecting donors with people in recovery through transparent, verified vendor payments.",
+          "foundingDate": "2024",
+          "areaServed": {
+            "@type": "State",
+            "name": "Colorado"
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+1-555-RECOVER",
+            "contactType": "customer service",
+            "availableLanguage": "English"
+          },
+          "sameAs": [
+            "https://twitter.com/SecondWindCO"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://metzlercares.com/#website",
+          "url": "https://metzlercares.com",
+          "name": "SecondWind | Colorado Sober Living & Recovery Fund",
+          "description": "The #1 direct-aid platform for recovery in Colorado. We fund sober living rent, rehab transit, and essential tech for people in Denver, Boulder, and Colorado Springs.",
+          "publisher": {
+            "@id": "https://metzlercares.com/#organization"
+          },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://metzlercares.com/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "Service",
+          "name": "Sober Living Rent Assistance",
+          "description": "Direct rent payments to verified sober living facilities in Colorado",
+          "provider": {
+            "@id": "https://metzlercares.com/#organization"
+          },
+          "areaServed": {
+            "@type": "State",
+            "name": "Colorado"
+          },
+          "serviceType": "Housing Assistance"
+        },
+        {
+          "@type": "Service",
+          "name": "Rehab Transportation Funding",
+          "description": "Transportation support for recovery treatment access",
+          "provider": {
+            "@id": "https://metzlercares.com/#organization"
+          },
+          "areaServed": {
+            "@type": "State",
+            "name": "Colorado"
+          },
+          "serviceType": "Transportation"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How does SecondWind work?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "SecondWind connects donors directly with verified recovery service providers. When you make a donation, we pay the vendor directly for essential services like housing, transportation, and technology - no cash to individuals, maximum transparency and accountability."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What services does SecondWind fund?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "We fund three critical categories: 1) Sober living rent and deposits, 2) Transportation to treatment facilities, and 3) Essential technology for recovery support and job searching."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I know my donation is being used properly?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "We maintain a public transaction ledger showing every donation and how it was used. All vendors are verified and audited. Donors receive impact reports showing exactly how their contribution helped someone in recovery."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
 
     <!-- Mobile App Capabilities (PWA-lite) -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
