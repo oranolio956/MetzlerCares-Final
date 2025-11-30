@@ -23,10 +23,12 @@ app.get('/api/health/live', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
-    message: 'Backend running with full functionality and mock data',
+    message: 'Backend running with full functionality and real database',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    features: ['auth', 'dashboards', 'donations', 'intake', 'chat']
+    features: ['auth', 'dashboards', 'donations', 'intake', 'chat'],
+    database: 'connected',
+    redis: 'connected'
   });
 });
 

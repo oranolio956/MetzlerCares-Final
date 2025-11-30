@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import { createClient } from 'redis';
 
-// Database availability flags
+// Database availability flags (now required)
 let postgresAvailable = false;
 let redisAvailable = false;
 
@@ -37,12 +37,12 @@ redis.on('error', (err) => console.error('❌ Redis error:', err));
 redis.on('end', () => console.log('ℹ️ Redis connection ended'));
 redis.on('reconnecting', () => console.log('🔄 Redis reconnecting...'));
 
-// Test connections on startup
+// Test connections on startup (required for production)
 export async function initializeDatabase() {
   try {
-    console.log('🔄 Attempting database connections...');
+    console.log('🔄 Connecting to production databases...');
 
-    // Test PostgreSQL connection
+    // Test PostgreSQL connection (required)
     try {
       await pool.query('SELECT NOW()');
       postgresAvailable = true;
@@ -52,57 +52,55 @@ export async function initializeDatabase() {
       await createTables();
       console.log('✅ Database schema initialized');
     } catch (pgError) {
-      console.warn('⚠️ PostgreSQL connection failed:', pgError.message);
-      console.warn('⚠️ Running without database - limited functionality available');
-      postgresAvailable = false;
+      console.error('❌ PostgreSQL connection failed:', pgError.message);
+      console.error('❌ Cannot start without database connection');
+      throw new Error('Database connection required for production');
     }
 
-    // Test Redis connection
+    // Test Redis connection (required)
     try {
       await redis.connect();
       redisAvailable = true;
       console.log('✅ Redis connected');
     } catch (redisError) {
-      console.warn('⚠️ Redis connection failed:', redisError.message);
-      console.warn('⚠️ Running without Redis - some features may be limited');
-      redisAvailable = false;
+      console.error('❌ Redis connection failed:', redisError.message);
+      console.error('❌ Cannot start without Redis connection');
+      throw new Error('Redis connection required for production');
     }
 
+    console.log('🎉 All databases connected successfully - production ready!');
+
   } catch (error) {
-    console.warn('⚠️ Database initialization had issues, running in degraded mode:', error.message);
-    console.warn('⚠️ Some features may not work properly without database connectivity');
+    console.error('💥 Database initialization failed - cannot start server:', error.message);
+    throw error;
   }
 }
 
-// Database operation wrappers with fallback to mock data
+// Database operation functions (production ready)
 export const dbQuery = async (query: string, params?: any[]): Promise<any> => {
   if (!postgresAvailable) {
-    console.log(`⚠️ Database not available, simulating query: ${query}`);
-    return { rows: [], rowCount: 0 };
+    throw new Error('Database not available - required for production');
   }
   return pool.query(query, params);
 };
 
 export const dbRedisGet = async (key: string): Promise<string | null> => {
   if (!redisAvailable) {
-    console.log(`⚠️ Redis not available, simulating get: ${key}`);
-    return null;
+    throw new Error('Redis not available - required for production');
   }
   return redis.get(key);
 };
 
 export const dbRedisSet = async (key: string, value: string, options?: any): Promise<string | null> => {
   if (!redisAvailable) {
-    console.log(`⚠️ Redis not available, simulating set: ${key}`);
-    return 'OK';
+    throw new Error('Redis not available - required for production');
   }
   return redis.set(key, value, options);
 };
 
 export const dbRedisDel = async (key: string): Promise<number> => {
   if (!redisAvailable) {
-    console.log(`⚠️ Redis not available, simulating del: ${key}`);
-    return 1;
+    throw new Error('Redis not available - required for production');
   }
   return redis.del(key);
 };
