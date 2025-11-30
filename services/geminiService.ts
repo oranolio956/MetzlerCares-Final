@@ -6,7 +6,7 @@ export interface SessionPayload {
   type: SessionType;
 }
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "https://secondwind-backend.onrender.com";
 
 export const SYSTEM_INSTRUCTION = `You are Windy. You are NOT a corporate bot. You are a recovery advocate for SecondWind.
 
