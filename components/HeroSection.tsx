@@ -112,8 +112,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                    <h1 className="font-display font-bold text-[clamp(2.75rem,12vw,9rem)] text-brand-navy tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.1s' }}>
                       INVEST IN
                    </h1>
-                   <div className="flex items-center gap-4 w-full">
-                      <h2 className="font-display font-bold text-[clamp(2.75rem,12vw,9rem)] text-brand-teal tracking-[-0.04em] animate-slide-up opacity-0 whitespace-nowrap" style={{ animationDelay: '0.2s' }}>
+                   <div className="flex flex-wrap items-center gap-4 w-full">
+                      <h2 className="font-display font-bold text-[clamp(2.75rem,12vw,9rem)] text-brand-teal tracking-[-0.04em] animate-slide-up opacity-0" style={{ animationDelay: '0.2s' }}>
                          COLORADO
                       </h2>
                       {/* Line Decorator */}
@@ -132,7 +132,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
 
                    {/* Mobile Only HUD - Kept under text for immediate action */}
                    <div className="lg:hidden w-full mt-8 animate-slide-up opacity-0" style={{ animationDelay: '0.5s' }}>
-                      <div className="flex gap-3">
+                      <div className="flex flex-col sm:flex-row gap-3">
                         <button 
                            onClick={() => onNavigate('apply')}
                            className="flex-1 bg-brand-navy text-white py-4 rounded-xl font-bold active:scale-95 transition-transform"
@@ -280,9 +280,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
 
       {/* --- TRUST SIGNALS --- */}
       <div className="w-full bg-brand-navy/5 py-12 border-y border-brand-navy/5 overflow-hidden">
-         <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 flex flex-col md:flex-row items-center gap-8 md:gap-12">
-            <div className="text-brand-navy/40 text-xs font-bold uppercase tracking-widest whitespace-nowrap shrink-0">
-               Directly Paying Verified Vendors:
+         <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 flex flex-col md:flex-row items-center gap-6 md:gap-12">
+            <div className="text-brand-navy/40 text-xs font-bold uppercase tracking-widest text-center md:text-left leading-tight w-full md:w-auto">
+               Directly Paying Verified Vendors
+               <span className="hidden md:inline">:</span>
             </div>
             <div className="flex items-center gap-12 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 overflow-x-auto no-scrollbar w-full md:w-auto mask-linear-fade">
                <div className="flex items-center gap-2 shrink-0">
