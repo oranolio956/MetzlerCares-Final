@@ -2,8 +2,17 @@ import React, { useMemo } from 'react';
 import { ArrowRight, Star, Play, CheckCircle } from 'lucide-react';
 import { SEOHead } from './SEOHead';
 import { useRouter } from '../hooks/useRouter';
-import { SERVICE_PAGES } from '../services/pageContent';
+import { CITY_DATA } from './LocationPage';
+import { SERVICE_PAGES, ServicePageMeta } from '../services/pageContent';
 import { useStore } from '../context/StoreContext';
+
+export type ServiceData = ServicePageMeta;
+export const SERVICE_DATA = SERVICE_PAGES.reduce<Record<string, ServicePageMeta>>((acc, page) => {
+  acc[page.slug] = page;
+  return acc;
+}, {});
+
+export const CITY_LINKS = Object.values(CITY_DATA).map(({ name, slug }) => ({ name, slug }));
 
 export const ServicePage: React.FC = () => {
   const { route } = useRouter();

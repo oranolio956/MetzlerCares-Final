@@ -384,8 +384,6 @@ const App: React.FC = () => {
     if (typeof activeSection === 'string' && activeSection.startsWith('/locations/')) {
       return <LocationPage />;
     }
-<<<<<<< HEAD
-
     if (activeSection === '/services') {
       return <ServicesIndex />;
     }
@@ -400,17 +398,14 @@ const App: React.FC = () => {
 
     if (typeof activeSection === 'string' && activeSection.startsWith('/guides/')) {
       return <GuidePage />;
-=======
-    if (typeof activeSection === 'string' && activeSection.startsWith('/services/')) {
-      return <ServicePage />;
     }
-    if (typeof activeSection === 'string' && activeSection.startsWith('/blog/')) {
-      return <BlogPage />;
->>>>>>> origin/codex/implement-review-intake-and-schema-updates
-    }
-    
-    // AUTH GUARD: Redirect unauthenticated users from protected routes
-    if ((activeSection === 'portal' || activeSection === 'coach' || activeSection === 'vision') && (!isAuthenticated || userType !== 'beneficiary')) {
+
+      if (typeof activeSection === 'string' && activeSection.startsWith('/blog/')) {
+        return <BlogPage />;
+      }
+
+      // AUTH GUARD: Redirect unauthenticated users from protected routes
+      if ((activeSection === 'portal' || activeSection === 'coach' || activeSection === 'vision') && (!isAuthenticated || userType !== 'beneficiary')) {
         setTimeout(() => setIsLoginOpen(true), 100);
         return <HeroSection onNavigate={navigate} />; 
     }
