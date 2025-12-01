@@ -12,6 +12,9 @@ export default defineConfig(({ mode }) => {
   
   return {
     plugins: [react()],
+    // Use relative asset paths so the app can be served from sub-paths
+    // like /dashboard without breaking module resolution.
+    base: './',
     define: {
       'process.env.API_KEY': JSON.stringify(apiKey),
       'process.env': JSON.stringify(env)
