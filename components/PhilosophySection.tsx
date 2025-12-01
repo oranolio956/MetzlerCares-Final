@@ -75,17 +75,17 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
           {/* Header Area */}
           <div className="text-center mb-16 relative z-10 w-full max-w-4xl">
             <h2 className="font-display text-[clamp(2.5rem,6vw,5rem)] font-bold text-brand-navy leading-[0.9] tracking-tight">
-              We fixed the <br/>
+              We made the <br/>
               <span className="relative inline-block text-brand-teal">
                   system
                   <svg className="absolute -bottom-2 left-0 w-full h-3 md:h-4 text-brand-yellow" viewBox="0 0 100 10" preserveAspectRatio="none">
                     <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="4" fill="none" />
                   </svg>
-              </span>.
+              </span> feel human.
             </h2>
             <p className="mt-8 text-brand-navy/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-                Most charities are "black boxes"—money goes in, but you never see the result. <br className="hidden md:block"/>
-                We built a transparent engine for direct human impact in the Colorado recovery ecosystem.
+                You deserve to know your generosity is safe and that your neighbors are cared for. <br className="hidden md:block"/>
+                Every dollar is matched to a verified need in the Colorado recovery community, and you can see where it lands.
             </p>
           </div>
 
@@ -117,9 +117,9 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
                        <Mascot expression="confused" className="w-24 h-24 grayscale opacity-80" />
                     </div>
 
-                    <h3 className="font-display font-bold text-3xl text-brand-navy mb-4">The Black Box</h3>
+                    <h3 className="font-display font-bold text-3xl text-brand-navy mb-4">The Old Way</h3>
                     <p className="text-brand-navy/60 text-lg leading-relaxed mb-8 max-w-sm">
-                       Traditional charities swallow up to 40% of donations in "overhead". You give money, but you never know if it actually helped a human in recovery.
+                       In a lot of models, administrative costs blur the impact. Donors rarely see updates, and people waiting for help feel left in the dark.
                     </p>
 
                     <div className="mt-auto w-full bg-brand-navy/5 rounded-2xl p-4 flex flex-col gap-2 opacity-70">
@@ -157,8 +157,8 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onNavigate
 
                     <h3 className="font-display font-bold text-3xl text-white mb-4">Direct Action</h3>
                     <p className="text-brand-lavender text-lg leading-relaxed mb-8 max-w-sm">
-                       We verify the need (Rent, Tools, Transit) in Denver/Boulder and pay the <span className="text-brand-teal font-bold">vendor directly</span>. 
-                       Zero fraud. Zero waste. You see the receipt.
+                       We verify each need—rent, tools, transit—in Denver and Boulder and pay the <span className="text-brand-teal font-bold">vendor directly</span>.
+                       You get receipts, and neighbors get steady support without friction.
                     </p>
 
                     <div className="mt-auto w-full bg-white/5 rounded-2xl p-4 flex flex-col gap-2 border border-brand-teal/20">

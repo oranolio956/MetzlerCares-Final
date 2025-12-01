@@ -113,13 +113,13 @@ export const PeerCoachingSection: React.FC<PeerCoachingSectionProps> = ({ onNavi
                 </div>
                 
                 <h1 className="font-display font-bold text-[3.5rem] md:text-[5rem] leading-[0.95] text-brand-navy mb-6 tracking-tight animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                    Stop asking. <br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-coral via-brand-yellow to-brand-coral bg-[length:200%_auto] animate-text-shimmer">Start claiming.</span>
+                    You deserve support. <br/>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-coral via-brand-yellow to-brand-coral bg-[length:200%_auto] animate-text-shimmer">Let's unlock it together.</span>
                 </h1>
-                
+
                 <p className="text-lg md:text-xl text-brand-navy/60 leading-relaxed mb-10 font-medium animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                    You have insurance. That means you have a budget. <br className="hidden md:block"/>
-                    We assign you a <span className="text-brand-navy font-bold">Personal Recovery Agent</span> to navigate the system, handle your paperwork, and get your bills paid.
+                    Your coverage can fund real help. <br className="hidden md:block"/>
+                    We pair you with a <span className="text-brand-navy font-bold">Personal Recovery Agent</span> who handles the paperwork gently, keeps you informed, and gets bills paid without you having to push.
                 </p>
 
                 {/* Interactive Eligibility Checker - Multi-Step Questionnaire */}
@@ -198,7 +198,7 @@ export const PeerCoachingSection: React.FC<PeerCoachingSectionProps> = ({ onNavi
                         <div className="w-full px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 animate-in fade-in duration-300">
                             <div className="flex items-center gap-2 text-brand-coral font-bold text-sm">
                                 <XCircle size={18} className="shrink-0" />
-                                <span>Currently available in CO only.</span>
+                                <span>We're live in Colorado today and working to welcome other states soon.</span>
                             </div>
                             <button 
                                 onClick={() => setCheckState('idle')}
