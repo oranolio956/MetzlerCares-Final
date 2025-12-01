@@ -127,7 +127,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate }) => {
                    
                    {/* Subtext */}
                    <p className="mt-8 text-lg md:text-xl lg:text-2xl text-brand-navy/60 font-medium max-w-xl animate-slide-up opacity-0 leading-relaxed" style={{ animationDelay: '0.4s' }}>
-                      The platform for direct-action aid. We replace bureaucracy with instant, verified funding for sober living rent and rehab access in Denver & Boulder.
+                      A calm place to ask for help and to give it. We move support quickly to verified sober living and treatment partners in Denver &amp; Boulder so people can stay housed, connected, and safe.
                    </p>
 
                    {/* Mobile Only HUD - Kept under text for immediate action */}

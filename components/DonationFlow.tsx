@@ -108,6 +108,9 @@ export const DonationFlow: React.FC = () => {
                Choose where to <br/>
                <span className="text-brand-teal opacity-100 relative inline-block">Support<svg className="absolute -bottom-2 left-0 w-full h-3 text-brand-yellow/50" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="4" fill="none" /></svg></span>.
             </h3>
+            <p className="mt-4 text-lg text-brand-navy/60 max-w-2xl leading-relaxed">
+               Every choice is pre-vetted with a real vendor, so your gift immediately covers food, housing, work tools, or urgent gaps without guesswork.
+            </p>
          </div>
          <div className="flex flex-col items-start md:items-end gap-2 w-full md:w-auto">
             <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-xl border border-brand-navy/10 shadow-sm transition-transform hover:scale-105 w-full md:w-auto justify-center md:justify-start">
